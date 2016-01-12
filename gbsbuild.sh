@@ -8,6 +8,9 @@ version=`echo $version|cut -d" " -f 1`
 
 name=iotivity
 
+which git
+which gbs
+
 rm -rf $name-$version
 
 builddir=`pwd`
@@ -24,6 +27,8 @@ mkdir ./tmp/extlibs/
 mkdir ./tmp/packaging
 cp -R ./build_common $sourcedir/tmp
 cp -R ./examples $sourcedir/tmp
+
+${SHELL} ./prep.sh
 
 # tinycbor is available as soft-link, so copying with 'dereference' option.
 cp -LR ./extlibs/tinycbor $sourcedir/tmp/extlibs
