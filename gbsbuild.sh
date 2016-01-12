@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 spec=`ls tools/tizen/*.spec`
 version=`rpm --query --queryformat '%{version}\n' --specfile $spec`
@@ -7,6 +8,11 @@ name=`echo $name|cut -d" " -f 1`
 version=`echo $version|cut -d" " -f 1`
 
 name=iotivity
+tinycbor_url='https://github.com/01org/tinycbor.git'
+
+which git
+which rpm
+which gbs
 
 rm -rf $name-$version
 
@@ -14,6 +20,12 @@ builddir=`pwd`
 sourcedir=`pwd`
 
 echo `pwd`
+
+grep 'email *= *' ~/.gitconfig \
+    || git config --global user.email "you@example.com"
+
+grep 'name *= *' ~/.gitconfig \
+    || git config --global user.name "Your Name"
 
 # Clean tmp directory.
 rm -rf ./tmp
@@ -24,6 +36,12 @@ mkdir ./tmp/extlibs/
 mkdir ./tmp/packaging
 cp -R ./build_common $sourcedir/tmp
 cp -R ./examples $sourcedir/tmp
+
+# Fetch tinycbor sources if not available locally
+if [ ! -e 'extlibs/tinycbor/tinycbor' ] ; then
+    echo "warning: fetching online sources may not be reproductible"
+    git clone $tinycbor_url extlibs/tinycbor/tinycbor
+fi
 
 # tinycbor is available as soft-link, so copying with 'dereference' option.
 cp -LR ./extlibs/tinycbor $sourcedir/tmp/extlibs
@@ -57,8 +75,6 @@ rm -rf ./extlibs/tinycbor/tinycbor/.git*
 # Initialize Git repository
 if [ ! -d .git ]; then
    git init ./
-   git config user.email "you@example.com"
-   git config user.name "Your Name"
    git add ./
    git commit -m "Initial commit"
 fi
