@@ -10,9 +10,15 @@ YOCTOCXXFLAGS=-I$(SDKTARGETSYSROOT)/usr/include/iotivity/resource/ -I$(SDKTARGET
 
 YOCTOLDFLAGS=-loc -loctbstack -loc_logger -lmraa
 
-CXXFLAGS=-I../../resource/include -I../../resource/c_common -I../../resource/csdk/stack/include -I../../resource/c_common/ocrandom/include -I../../resource/csdk/logger/include -I../../resource/oc_logger/include
 
-LDFLAGS=-L../../out/${OSTYPE}/$(CLIENTARCH)/$(BUILDTYPE) \
+IOTIVITY_DIR?=../../
+
+CXXFLAGS=-I${IOTIVITY_DIR}resource/include -I${IOTIVITY_DIR}resource/c_common -I${IOTIVITY_DIR}resource/csdk/stack/include -I${IOTIVITY_DIR}resource/c_common/ocrandom/include -I${IOTIVITY_DIR}resource/csdk/logger/include -I${IOTIVITY_DIR}resource/oc_logger/include
+
+CXXFLAGS+=-I${IOTIVITY_DIR}resource/c_common -I${IOTIVITY_DIR}resource/include
+
+
+LDFLAGS=-L${IOTIVITY_DIR}out/${OSTYPE}/$(CLIENTARCH)/$(BUILDTYPE) \
   -loc -loctbstack -loc_logger \
   -lconnectivity_abstraction
 
