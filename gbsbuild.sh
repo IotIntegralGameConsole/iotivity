@@ -39,7 +39,7 @@ cp -R ./examples $sourcedir/tmp
 
 # Fetch tinycbor sources if not available locally
 if [ ! -e 'extlibs/tinycbor/tinycbor' ] ; then
-    echo "warning: fetching online sources may not be reproductible"
+    echo "warning: fetching online sources may not be reproductible" && sleep 10
     git clone $tinycbor_url extlibs/tinycbor/tinycbor
 fi
 
@@ -50,6 +50,16 @@ rm -rf $sourcedir/tmp/extlibs/tinycbor/tinycbor/.git
 cp -R ./extlibs/cjson $sourcedir/tmp/extlibs
 cp -R ./extlibs/gtest $sourcedir/tmp/extlibs
 cp -R ./extlibs/tinydtls $sourcedir/tmp/extlibs
+
+# Fetch mysql if not available locally
+sqlite_url='http://www.sqlite.org/2015/sqlite-amalgamation-3081101.zip'
+sqlite_file=$(basename -- "$sqlite_url")
+if [ ! -e 'extlibs/sqlite3/$sqlite_file' ] ; then
+    echo "warning: fetching online sources may not be reproductible" && sleep 10
+    cd extlibs/sqlite3 && wget -nc "$sqlite_url" && unzip $sqlite_file && mv */* .
+    cd -
+fi
+
 cp -R ./extlibs/sqlite3 $sourcedir/tmp/extlibs
 cp -R ./extlibs/timer $sourcedir/tmp/extlibs
 cp -R ./extlibs/rapidxml $sourcedir/tmp/extlibs
