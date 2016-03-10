@@ -698,7 +698,7 @@ TEST_F(ResourceObjectInterfaceHandlerTest, ThrowIfDefaultInterfaceIsInvalid)
 
 TEST_F(ResourceObjectInterfaceHandlerTest, SettingDefaultInterfaceEqualsGetDefaultInterface)
 {
-    initServer({SENSOR_INTERFACE}, BASELINE_INTERFACE);
+    initServer({ SENSOR_INTERFACE }, BASELINE_INTERFACE);
 
     EXPECT_EQ(BASELINE_INTERFACE, server->getDefaultInterface());
 }
