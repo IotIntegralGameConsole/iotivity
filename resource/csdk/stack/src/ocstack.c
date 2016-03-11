@@ -2070,7 +2070,7 @@ OCStackResult OCInit1(OCMode mode, OCTransportFlags serverFlags, OCTransportFlag
 #endif
 
 #ifdef TCP_ADAPTER
-    if(result == OC_STACK_OK)
+    if (result == OC_STACK_OK)
     {
         result = InitializeKeepAlive(myStackMode);
     }
