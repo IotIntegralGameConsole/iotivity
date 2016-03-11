@@ -3,6 +3,7 @@ default: all
 #Set the two variables below for the client build.
 CLIENTARCH?=x86
 BUILDTYPE?=release
+OSTYPE?=linux
 ##
 
 YOCTOCXXFLAGS=-I$(SDKTARGETSYSROOT)/usr/include/iotivity/resource/ -I$(SDKTARGETSYSROOT)/usr/include/iotivity/resource/stack -I$(SDKTARGETSYSROOT)/usr/include/iotivity/resource/ocrandom -I$(SDKTARGETSYSROOT)/usr/include/iotivity/resource/logger -I$(SDKTARGETSYSROOT)/usr/include/iotivity/resource/oc_logger
@@ -11,7 +12,9 @@ YOCTOLDFLAGS=-loc -loctbstack -loc_logger -lmraa
 
 CXXFLAGS=-I../../resource/include -I../../resource/c_common -I../../resource/csdk/stack/include -I../../resource/c_common/ocrandom/include -I../../resource/csdk/logger/include -I../../resource/oc_logger/include
 
-LDFLAGS=-L../../out/linux/$(CLIENTARCH)/$(BUILDTYPE) -loc -loctbstack -loc_logger
+LDFLAGS=-L../../out/${OSTYPE}/$(CLIENTARCH)/$(BUILDTYPE) \
+  -loc -loctbstack -loc_logger \
+  -lconnectivity_abstraction
 
 install_dir?=${DESTDIR}/usr/lib/iotivity/examples/OICSensorBoard
 
