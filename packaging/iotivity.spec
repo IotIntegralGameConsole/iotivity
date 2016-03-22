@@ -1,5 +1,5 @@
 Name: iotivity
-Version: 1.1.0+RC1
+Version: 1.1.0+RC1+63+g2a7b046
 Release: 0
 Summary: IoTivity Base Stack & IoTivity Services
 Group: System Environment/Libraries
@@ -75,7 +75,8 @@ Contains samples applications that use %{name}.
 
 %define secure_mode 0
 %define RPM_ARCH %{_arch}
-%define TARGET_OS tizen
+#%define TARGET_OS tizen
+%define TARGET_OS linux
 
 # overide to prevent issues
 %define _smp_mflags -j4
