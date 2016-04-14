@@ -4241,7 +4241,11 @@ void insertResourceType(OCResource *resource, OCResourceType *resourceType)
             previous = pointer;
             pointer = pointer->next;
         }
-        previous->next = resourceType;
+
+        if (previous)
+        {
+            previous->next = resourceType;
+        }
     }
     resourceType->next = NULL;
 
