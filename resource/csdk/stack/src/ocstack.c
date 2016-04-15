@@ -1674,6 +1674,11 @@ void OCHandleRequests(const CAEndpoint_t* endPoint, const CARequestInfo_t* reque
     {
         serverRequest.reqTotalSize = requestInfo->info.payloadSize;
         serverRequest.payload = (uint8_t *) OICMalloc(requestInfo->info.payloadSize);
+        if (!serverRequest.payload)
+        {
+            OIC_LOG(ERROR, TAG, "Allocation for payload failed.");
+            return;
+        }
         memcpy (serverRequest.payload, requestInfo->info.payload,
                 requestInfo->info.payloadSize);
     }
