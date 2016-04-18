@@ -915,14 +915,15 @@ CAResult_t CADisconnectTCPSession(CATCPSessionInfo_t *svritem, size_t index)
     }
     u_arraylist_remove(caglobals.tcp.svrlist, index);
     OICFree(svritem->recvData);
-    OICFree(svritem);
-    ca_mutex_unlock(g_mutexObjectList);
 
     // pass the connection information to CA Common Layer.
     if (g_connectionCallback)
     {
         g_connectionCallback(&(svritem->sep.endpoint), false);
     }
+
+    OICFree(svritem);
+    ca_mutex_unlock(g_mutexObjectList);
 
     return CA_STATUS_OK;
 }
