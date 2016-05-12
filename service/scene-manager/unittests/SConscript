@@ -41,7 +41,6 @@ SConscript(env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
 ######################################################################
 src_dir = lib_env.get('SRC_DIR')
 gtest_dir = src_dir + '/extlibs/gtest/gtest-1.7.0'
-SConscript(src_dir + '/extlibs/gtest/SConscript')
 
 scene_test_env = lib_env.Clone()
 target_os = env.get('TARGET_OS')
@@ -50,7 +49,6 @@ target_os = env.get('TARGET_OS')
 # Build flags
 ######################################################################
 
-scene_test_env.AppendUnique(LIBPATH = [gtest_dir + '/lib/.libs'])
 scene_test_env.AppendUnique(LIBPATH = [lib_env.get('BUILD_DIR')])
 scene_test_env.AppendUnique(LIBS = [
     'scene_manager', 'rcs_server', 'rcs_client','rcs_common',
