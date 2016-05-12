@@ -43,6 +43,15 @@ if os.environ.get('PKG_CONFIG_PATH') != None:
 if os.environ.get('PKG_CONFIG_SYSROOT_DIR') != None:
    env["ENV"]["PKG_CONFIG_SYSROOT_DIR"] = os.environ.get("PKG_CONFIG_SYSROOT_DIR")
 
+if os.environ.get('PKG_CONFIG') != None:
+   env["ENV"]["PKG_CONFIG"] = os.environ.get("PKG_CONFIG")
+
+if os.environ.get('PKG_CONFIG_PATH') != None:
+   env["ENV"]["PKG_CONFIG_PATH"] = os.environ.get("PKG_CONFIG_PATH")
+
+if os.environ.get('PKG_CONFIG_SYSROOT_DIR') != None:
+   env["ENV"]["PKG_CONFIG_SYSROOT_DIR"] = os.environ.get("PKG_CONFIG_SYSROOT_DIR")
+
 # Load extra options
 SConscript('extra_options.scons')
 
