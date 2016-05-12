@@ -24,6 +24,15 @@
 import os
 Import('env')
 
+target_os = env.get('TARGET_OS')
+src_dir = env.get('SRC_DIR')
+
+
+######################### unit test setting ##########################
+#src_dir = lib_env.get('SRC_DIR')
+gtest_dir = src_dir + '/extlibs/gtest/gtest-1.7.0'
+SConscript(src_dir + '/extlibs/gtest/SConscript')
+
 import os.path
 
 containerJavaSupport = ARGUMENTS.get('containerJavaSupport',0)
@@ -72,20 +81,13 @@ if int(containerJavaSupport):
         container_gtest_env.Append(CPPDEFINES={'JAVA_SUPPORT_TEST':0})
 
 
-target_os = env.get('TARGET_OS')
 
-######################### unit test setting ##########################
-src_dir = lib_env.get('SRC_DIR')
-gtest_dir = src_dir + '/extlibs/gtest/gtest-1.7.0'
 ######################################################################
 
 
 ######################################################################
 # Build flags
 ######################################################################
-gtest = File(gtest_dir + '/lib/.libs/libgtest.a')
-gtest_main = File(gtest_dir + '/lib/.libs/libgtest_main.a')
-
 container_gtest_env.AppendUnique(
     CPPPATH = [
         env.get('SRC_DIR')+'/extlibs',
@@ -127,7 +129,7 @@ if int(containerJavaSupport):
 
 container_gtest_env.AppendUnique(CCFLAGS = ['-Wnoexcept'])
 
-container_gtest_env.PrependUnique(LIBS = ['rcs_container', 'rcs_client', 'rcs_server', 'rcs_common', 'oc','octbstack', 'oc_logger', 'oc_logger_core', 'connectivity_abstraction', gtest, gtest_main])
+container_gtest_env.PrependUnique(LIBS = ['rcs_container', 'rcs_client', 'rcs_server', 'rcs_common', 'oc','octbstack', 'oc_logger', 'oc_logger_core', 'connectivity_abstraction', 'gtest', 'gtest_main'])
 
 container_gtest_env.AppendUnique(LIBS = ['dl'])
 
@@ -157,6 +159,10 @@ test_bundle_src = [ Glob(TEST_BUNDLE_DIR + 'src/*.cpp'), Glob('src/*.cpp')]
 TestBundle = test_bundle_env.SharedLibrary('TestBundle', test_bundle_src)
 test_bundle_env.InstallTarget(TestBundle, 'libTestBundle')
 
+test_bundle_env.PrependUnique(LIBS = [
+    'gtest',
+    'gtest_main'
+    ])
 
 ######################################################################
 # Build Test
