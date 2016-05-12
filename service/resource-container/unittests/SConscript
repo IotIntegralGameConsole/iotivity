@@ -24,15 +24,6 @@
 import os
 Import('env')
 
-target_os = env.get('TARGET_OS')
-src_dir = env.get('SRC_DIR')
-
-
-######################### unit test setting ##########################
-#src_dir = lib_env.get('SRC_DIR')
-gtest_dir = src_dir + '/extlibs/gtest/gtest-1.7.0'
-SConscript(src_dir + '/extlibs/gtest/SConscript')
-
 import os.path
 
 containerJavaSupport = ARGUMENTS.get('containerJavaSupport',0)
