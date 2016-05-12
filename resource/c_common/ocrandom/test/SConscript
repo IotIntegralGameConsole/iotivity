@@ -21,6 +21,7 @@
 Import('env')
 import os
 import os.path
+SConscript(env.get('SRC_DIR') + '/extlibs/gtest/SConscript')
 randomtest_env = env.Clone()
 
 src_dir = randomtest_env.get('SRC_DIR')

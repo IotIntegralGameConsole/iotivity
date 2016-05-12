@@ -20,6 +20,7 @@
 
 Import('env')
 import os
+SConscript(env.get('SRC_DIR') + '/extlibs/gtest/SConscript')
 
 malloctest_env = env.Clone()
 src_dir = malloctest_env.get('SRC_DIR')
