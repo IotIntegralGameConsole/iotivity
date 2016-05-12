@@ -103,8 +103,6 @@ if target_os == 'linux':
 		'utils/include'
 		])
 
-	gtest = File(gtest_dir + '/lib/.libs/libgtest.a')
-	gtest_main = File(gtest_dir + '/lib/.libs/libgtest_main.a')
 
 	rcs_common_test_env.PrependUnique(LIBS = [
 		'octbstack',
@@ -112,8 +110,8 @@ if target_os == 'linux':
 		'connectivity_abstraction',
 		'coap',
 		'rcs_common',
-		gtest,
-		gtest_main,
+		'gtest',
+		'gtest_main',
 		'pthread'
 		])
 
