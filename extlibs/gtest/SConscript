@@ -12,8 +12,8 @@ target_os = env.get('TARGET_OS')
 src_dir = env.get('SRC_DIR')
 
 targets_need_gtest = ['darwin','linux']
-gtest_dir      = src_dir + '/extlibs/gtest/gtest-1.7.0'
-gtest_zip_file = src_dir + '/extlibs/gtest/gtest-1.7.0.zip'
+gtest_dir      = os.path.join(src_dir, 'extlibs', 'gtest', 'gtest-1.7.0')
+gtest_zip_file = os.path.join(src_dir, 'extlibs', 'gtest', 'gtest-1.7.0.zip')
 gtest_url      = 'https://googletest.googlecode.com/files/gtest-1.7.0.zip'
 
 if target_os in targets_need_gtest:
@@ -79,3 +79,5 @@ elif target_os == 'linux':
 			env.Configure(gtest_dir, 'make')
 
 
+env.AppendUnique(LIBPATH = [ os.path.join(gtest_dir , 'lib', '.libs')])
+env.PrependUnique(CPPPATH = [ os.path.join(gtest_dir, 'include')])
