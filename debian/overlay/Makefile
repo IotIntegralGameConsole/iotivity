@@ -68,6 +68,8 @@ build: SConstruct deps
     TARGET_OS=${TARGET_OS} \
     TARGET_TRANSPORT=IP
 
+check: auto_build.sh
+	$< unit_tests
 
 deps/ubuntu: extlibs/boost/boost_1_55_0 
 
