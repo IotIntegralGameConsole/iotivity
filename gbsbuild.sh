@@ -41,6 +41,7 @@ cp -LR ./extlibs/tinycbor $sourcedir/tmp/extlibs
 rm -rf $sourcedir/tmp/extlibs/tinycbor/tinycbor/.git
 
 cp -R ./extlibs/cjson $sourcedir/tmp/extlibs
+cp -R ./extlibs/gtest $sourcedir/tmp/extlibs
 cp -R ./extlibs/tinydtls $sourcedir/tmp/extlibs
 
 # Fetch mysql if not available locally
