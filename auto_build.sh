@@ -40,7 +40,7 @@ function build_linux()
 function build_linux_unsecured()
 {
 	echo "*********** Build for linux ************"
-	scons RELEASE=$1 $2
+	scons VERBOSE=1 RELEASE=$1 $2
 }
 
 function build_linux_unsecured_with_rm()
