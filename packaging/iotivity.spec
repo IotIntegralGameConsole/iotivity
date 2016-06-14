@@ -40,6 +40,9 @@ Requires(post): /sbin/ldconfig
 %define RELEASE True
 %define BUILDTYPE release
 %endif
+
+%define RELEASE False
+%define BUILDTYPE debug
 %define release_mode ${RELEASE}
 
 
@@ -75,7 +78,9 @@ Contains samples applications that use %{name}.
 
 %define secure_mode 0
 %define RPM_ARCH %{_arch}
-%define TARGET_OS tizen
+
+%define TARGET_OS linux
+%define TARGET_TRANSPORT BLE
 
 # overide to prevent issues
 %define _smp_mflags -j4
@@ -106,19 +111,12 @@ scons %{?_smp_mflags} \
     SECURED=%{SECURED} \
     TARGET_ARCH=%{RPM_ARCH} \
     TARGET_OS=%{TARGET_OS} \
-    TARGET_TRANSPORT=IP
+    TARGET_TRANSPORT=%{TARGET_TRANSPORT}
 
 
 %install
-rm -rf %{buildroot}
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
-echo scons install --install-sandbox=%{buildroot} --prefix=%{_prefix} \
-    TARGET_OS=%{TARGET_OS} \
-    TARGET_ARCH=%{RPM_ARCH} \
-    TARGET_TRANSPORT=%{TARGET_TRANSPORT} \
-	RELEASE=%{RELEASE} SECURED=%{SECURED} LOGGING=%{LOGGING} ROUTING=%{ROUTING} \
-	LIB_INSTALL_DIR=%{_libdir}
 
 install -d %{buildroot}%{_sbindir}
 
@@ -153,16 +151,14 @@ install -d %{buildroot}%{_libdir}/%{name}/examples/
 install out/%{TARGET_OS}/%{RPM_ARCH}/%{BUILDTYPE}/resource/examples/*client %{buildroot}%{_libdir}/%{name}/examples/
 install out/%{TARGET_OS}/%{RPM_ARCH}/%{BUILDTYPE}/resource/examples/*server %{buildroot}%{_libdir}/%{name}/examples/
 
+
+%clean
+
 rm -fv %{buildroot}%{_libdir}/libcoap.a
 rm -fv %{buildroot}%{_libdir}/liboc.a
 rm -fv %{buildroot}%{_libdir}/liboc_logger.a
 rm -fv %{buildroot}%{_libdir}/libmosquitto.a
 
-rm -rf   %{buildroot}%{_includedir}/resource
-
-
-%clean
-rm -rf %{buildroot}
 
 %post -p /sbin/ldconfig
 
