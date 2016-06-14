@@ -868,7 +868,7 @@ OCStackResult CreateDoxmResource()
                                          DoxmEntityHandler,
                                          NULL,
                                          OC_OBSERVABLE | OC_SECURE |
-                                         OC_DISCOVERABLE);
+                                         OC_EXPLICIT_DISCOVERABLE);
 
     if (OC_STACK_OK != ret)
     {
