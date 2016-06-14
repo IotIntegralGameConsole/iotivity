@@ -150,6 +150,7 @@ install ./resource/c_common/*.h %{buildroot}%{_includedir}/%{name}/resource/c_co
 install -d %{buildroot}%{_libdir}/%{name}/examples/
 install out/%{TARGET_OS}/%{RPM_ARCH}/%{BUILDTYPE}/resource/examples/*client %{buildroot}%{_libdir}/%{name}/examples/
 install out/%{TARGET_OS}/%{RPM_ARCH}/%{BUILDTYPE}/resource/examples/*server %{buildroot}%{_libdir}/%{name}/examples/
+install out/%{TARGET_OS}/%{RPM_ARCH}/%{BUILDTYPE}/resource/examples/*.dat  %{buildroot}%{_libdir}/%{name}/examples/
 
 
 %clean
