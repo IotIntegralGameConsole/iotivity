@@ -80,7 +80,7 @@ Contains samples applications that use %{name}.
 %define RPM_ARCH %{_arch}
 
 %define TARGET_OS linux
-%define TARGET_TRANSPORT BLE
+%define TARGET_TRANSPORT IP
 
 # overide to prevent issues
 %define _smp_mflags -j4
