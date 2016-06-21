@@ -500,6 +500,9 @@ OCStackResult HandleSingleResponse(OCEntityHandlerResponse * ehResponse)
     responseInfo.info.resourceUri = serverRequest->resourceUrl;
     responseInfo.result = ConvertEHResultToCAResult(ehResponse->ehResult, serverRequest->method);
 
+    if (responseInfo.result != OC_STACK_OK && ehResponse->getErrorCode() ) {
+      responseInfo.result = ehResponse->getErrorCode();
+    }
     if(serverRequest->notificationFlag && serverRequest->qos == OC_HIGH_QOS)
     {
         responseInfo.info.type = CA_MSG_CONFIRM;
