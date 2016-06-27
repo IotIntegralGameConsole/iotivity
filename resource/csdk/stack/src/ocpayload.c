@@ -34,7 +34,7 @@
 
 #define TAG "OIC_RI_PAYLOAD"
 #define CSV_SEPARATOR ','
-#define CSV_SEPARATORS ",;"
+#define CSV_SEPARATORS ","
 
 static void OCFreeRepPayloadValueContents(OCRepPayloadValue* val);
 
