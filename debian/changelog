@@ -1,3 +1,9 @@
+iotivity (0.0.20160628-0~rzr2) UNRELEASED; urgency=medium
+
+  * WIP
+
+ -- Philippe Coval <rzr@gna.org>  Tue, 28 Jun 2016 05:13:51 -0400
+
 iotivity (0.0.20160627-0~rzr1) wily; urgency=medium
 
   * publish to ubuntu DISTRIBUTION=wily
