@@ -8,11 +8,14 @@ import os
 
 Import('env')
 
-target_os = env.get('TARGET_OS')
-src_dir = env.get('SRC_DIR')
+gtest_env = env.Clone()
+target_os = gtest_env.get('TARGET_OS')
+src_dir = gtest_env.get('SRC_DIR')
 
 targets_need_gtest = ['darwin','linux', 'msys_nt', 'windows']
 gtest_dir      = os.path.join(src_dir, 'extlibs', 'gtest', 'gtest-1.7.0')
+gtest_lib_dir = os.path.join(gtest_dir,'lib')
+gtest_dotlib_dir =  os.path.join(gtest_lib_dir, '.libs')
 gtest_zip_file = os.path.join(src_dir, 'extlibs', 'gtest', 'gtest-1.7.0.zip')
 gtest_url      = 'https://googletest.googlecode.com/files/gtest-1.7.0.zip'
 
@@ -22,7 +25,7 @@ if target_os in targets_need_gtest:
 	if not os.path.exists(gtest_dir):
 		# If the gtest zip file is not already present, download it
 		if not os.path.exists(gtest_zip_file):
-			gtest_zip = env.Download(gtest_zip_file, gtest_url)
+			gtest_zip = gtest_env.Download(gtest_zip_file, gtest_url)
 		else:
 			gtest_zip = gtest_zip_file
 
@@ -35,20 +38,18 @@ if target_os in targets_need_gtest:
 if target_os == 'darwin':
 	if os.path.exists(gtest_dir):
 		# Build gtest and store it at a temporary directory
-		gtest_lib_dir = gtest_dir + '/lib'
-		gtest_dotlib_dir = gtest_lib_dir + '/.libs'
 
-        if not os.path.exists(gtest_lib_dir):
+		if not os.path.exists(gtest_lib_dir):
 #			print 'Create a directory'
 #			os.mkdir(gtest_lib_dir)
 
 
 			print 'Invoke cmake command to generate appropriate make files'
-			env.Configure(gtest_dir, './configure')
+			gtest_env.Configure(gtest_dir, './configure')
 
 			# Run make on gtest
 			print 'Making google unit test'
-			env.Configure(gtest_dir, 'make')
+			gtest_env.Configure(gtest_dir, 'make')
 
 #			print 'Create a directory'
 #			os.mkdir(gtest_dotlib_dir)
@@ -67,23 +68,20 @@ if target_os == 'darwin':
 
 elif target_os == 'linux':
 	if os.path.exists(gtest_dir):
-		if not os.path.exists(gtest_dir + "/lib"):
+		if not os.path.exists(gtest_lib_dir):
 			# Run configure on gtest
 			print 'Configuring google unit test'
-			if env.get('CROSS_COMPILE'):
-				env.Configure(gtest_dir, './configure --host=' + env['CROSS_COMPILE'])
+			if gtest_env.get('CROSS_COMPILE'):
+				gtest_env.Configure(gtest_dir, './configure --host=' + env['CROSS_COMPILE'])
 			else:
-				env.Configure(gtest_dir, './configure')
+				gtest_env.Configure(gtest_dir, './configure')
 
 			# Run make on gtest
 			print 'Making google unit test'
-			env.Configure(gtest_dir, 'make')
-
+			gtest_env.Configure(gtest_dir, 'make')
 
 elif target_os == 'msys_nt':
 	if os.path.exists(gtest_dir):
-		gtest_lib_dir = gtest_dir + '/lib'
-		gtest_dotlib_dir = gtest_lib_dir + '/.libs'
 		if not os.path.exists(gtest_lib_dir):
 			# Create lib dir
 			os.mkdir(gtest_lib_dir)
@@ -105,8 +103,6 @@ elif target_os == 'msys_nt':
 
 elif target_os == 'windows':
 	if os.path.exists(gtest_dir):
-		gtest_lib_dir = os.path.join(gtest_dir, 'lib')
-		gtest_dotlib_dir = os.path.join(gtest_lib_dir, '.libs')
 		if env.get('RELEASE'):
 			output_dir = os.path.join(gtest_dir, 'Release') + os.sep
 		else:
@@ -172,3 +168,10 @@ elif target_os == 'windows':
 			env.Configure(gtest_dir, 'copy '+output_dir+'gtest_main.lib %s' % gtest_lib_dir)
 			env.Configure(gtest_dir, 'move '+output_dir+'gtest_main.lib %s' % gtest_dotlib_dir)
 
+# Export flags once
+if target_os in targets_need_gtest:
+	gtest_env.AppendUnique(LIBPATH = [ gtest_dotlib_dir])
+	gtest_env.PrependUnique(CPPPATH = [ os.path.join(gtest_dir, 'include')])
+	gtest_env.AppendENVPath('LD_LIBRARY_PATH', gtest_dotlib_dir)
+
+Return('gtest_env')
