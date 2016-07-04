@@ -37,7 +37,7 @@ unittests_env.PrependUnique(CPPPATH = [
 		])
 
 unittests_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall', '-pthread'])
-unittests_env.PrependUnique(LIBS = ['-lpthread'])
+unittests_env.PrependUnique(LIBS = ['pthread'])
 unittests_env.AppendUnique(LIBPATH = [unittests_env.get('BUILD_DIR')])
 unittests_env.PrependUnique(LIBS = [
 		'plugin_interface',

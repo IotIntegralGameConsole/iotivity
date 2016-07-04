@@ -49,7 +49,7 @@ enrollee_test_env.PrependUnique(CPPPATH = [
 		enrollee_test_env.get('SRC_DIR') + '/service/easy-setup/enrollee/src'])
 
 enrollee_test_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall', '-pthread'])
-enrollee_test_env.AppendUnique(LIBS = ['-lpthread'])
+enrollee_test_env.AppendUnique(LIBS = ['pthread'])
 enrollee_test_env.AppendUnique(LIBPATH = [enrollee_test_env.get('BUILD_DIR')])
 enrollee_test_env.PrependUnique(LIBS = ['m',
                                     'octbstack',

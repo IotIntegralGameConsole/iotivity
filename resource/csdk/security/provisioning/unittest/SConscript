@@ -53,7 +53,7 @@ sptest_env.PrependUnique(CPPPATH = [
 		'../../../../../extlibs/tinydtls'
 		])
 sptest_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall', '-pthread'])
-sptest_env.AppendUnique(LIBS = ['-lpthread','-ldl'])
+sptest_env.AppendUnique(LIBS = ['dl', 'pthread'])
 sptest_env.AppendUnique(LIBPATH = [sptest_env.get('BUILD_DIR')])
 sptest_env.PrependUnique(LIBS = [   'ocpmapi',
                                     'oc',
