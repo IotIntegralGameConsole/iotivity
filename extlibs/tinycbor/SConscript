@@ -25,14 +25,15 @@ Import('env')
 src_dir = env.get('SRC_DIR')
 
 cborDir = os.path.join(src_dir, 'extlibs','tinycbor','tinycbor')
+cborRevision = 'v0.3.2'
 
 if not os.path.exists(cborDir):
     print '''
 *********************************** Error: ****************************************
 * Please download cbor using the following command:                               *
-*     $ git clone https://github.com/01org/tinycbor.git extlibs/tinycbor/tinycbor *
+*   $ git clone https://github.com/01org/tinycbor.git extlibs/tinycbor/tinycbor -b %s *
 ***********************************************************************************
-'''
+''' % cborRevision
     Exit(1)
 
 cbor_src = [
