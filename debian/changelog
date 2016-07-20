@@ -1,3 +1,9 @@
+iotivity (0.0.20160711.0-0~rzr1) trusty; urgency=medium
+
+  * wip
+
+ -- Philippe Coval <philippe.coval@osg.samsung.com>  Wed, 20 Jul 2016 13:12:14 +0200
+
 iotivity (0.0.20160628.3-0~rzr3) wily; urgency=medium
 
   * publish to ubuntu DISTRIBUTION=wily
