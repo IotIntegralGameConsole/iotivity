@@ -1,10 +1,10 @@
-iotivity (0.0.20160721.0-0~rzr0) UNRELEASED; urgency=medium
+iotivity (0.0.20160721-0~rzr1) UNRELEASED; urgency=medium
 
   * wip
 
- -- Philippe Coval <rzr@gna.org>  Thu, 21 Jul 2016 15:07:09 +0200
+ -- Philippe Coval <rzr@gna.org>  Thu, 21 Jul 2016 15:07:52 +0200
 
-iotivity (0.0.20160720.1.0-0~rzr6+xenial1) xenial; urgency=medium
+iotivity (0.0.20160720-0~rzr6+xenial1) xenial; urgency=medium
 
   * wip
 
