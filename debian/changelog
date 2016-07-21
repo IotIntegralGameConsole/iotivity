@@ -1,3 +1,21 @@
+iotivity (0.0.0-0~rzr2) trusty; urgency=medium
+
+  * publish to ubuntu DISTRIBUTION=trusty
+
+ -- Philippe Coval <rzr@gna.org>  Thu, 21 Jul 2016 16:50:01 +0200
+
+iotivity (0.0.0-0~rzr1) trusty; urgency=medium
+
+  * WIP: http://rzr.online.fr/q/snapshot#iotivity
+
+ -- Philippe Coval <rzr@gna.org>  Thu, 21 Jul 2016 16:49:16 +0200
+
+iotivity (0.0.0-0) trusty; urgency=medium
+
+  * WIP: http://rzr.online.fr/q/snapshot#iotivity
+
+ -- Philippe Coval <rzr@gna.org>  Thu, 21 Jul 2016 16:49:00 +0200
+
 iotivity (0.0.20160721-0~rzr1) unstable; urgency=medium
 
   * wip
