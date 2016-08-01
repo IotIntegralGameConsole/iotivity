@@ -230,6 +230,15 @@ extern "C" {
 /** For Server instance ID.*/
 #define OC_RSRVD_SERVER_INSTANCE_ID     "sid"
 
+/** To represent endpoints.*/
+#define OC_RSRVD_ENDPOINTS              "eps"
+
+/** To represent endpoint.*/
+#define OC_RSRVD_ENDPOINT               "ep"
+
+/** To represent priority.*/
+#define OC_RSRVD_PRIORITY               "pri"
+
 /**
  *  Platform.
  */
@@ -1225,6 +1234,42 @@ typedef struct
     OCStringLL *dataModelVersions;
 } OCDeviceInfo;
 
+/**
+ *  This enum type for indicate Transport Protocol Suites
+ */
+typedef enum
+{
+    /** For initialize */
+    OC_NO_TPS         = 0,
+
+    /** coap + udp */
+    OC_COAP           = 1,
+
+    /** coaps + udp */
+    OC_COAPS          = (1 << 1),
+
+#ifdef TCP_ADAPTER
+    /** coap + tcp */
+    OC_COAP_TCP       = (1 << 2),
+
+    /** coaps + tcp */
+    OC_COAPS_TCP      = (1 << 3),
+#endif
+#ifdef HTTP_ADAPTER
+    /** http + tcp */
+    OC_HTTP           = (1 << 4),
+
+    /** https + tcp */
+    OC_HTTPS          = (1 << 5),
+#endif
+#ifdef EDR_ADAPTER
+    /** coap + rfcomm */
+    OC_COAP_RFCOMM    = (1 << 6),
+#endif
+    /** Allow all endpoint.*/
+    OC_ALL       = 0xffff
+} OCTpsSchemeFlags;
+
 #ifdef RA_ADAPTER
 /**
  * callback for bound JID
@@ -1354,6 +1399,17 @@ typedef struct OCRepPayload
     struct OCRepPayload* next;
 } OCRepPayload;
 
+// used inside a resource payload
+typedef struct OCEndpointPayload
+{
+    char* tps;
+    char* addr;
+    OCTransportFlags family;
+    uint16_t port;
+    uint16_t pri;
+    struct OCEndpointPayload* next;
+} OCEndpointPayload;
+
 // used inside a discovery payload
 typedef struct OCResourcePayload
 {
@@ -1367,6 +1423,7 @@ typedef struct OCResourcePayload
     uint16_t tcpPort;
 #endif
     struct OCResourcePayload* next;
+    OCEndpointPayload* eps;
 } OCResourcePayload;
 
 typedef struct OCDiscoveryPayload
