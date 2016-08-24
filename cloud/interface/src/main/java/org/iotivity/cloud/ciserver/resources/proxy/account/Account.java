@@ -76,6 +76,9 @@ public class Account extends Resource {
                                     uriPath.toString(), mRequest.getUriQuery()),
                             mSrcDevice);
                     break;
+                case CHANGED:
+                    mSrcDevice.sendResponse(response);
+                    break;
                 default:
                     mSrcDevice.sendResponse(response);
             }
