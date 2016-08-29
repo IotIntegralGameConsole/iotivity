@@ -102,6 +102,9 @@ BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(ttrace)
 BuildRequires:  pkgconfig(capi-network-connection)
 BuildRequires:  pkgconfig(capi-network-bluetooth) >= 0.1.52
+%if 3 <= 0%{?tizen_version_major}
+BuildRequires:  bluetooth-tools-profile_%{profile}
+%endif
 %else
 %if 0%{?fedora:1}
 BuildRequires:  sqlite-devel
