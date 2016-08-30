@@ -101,3 +101,5 @@ OCStartPresence
 OCStop
 OCStopPresence
 OCUnBindResource
+OCSetHeaderOption
+OCGetHeaderOption
