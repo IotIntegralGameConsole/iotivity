@@ -86,7 +86,6 @@ out/
 platform
 
 # Ignore downloaded dependencies
-extlibs/gtest/gtest-*
 extlibs/hippomocks-master/
 extlibs/master.zip
 extlibs/cereal/cereal
@@ -98,7 +97,6 @@ extlibs/android/sdk/android-sdk-linux
 extlibs/android/sdk/android-sdk-macosx
 extlibs/android/sdk/android-sdk-windows
 extlibs/boost/boost_1_58_0
-extlibs/tinycbor/tinycbor
 *.tgz
 *.zip
 extlibs/arduino/arduino-1.5.8
