@@ -24,13 +24,9 @@ Requires(post): /sbin/ldconfig
 %en_speedpython
 %endif
 
-## If tizen 2.x, RELEASE follows tizen_build_binary_release_type_eng. ##
-## and if tizen 3.0, RELEASE follows tizen_build_devel_mode. ##
-%if 0%{?tizen_build_devel_mode} == 1 || 0%{?tizen_build_binary_release_type_eng} == 1
-%define RELEASE False
-%else
+# default is RELEASE mode.
+# If DEBUG mode is needed, please use tizen_build_devel_mode
 %define RELEASE True
-%endif
 
 %{!?TARGET_TRANSPORT: %define TARGET_TRANSPORT IP}
 %{!?LOGGING: %define LOGGING True}
