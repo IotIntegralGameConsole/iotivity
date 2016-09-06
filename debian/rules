@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+V=1
+
+default: rule/debuild
+
+%:
+	dh $@
+
+
+version?=$(shell [ -r debian/changelog ] && dpkg-parsechangelog | grep "Version:" | sed -e "s/Version: \(.*\)-.*/\1/g" )
+tarball?=${CURDIR}/../iotivity_${version}.orig.tar.xz
+
+rule/debuild: ${tarball}
+	debuild
+
+${tarball}: ${CURDIR}
+	cd .. && tar cvfJ \
+ $@ \
+ --exclude 'debian' --exclude-vcs \
+ ${<F}/
