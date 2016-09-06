@@ -1,0 +1,11 @@
+iotivity (1.2.1-0) UNRELEASED; urgency=medium
+
+  * Bump version
+
+ -- Philippe Coval <philippe.coval@osg.samsung.com>  Thu, 09 Mar 2017 21:04:20 +0100
+
+iotivity (0.0.0-0) unstable; urgency=low
+
+  * Initial release (Closes: #824155)
+
+ -- Philippe Coval <rzr@gna.org>  Tue, 01 Dec 2015 23:32:27 +0000
