@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Comment this to turn off verbose mode.
+export DH_VERBOSE=1
+V=1
+version?=$(shell [ -r debian/changelog ] && dpkg-parsechangelog \
+	| grep "Version:" | sed -e "s/Version: \(.*\)-.*/\1/g" )
+tarball?=${CURDIR}/../iotivity_${version}.orig.tar.xz
+export tarball
+
+default: rule/debuild
+
+%:
+	dh $@ tarball=${tarball}
+
+rule/debuild: ${tarball}
+	which ${@F} \
+|| sudo apt-get install devscripts debhelper
+	${@F}
+
+${tarball}:
+	make dist
