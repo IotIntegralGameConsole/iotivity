@@ -1,0 +1,11 @@
+iotivity (1.2.1-0) unstable; urgency=medium
+
+  * Bump version
+
+ -- Philippe Coval <rzr@users.sf.net>  Wed, 07 Jun 2017 14:25:51 +0200
+
+iotivity (0.0.0-0) unstable; urgency=low
+
+  * Initial release (Closes: #824155)
+
+ -- Philippe Coval <rzr@users.sf.net>  Tue, 01 Dec 2015 23:32:27 +0000
