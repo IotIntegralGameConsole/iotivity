@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 # ex: set tabstop=4 noexpandtab:
+#{
 # Copyright 2017 Samsung Electronics France SAS
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +15,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#}
 
 name?=iotivity
 
 default/%:
 	@echo "# $@ ignored"
-
 
 default: all
 
@@ -151,7 +152,10 @@ check/default: auto_build.sh
 check/unknown:
 	@echo "${@D}: TODO support arch"
 
-check: check/${host_arch}
+check/skip:
+	@echo "${@D}: TODO support arch"
+
+check: check/skip
 	@echo "TODO: verify $<"
 
 install/scons:
