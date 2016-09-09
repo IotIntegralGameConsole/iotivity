@@ -19,4 +19,5 @@ Cflags: -I${includedir}/resource \
 			-I${svcincludedir}/resource-directory \
 			-I${svcincludedir}/things-manager \
 			-D@ROUTING_DEFINE@ \
-			-D__WITH_DTLS__
+			-D__WITH_DTLS__ \
+			-DTCP_ADAPTER
