@@ -70,6 +70,15 @@ EOF
     if [ ! -e 'extlibs/sqlite3/$sqlite_file' ] ; then
         do_ "cd ${sqlite_dir} && wget -nc $sqlite_url && unzip ${sqlite_archive} && mv */* ."
     fi
+
+    echo "# Checking for mbedtls presence:"
+    mbedtls_url='https://github.com/ARMmbed/mbedtls.git'
+    mbedtls_dir="extlibs/mbedtls/mbedtls"
+    mbedtls_rev="2.3.0"
+    if [ ! -e "${mbedtls_dir}" ] ; then
+        do_ "git clone -b ${mbedtls_rev} ${mbedtls_url} ${mbedtls_dir} "
+    fi
+
 }
 
 
