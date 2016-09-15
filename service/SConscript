@@ -52,8 +52,8 @@ if target_os not in ['arduino','darwin', 'ios', 'windows']:
         SConscript('simulator/SConscript')
 
     # Build resource directory project
-    #if env.get('WITH_RD') == '1':
-        #SConscript('resource-directory/SConscript')
+    if env.get('WITH_RD') == '1':
+        SConscript('resource-directory/SConscript')
 
     # Build coap-http-proxy project
     if target_os in ['linux'] and env.get('WITH_PROXY', False):
