@@ -331,7 +331,7 @@ CAResult_t CAReceiveBlockWiseData(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
         CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
                 receivedData->responseInfo->info.token,
                 receivedData->responseInfo->info.tokenLength,
-                endpoint->port);
+                endpoint->addr, endpoint->port);
         if (NULL == blockDataID || blockDataID->idLength < 1)
         {
             // if retransmission is timeout, callback msg will be send without token.
@@ -394,7 +394,7 @@ CAResult_t CAReceiveBlockWiseData(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
         CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
                 (CAToken_t)pdu->transport_hdr->udp.token,
                 pdu->transport_hdr->udp.token_length,
-                endpoint->port);
+                endpoint->addr, endpoint->port);
         if (NULL == blockDataID || blockDataID->idLength < 1)
         {
             OIC_LOG(ERROR, TAG, "blockId is null");
@@ -875,7 +875,7 @@ CAResult_t CASetNextBlockOption1(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
             (CAToken_t)pdu->transport_hdr->udp.token,
             pdu->transport_hdr->udp.token_length,
-            endpoint->port);
+            endpoint->addr, endpoint->port);
     if (NULL == blockDataID || blockDataID->idLength < 1)
     {
         OIC_LOG(ERROR, TAG, "blockId is null");
@@ -1018,7 +1018,7 @@ CAResult_t CASetNextBlockOption2(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
             (CAToken_t)pdu->transport_hdr->udp.token,
             pdu->transport_hdr->udp.token_length,
-            endpoint->port);
+            endpoint->addr, endpoint->port);
     if (NULL == blockDataID || blockDataID->idLength < 1)
     {
         OIC_LOG(ERROR, TAG, "blockId is null");
@@ -1405,7 +1405,7 @@ CAResult_t CAAddBlockOption(coap_pdu_t **pdu, const CAInfo_t *info,
     CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
             (CAToken_t)(*pdu)->transport_hdr->udp.token,
             (*pdu)->transport_hdr->udp.token_length,
-            endpoint->port);
+            endpoint->addr, endpoint->port);
     if (NULL == blockDataID || blockDataID->idLength < 1)
     {
         OIC_LOG(ERROR, TAG, "blockId is null");
@@ -2366,7 +2366,7 @@ CAResult_t CACheckBlockDataValidation(const CAData_t *sendData, CABlockData_t **
         CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
                 (CAToken_t)sendData->responseInfo->info.token,
                 sendData->responseInfo->info.tokenLength,
-                sendData->remoteEndpoint->port);
+                sendData->remoteEndpoint->addr, sendData->remoteEndpoint->port);
         if (NULL == blockDataID || blockDataID->idLength < 1)
         {
             OIC_LOG(ERROR, TAG, "blockId is null");
@@ -2519,6 +2519,7 @@ CABlockData_t *CACreateNewBlockData(const CAData_t *sendData)
     }
 
     CABlockDataID_t* blockDataID = CACreateBlockDatablockId(token, tokenLength,
+                                                            data->sentData->remoteEndpoint->addr,
                                                             data->sentData->remoteEndpoint->port);
     if (NULL == blockDataID || blockDataID->idLength < 1)
     {
@@ -2627,8 +2628,9 @@ void CADestroyDataSet(CAData_t* data)
 }
 
 CABlockDataID_t* CACreateBlockDatablockId(const CAToken_t token, uint8_t tokenLength,
-                                          uint16_t portNumber)
+                                          const char* addr, uint16_t portNumber)
 {
+    size_t addrLength = strlen(addr);
     char port[PORT_LENGTH] = { 0, };
     port[0] = (char) ((portNumber >> 8) & 0xFF);
     port[1] = (char) (portNumber & 0xFF);
@@ -2639,7 +2641,7 @@ CABlockDataID_t* CACreateBlockDatablockId(const CAToken_t token, uint8_t tokenLe
         OIC_LOG(ERROR, TAG, "memory alloc has failed");
         return NULL;
     }
-    blockDataID->idLength = tokenLength + sizeof(port);
+    blockDataID->idLength = tokenLength + sizeof(port) + addrLength;
     blockDataID->id = (uint8_t *) OICMalloc(blockDataID->idLength);
     if (!blockDataID->id)
     {
@@ -2654,6 +2656,7 @@ CABlockDataID_t* CACreateBlockDatablockId(const CAToken_t token, uint8_t tokenLe
     }
 
     memcpy(blockDataID->id + tokenLength, port, sizeof(port));
+    memcpy(blockDataID->id + tokenLength + sizeof(port), addr, addrLength);
 
     OIC_LOG(DEBUG, TAG, "BlockID is ");
     OIC_LOG_BUFFER(DEBUG, TAG, (const uint8_t *)blockDataID->id, blockDataID->idLength);
@@ -2699,9 +2702,9 @@ void CALogBlockInfo(coap_block_t *block)
 }
 
 CAResult_t CARemoveBlockDataFromListWithSeed(const CAToken_t token, uint8_t tokenLength,
-                                             uint16_t portNumber)
+                                             const char* addr, uint16_t portNumber)
 {
-    CABlockDataID_t* blockDataID = CACreateBlockDatablockId(token, tokenLength, portNumber);
+    CABlockDataID_t* blockDataID = CACreateBlockDatablockId(token, tokenLength, addr, portNumber);
     if (NULL == blockDataID || blockDataID->idLength < 1)
     {
         OIC_LOG(ERROR, TAG, "blockId is null");
