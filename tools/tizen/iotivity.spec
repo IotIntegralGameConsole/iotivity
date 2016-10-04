@@ -81,7 +81,7 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %{!?WITH_CLOUD: %define WITH_CLOUD 1}
 %{!?WITH_MQ: %define WITH_MQ OFF}
 %{!?WITH_PROXY: %define WITH_PROXY 0}
-%{!?WITH_TCP: %define WITH_TCP 0}
+%{!?WITH_TCP: %define WITH_TCP 1}
 
 BuildRequires:  expat-devel
 BuildRequires:  python, libcurl-devel
