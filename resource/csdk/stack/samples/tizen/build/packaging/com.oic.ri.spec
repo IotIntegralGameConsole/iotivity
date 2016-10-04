@@ -1,3 +1,4 @@
+
 %define PREFIX /usr/apps/com.oic.ri
 %define ROOTDIR  %{_builddir}/%{name}-%{version}
 %define DEST_INC_DIR  %{buildroot}/%{_includedir}/OICHeaders

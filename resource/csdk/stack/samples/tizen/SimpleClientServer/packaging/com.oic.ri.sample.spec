@@ -84,3 +84,4 @@ cp -rf %{ROOTDIR}/scons/ocrouting %{buildroot}/usr/apps/com.oic.ri.sample/bin/
 /%{_datadir}/packages/com.oic.ri.sample.xml
 
 
+
