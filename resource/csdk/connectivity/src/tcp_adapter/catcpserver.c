@@ -907,11 +907,6 @@ static CAResult_t CATCPCreateSocket(int family, CATCPSessionInfo_t *svritem)
     socklen_t socklen = 0;
     if (sa.ss_family == AF_INET6)
     {
-        struct sockaddr_in6 *sock6 = (struct sockaddr_in6 *)&sa;
-        if (!sock6->sin6_scope_id)
-        {
-            sock6->sin6_scope_id = svritem->sep.endpoint.ifindex;
-        }
         socklen = sizeof(struct sockaddr_in6);
     }
     else
