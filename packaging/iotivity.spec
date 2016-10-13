@@ -3,7 +3,7 @@ Version: 1.1.1
 Release: 0
 Summary: IoT Connectivity sponsored by the OIC
 Group: Network & Connectivity/Other
-License: Apache-2.0
+License: Apache-2.0 BSD-2-Clause BSD-2.0 MIT
 URL: https://www.iotivity.org/
 Source0: %{name}-%{version}.tar.bz2
 Source1001: %{name}.manifest
@@ -73,7 +73,7 @@ developing applications that use %{name}.
 %setup -q
 chmod g-w %_sourcedir/*
 
-cp LICENSE.md LICENSE.APLv2
+cat LICENSE.md extlibs/tinydtls/LICENSE extlibs/tinydtls/ecc/LICENSE.txt extlibs/tinycbor/tinycbor/LICENSE resource/csdk/connectivity/lib/libcoap-4.1.1/LICENSE.BSD > LICENSE
 cp %{SOURCE1001} .
 %if 0%{?tizen_version_major} < 3
 cp %{SOURCE1002} .
@@ -176,9 +176,9 @@ cp ./resource/csdk/security/include/internal/verresource.h %{buildroot}%{_includ
 
 %if 0%{?tizen_version_major} < 3
 mkdir -p %{buildroot}/%{_datadir}/license
-cp LICENSE.APLv2 %{buildroot}/%{_datadir}/license/%{name}
-cp LICENSE.APLv2 %{buildroot}/%{_datadir}/license/%{name}-service
-cp LICENSE.APLv2 %{buildroot}/%{_datadir}/license/%{name}-test
+cp LICENSE %{buildroot}/%{_datadir}/license/%{name}
+cp LICENSE %{buildroot}/%{_datadir}/license/%{name}-service
+cp LICENSE %{buildroot}/%{_datadir}/license/%{name}-test
 %endif
 
 cp service/things-manager/sdk/inc/*.h %{buildroot}%{_includedir}
@@ -203,7 +203,7 @@ cp service/easy-setup/enrollee/inc/*.h %{buildroot}%{_includedir}
 %if 0%{?tizen_version_major} < 3
 %{_datadir}/license/%{name}
 %else
-%license LICENSE.APLv2
+%license LICENSE
 %endif
 
 %files service
@@ -222,7 +222,7 @@ cp service/easy-setup/enrollee/inc/*.h %{buildroot}%{_includedir}
 %if 0%{?tizen_version_major} < 3
 %{_datadir}/license/%{name}-service
 %else
-%license LICENSE.APLv2
+%license LICENSE
 %endif
 
 %files test
@@ -232,7 +232,7 @@ cp service/easy-setup/enrollee/inc/*.h %{buildroot}%{_includedir}
 %if 0%{?tizen_version_major} < 3
 %{_datadir}/license/%{name}-test
 %else
-%license LICENSE.APLv2
+%license LICENSE
 %endif
 
 %files devel
