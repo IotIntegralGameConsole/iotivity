@@ -345,14 +345,15 @@ if env.get('SECURED'):
 
 libs = []
 if env.get('SECURED'):
-	libs.append('locpmapi')
+    libs.append('-locpmapi')
 
 pc_vars = {
     '\@VERSION\@': project_version,
     '\@PREFIX\@': user_prefix,
     '\@EXEC_PREFIX\@': user_prefix,
     '\@LIB_INSTALL_DIR\@': user_lib,
-    '\@DEFINES\@': " ".join(defines)
+    '\@DEFINES\@': " ".join(defines),
+    '\@LIBS\@': " ".join(libs)
 }
 
 env.Substfile(pc_file, SUBST_DICT = pc_vars)
