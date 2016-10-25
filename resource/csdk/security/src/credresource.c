@@ -39,6 +39,7 @@
 #include "ocserverrequest.h"
 #include "oic_malloc.h"
 #include "ocpayload.h"
+#include "ocpayloadcbor.h"
 #include "utlist.h"
 #include "credresource.h"
 #include "doxmresource.h"
