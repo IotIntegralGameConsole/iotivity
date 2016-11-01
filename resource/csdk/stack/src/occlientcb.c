@@ -18,19 +18,19 @@
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-
+#include "iotivity_config.h"
 #include "occlientcb.h"
-#include "utlist.h"
+#include <coap/coap.h>
 #include "logger.h"
 #include "oic_malloc.h"
 #include <string.h>
 
-#ifdef WITH_ARDUINO
-#include "Time.h"
-#else
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#include "coap_time.h"
+#ifdef HAVE_ARDUINO_TIME_H
+#include "Time.h"
+#endif
 
 #include "cacommon.h"
 #include "cainterface.h"
@@ -39,7 +39,6 @@
 #define TAG "OIC_RI_CLIENTCB"
 
 struct ClientCB *cbList = NULL;
-static OCMulticastNode * mcPresenceNodes = NULL;
 
 OCStackResult
 AddClientCB (ClientCB** clientCB, OCCallbackData* cbData,
@@ -48,7 +47,7 @@ AddClientCB (ClientCB** clientCB, OCCallbackData* cbData,
              OCDevAddr *devAddr, char * requestUri,
              char * resourceTypeName, uint32_t ttl)
 {
-    if (!clientCB || !cbData || !handle || !requestUri || tokenLength > CA_MAX_TOKEN_LEN)
+    if (!clientCB || !cbData || !handle || tokenLength > CA_MAX_TOKEN_LEN)
     {
         return OC_STACK_INVALID_PARAM;
     }
@@ -155,8 +154,11 @@ void DeleteClientCB(ClientCB * cbNode)
         CADestroyToken (cbNode->token);
         OICFree(cbNode->devAddr);
         OICFree(cbNode->handle);
-        OIC_LOG_V (INFO, TAG, "Deleting callback with uri %s", cbNode->requestUri);
-        OICFree(cbNode->requestUri);
+        if (cbNode->requestUri)
+        {
+            OIC_LOG_V (INFO, TAG, "Deleting callback with uri %s", cbNode->requestUri);
+            OICFree(cbNode->requestUri);
+        }
         if (cbNode->deleteCallback)
         {
             cbNode->deleteCallback(cbNode->context);
@@ -222,13 +224,13 @@ ClientCB* GetClientCB(const CAToken_t token, uint8_t tokenLength,
     {
         OIC_LOG (INFO, TAG,  "Looking for token");
         OIC_LOG_BUFFER(INFO, TAG, (const uint8_t *)token, tokenLength);
-        OIC_LOG(INFO, TAG, "\tFound in callback list");
         LL_FOREACH(cbList, out)
         {
-            OIC_LOG_BUFFER(INFO, TAG, (const uint8_t *)out->token, tokenLength);
-
+            /* de-annotate below line if want to see all token in cbList */
+            //OIC_LOG_BUFFER(INFO, TAG, (const uint8_t *)out->token, tokenLength);
             if (memcmp(out->token, token, tokenLength) == 0)
             {
+                OIC_LOG(INFO, TAG, "Found in callback list");
                 return out;
             }
             CheckAndDeleteTimedOutCB(out);
@@ -236,10 +238,12 @@ ClientCB* GetClientCB(const CAToken_t token, uint8_t tokenLength,
     }
     else if (handle)
     {
+        OIC_LOG (INFO, TAG,  "Looking for handle");
         LL_FOREACH(cbList, out)
         {
             if (out->handle == handle)
             {
+                OIC_LOG(INFO, TAG, "Found in callback list");
                 return out;
             }
             CheckAndDeleteTimedOutCB(out);
@@ -250,9 +254,11 @@ ClientCB* GetClientCB(const CAToken_t token, uint8_t tokenLength,
         OIC_LOG_V(INFO, TAG, "Looking for uri %s", requestUri);
         LL_FOREACH(cbList, out)
         {
-            OIC_LOG_V(INFO, TAG, "\tFound %s", out->requestUri);
+            /* de-annotate below line if want to see all uri in cbList */
+            //OIC_LOG_V(INFO, TAG, "%s", out->requestUri);
             if (out->requestUri && strcmp(out->requestUri, requestUri ) == 0)
             {
+                OIC_LOG(INFO, TAG, "Found in callback list");
                 return out;
             }
             CheckAndDeleteTimedOutCB(out);
@@ -310,41 +316,4 @@ void FindAndDeleteClientCB(ClientCB * cbNode)
             }
         }
     }
-}
-
-OCStackResult AddMCPresenceNode(OCMulticastNode** outnode, char* uri, uint32_t nonce)
-{
-    if (!outnode)
-    {
-        return OC_STACK_INVALID_PARAM;
-    }
-
-    OCMulticastNode *node = (OCMulticastNode*) OICMalloc(sizeof(*node));
-    if (node)
-    {
-        node->nonce = nonce;
-        node->uri = uri;
-        LL_APPEND(mcPresenceNodes, node);
-        *outnode = node;
-        return OC_STACK_OK;
-    }
-    *outnode = NULL;
-    return OC_STACK_NO_MEMORY;
-}
-
-OCMulticastNode* GetMCPresenceNode(const char * uri)
-{
-    if (uri)
-    {
-        OCMulticastNode* out = NULL;
-        LL_FOREACH(mcPresenceNodes, out)
-        {
-            if (out->uri && strcmp(out->uri, uri) == 0)
-            {
-                return out;
-            }
-        }
-    }
-    OIC_LOG(INFO, TAG, "MulticastNode Not found !!");
-    return NULL;
 }

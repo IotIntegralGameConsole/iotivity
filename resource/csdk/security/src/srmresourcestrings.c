@@ -94,9 +94,15 @@ const char * OIC_JSON_PERMISSION_NAME = "permission";
 const char * OIC_JSON_OWNERS_NAME = "ownrs";
 const char * OIC_JSON_OWNER_NAME = "ownr";
 const char * OIC_JSON_DEVOWNERID_NAME = "devowneruuid";
+#ifdef _ENABLE_MULTIPLE_OWNER_
+const char * OIC_JSON_SUBOWNERID_NAME = "x.org.iotivity.subowneruuid";
+#endif //_ENABLE_MULTIPLE_OWNER_
 const char * OIC_JSON_OWNED_NAME = "owned";
 const char * OIC_JSON_OXM_NAME = "oxm";
 const char * OIC_JSON_OXMS_NAME = "oxms";
+#ifdef _ENABLE_MULTIPLE_OWNER_
+const char * OIC_JSON_MOM_NAME = "x.org.iotivity.mom";
+#endif //_ENABLE_MULTIPLE_OWNER_
 const char * OIC_JSON_OXM_TYPE_NAME = "oxmtype";
 const char * OIC_JSON_OXM_SEL_NAME = "oxmsel";
 const char * OIC_JSON_DEVICE_ID_FORMAT_NAME = "didformat";
@@ -115,7 +121,8 @@ const char * OIC_JSON_PUBLICDATA_NAME = "publicdata";
 const char * OIC_JSON_PRIVATEDATA_NAME = "privatedata";
 const char * OIC_JSON_PUBDATA_NAME = "pubdata";
 const char * OIC_JSON_PRIVDATA_NAME = "privdata";
-const char * OIC_JSON_OPTDATA_NAME = "optdata";
+const char * OIC_JSON_OPTDATA_NAME = "optionaldata";
+const char * OIC_JSON_CREDUSAGE_NAME = "credusage";
 const char * OIC_JSON_SERVICE_DEVICE_ID = "svcdid";
 const char * OIC_JSON_SERVICE_TYPE = "svct";
 const char* OIC_JSON_VALIDITY_NAME = "validity";
@@ -139,11 +146,17 @@ const char * OIC_JSON_REL_NAME = OC_RSRVD_REL;
 const char * OIC_JSON_RT_NAME = OC_RSRVD_RESOURCE_TYPE;
 const char * OIC_JSON_IF_NAME = OC_RSRVD_INTERFACE;
 const char * OIC_JSON_ROWNERID_NAME = "rowneruuid";
+#ifdef _ENABLE_MULTIPLE_OWNER_
+const char * OIC_JSON_EOWNERID_NAME = "x.org.iotivity.eowneruuid";
+#endif //_ENABLE_MULTIPLE_OWNER_
 const char * OIC_JSON_ENCODING_NAME = "encoding";
 const char * OIC_JSON_DATA_NAME = "data";
 const char * OIC_JSON_SEC_V_NAME = "secv";
 
 const char * OIC_JSON_EMPTY_STRING = "";
+
+const char * TRUST_CA = "trust_ca";
+const char * PRIMARY_CERT = "primary_cert";
 
 OicUuid_t WILDCARD_SUBJECT_ID = {"*"};
 OicUuid_t WILDCARD_SUBJECT_B64_ID = { .id = {'2', '2', '2', '2', '2', '2', '2', '2',
@@ -155,10 +168,15 @@ const char * WILDCARD_RESOURCE_URI = "*";
 const char * OXM_JUST_WORKS = "oic.sec.doxm.jw";
 const char * OXM_RANDOM_DEVICE_PIN = "oic.sec.doxm.rdp";
 const char * OXM_MANUFACTURER_CERTIFICATE = "oic.sec.doxm.mfgcert";
+#ifdef _ENABLE_MULTIPLE_OWNER_
+const char * OXM_PRECONF_PIN = "oic.sec.doxm.pcp";
+#endif //_ENABLE_MULTIPLE_OWNER_
 
 //Credential data encoding methods
 const char * OIC_SEC_ENCODING_BASE64 = "oic.sec.encoding.base64";
 const char * OIC_SEC_ENCODING_RAW = "oic.sec.encoding.raw";
+const char * OIC_SEC_ENCODING_PEM = "oic.sec.encoding.pem";
+const char * OIC_SEC_ENCODING_DER = "oic.sec.encoding.der";
 
 const char * OIC_SEC_TRUE = "true";
 const char * OIC_SEC_FALSE = "false";

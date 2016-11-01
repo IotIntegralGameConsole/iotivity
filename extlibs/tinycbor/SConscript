@@ -30,14 +30,14 @@ if not os.path.exists(cborDir):
     print '''
 *********************************** Error: ****************************************
 * Please download cbor using the following command:                               *
-*   $ git clone https://github.com/01org/tinycbor.git extlibs/tinycbor/tinycbor \ *
-*      -b v0.2.1                                                                  *
+*     $ git clone https://github.com/01org/tinycbor.git extlibs/tinycbor/tinycbor *
 ***********************************************************************************
 '''
     Exit(1)
 
 cbor_src = [
     os.path.join(cborDir,'src/cborparser.c'),
+    os.path.join(cborDir,'src/cborparser_dup_string.c'),
     os.path.join(cborDir,'src/cborencoder.c'),
     os.path.join(cborDir,'src/cborerrorstrings.c'),
     ]

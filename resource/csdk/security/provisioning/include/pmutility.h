@@ -37,6 +37,25 @@ extern "C"
 #define COAPS_QUERY "coaps://%s:%d%s"
 #define COAP_QUERY "coap://%s:%d%s"
 
+#define COAP_TCP_PREFIX "coap+tcp://"
+#define COAP_TCP_QUERY "coap+tcp://%s:%d%s"
+#define COAPS_TCP_PREFIX "coaps+tcp://"
+#define COAPS_TCP_QUERY "coaps+tcp://%s:%d%s"
+
+/**
+ * Discover owned/unowned device in the specified endpoint/deviceID.
+ * It will return the found device even though timeout is not exceeded.
+ *
+ * @param[in] waittime           Timeout in seconds
+ * @param[in] deviceID           deviceID of target device.
+ * @param[out] ppFoundDevice     OCProvisionDev_t of found device
+ *
+ * @return OC_STACK_OK on success otherwise error.\n
+ *         OC_STACK_INVALID_PARAM when deviceID is NULL or ppFoundDevice is not initailized.
+ */
+OCStackResult PMSingleDeviceDiscovery(unsigned short waittime, const OicUuid_t* deviceID,
+                                 OCProvisionDev_t **ppFoundDevice);
+
 /**
  * Discover owned/unowned devices in the same IP subnet. .
  *
@@ -47,6 +66,19 @@ extern "C"
  * @return OC_STACK_OK on success otherwise error.
  */
 OCStackResult PMDeviceDiscovery(unsigned short waittime, bool isOwned, OCProvisionDev_t **ppList);
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+/**
+ * Discover multiple OTM enabled devices in the same IP subnet.
+ *
+ * @param[in] waittime      Timeout in seconds.
+ * @param[in] isMultipleOwned       bool flag for MOT enabled / multiple owned discovery
+ * @param[in] ppDevicesList        List of OCProvisionDev_t.
+ *
+ * @return OC_STACK_OK on success otherwise error.
+ */
+OCStackResult PMMultipleOwnerDeviceDiscovery(unsigned short waittime, bool isMultipleOwned, OCProvisionDev_t **ppDevicesList);
+#endif //_ENABLE_MULTIPLE_OWNER_
 
 /**
  * This function deletes list of provision target devices
@@ -109,7 +141,7 @@ void PMPrintOCProvisionDev(const OCProvisionDev_t* pDev);
  * @return true when deletion is happened, false when no deletion is occured. In case either of
  * two arguments is null it will return false.
  */
-bool PMDeleteFromUUIDList(OCUuidList_t *pUuidList, OicUuid_t *targetId);
+bool PMDeleteFromUUIDList(OCUuidList_t **pUuidList, OicUuid_t *targetId);
 
 #ifdef __cplusplus
 }

@@ -36,8 +36,8 @@
 #include "cacommon.h"
 #include "cainterface.h"
 
-#include "utlist.h"
-#include "pdu.h"
+#include <coap/utlist.h>
+#include <coap/pdu.h>
 
 // Module Name
 #define VERIFY_NON_NULL(arg) { if (!arg) {OIC_LOG(FATAL, TAG, #arg " is NULL"); goto exit;} }
@@ -442,7 +442,9 @@ CAResponseResult_t ConvertEHResultToCAResult (OCEntityHandlerResult result, OCMe
         case OC_EH_SLOW: // 2.05
             caResult = CA_CONTENT;
             break;
-        case OC_EH_OK: // 2.04/2.05
+        case OC_EH_OK:
+        case OC_EH_CHANGED: // 2.04
+        case OC_EH_CONTENT: // 2.05
             if (method == OC_REST_POST || method == OC_REST_PUT)
             {
                 caResult = CA_CHANGED;
@@ -454,9 +456,6 @@ CAResponseResult_t ConvertEHResultToCAResult (OCEntityHandlerResult result, OCMe
             break;
         case OC_EH_VALID: // 2.03
             caResult = CA_VALID;
-            break;
-        case OC_EH_CHANGED: // 2.04
-            caResult = CA_CHANGED;
             break;
         // Unsuccessful Client Request
         case OC_EH_UNAUTHORIZED_REQ: // 4.01
@@ -470,6 +469,9 @@ CAResponseResult_t ConvertEHResultToCAResult (OCEntityHandlerResult result, OCMe
             break;
         case OC_EH_RESOURCE_NOT_FOUND: // 4.04
             caResult = CA_NOT_FOUND;
+            break;
+        case OC_EH_METHOD_NOT_ALLOWED: // 4.05
+            caResult = CA_METHOD_NOT_ALLOWED;
             break;
         case OC_EH_NOT_ACCEPTABLE: // 4.06
             caResult = CA_NOT_ACCEPTABLE;
@@ -516,6 +518,7 @@ OCStackResult HandleSingleResponse(OCEntityHandlerResponse * ehResponse)
     responseInfo.info.messageId = serverRequest->coapID;
     responseInfo.info.resourceUri = serverRequest->resourceUrl;
     responseInfo.result = ConvertEHResultToCAResult(ehResponse->ehResult, serverRequest->method);
+    responseInfo.info.dataType = CA_RESPONSE_DATA;
 
     if(serverRequest->notificationFlag && serverRequest->qos == OC_HIGH_QOS)
     {
@@ -547,7 +550,8 @@ OCStackResult HandleSingleResponse(OCEntityHandlerResponse * ehResponse)
         responseInfo.info.type = CA_MSG_NONCONFIRM;
     }
 
-    char rspToken[CA_MAX_TOKEN_LEN + 1] = {};
+    char rspToken[CA_MAX_TOKEN_LEN + 1] = {0};
+    responseInfo.info.messageId = serverRequest->coapID;
     responseInfo.info.token = (CAToken_t)rspToken;
 
     memcpy(responseInfo.info.token, serverRequest->requestToken, serverRequest->tokenLength);
@@ -639,7 +643,11 @@ OCStackResult HandleSingleResponse(OCEntityHandlerResponse * ehResponse)
                     OICFree(responseInfo.info.options);
                     return result;
                 }
-                responseInfo.info.payloadFormat = CA_FORMAT_APPLICATION_CBOR;
+                // Add CONTENT_FORMAT OPT if payload exist
+                if (responseInfo.info.payloadSize > 0)
+                {
+                    responseInfo.info.payloadFormat = CA_FORMAT_APPLICATION_CBOR;
+                }
                 break;
             default:
                 responseInfo.result = CA_NOT_ACCEPTABLE;

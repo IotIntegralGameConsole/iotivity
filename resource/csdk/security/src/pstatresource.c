@@ -314,8 +314,11 @@ static OCStackResult CBORPayloadToPstatBin(const uint8_t *cborPayload, const siz
     cborFindResult = cbor_value_map_find_value(&pstatCbor, OIC_JSON_CM_NAME, &pstatMap);
     if (CborNoError == cborFindResult && cbor_value_is_integer(&pstatMap))
     {
-        cborFindResult = cbor_value_get_int(&pstatMap, (int *) &pstat->cm);
+        int cm;
+
+        cborFindResult = cbor_value_get_int(&pstatMap, &cm);
         VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding CM.");
+        pstat->cm = (OicSecDpm_t)cm;
     }
     else
     {
@@ -326,8 +329,11 @@ static OCStackResult CBORPayloadToPstatBin(const uint8_t *cborPayload, const siz
     cborFindResult = cbor_value_map_find_value(&pstatCbor, OIC_JSON_TM_NAME, &pstatMap);
     if (CborNoError == cborFindResult && cbor_value_is_integer(&pstatMap))
     {
-        cborFindResult = cbor_value_get_int(&pstatMap, (int *) &pstat->tm);
+        int tm;
+
+        cborFindResult = cbor_value_get_int(&pstatMap, &tm);
         VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding TM.");
+        pstat->tm = (OicSecDpm_t)tm;
     }
     else
     {
@@ -338,8 +344,11 @@ static OCStackResult CBORPayloadToPstatBin(const uint8_t *cborPayload, const siz
     cborFindResult = cbor_value_map_find_value(&pstatCbor, OIC_JSON_OM_NAME, &pstatMap);
     if (CborNoError == cborFindResult && cbor_value_is_integer(&pstatMap))
     {
-        cborFindResult = cbor_value_get_int(&pstatMap, (int *) &pstat->om);
+        int om;
+
+        cborFindResult = cbor_value_get_int(&pstatMap, &om);
         VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding OM.");
+        pstat->om = (OicSecDpom_t)om;
     }
     else
     {
@@ -350,10 +359,13 @@ static OCStackResult CBORPayloadToPstatBin(const uint8_t *cborPayload, const siz
     cborFindResult = cbor_value_map_find_value(&pstatCbor, OIC_JSON_SM_NAME, &pstatMap);
     if (CborNoError == cborFindResult && cbor_value_is_integer(&pstatMap))
     {
+        int sm;
+
         pstat->smLen = 1;
         pstat->sm = (OicSecDpom_t*)OICCalloc(pstat->smLen, sizeof(OicSecDpom_t));
-        cborFindResult = cbor_value_get_int(&pstatMap, (int *) &pstat->sm[0]);
+        cborFindResult = cbor_value_get_int(&pstatMap, &sm);
         VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding SM.");
+        pstat->sm[0] = (OicSecDpom_t)sm;
 
         if (roParsed)
         {
@@ -378,11 +390,6 @@ static OCStackResult CBORPayloadToPstatBin(const uint8_t *cborPayload, const siz
         VERIFY_SUCCESS(TAG, OC_STACK_OK == ret, ERROR);
         OICFree(strUuid );
         strUuid  = NULL;
-
-        if (roParsed)
-        {
-            *roParsed = true;
-        }
     }
     else
     {
@@ -552,8 +559,8 @@ static OCEntityHandlerResult HandlePstatPostRequest(const OCEntityHandlerRequest
             }
             validReq = false;
 
-            //Currently, we dose not support the multiple service server driven yet.
-            if (pstat->om != MULTIPLE_SERVICE_SERVER_DRIVEN)
+            //Currently, IoTivity only supports Single Service Client Directed provisioning
+            if (pstat->om == SINGLE_SERVICE_CLIENT_DRIVEN)
             {
                 if ((pstat->cm & RESET) && false == pstat->isOp)
                 {
@@ -595,6 +602,7 @@ static OCEntityHandlerResult HandlePstatPostRequest(const OCEntityHandlerRequest
             gPstat->om = pstat->om;
             gPstat->tm = pstat->tm;
             gPstat->cm = pstat->cm;
+            memcpy(&(gPstat->rownerID), &(pstat->rownerID), sizeof(OicUuid_t));
 
             // Convert pstat data into CBOR for update to persistent storage
             if (UpdatePersistentStorage(gPstat))

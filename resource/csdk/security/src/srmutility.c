@@ -92,7 +92,7 @@ OCStackResult AddUuidArray(const cJSON* jsonRoot, const char* arrayItem,
 
     do
     {
-        unsigned char base64Buff[sizeof(((OicUuid_t*)0)->id)] = {};
+        unsigned char base64Buff[sizeof(((OicUuid_t*)0)->id)] = {0};
         uint32_t outLen = 0;
         B64Result b64Ret = B64_OK;
 
@@ -133,6 +133,10 @@ const char* GetOxmString(OicSecOxm_t oxmType)
             return OXM_RANDOM_DEVICE_PIN;
         case OIC_MANUFACTURER_CERTIFICATE:
             return OXM_MANUFACTURER_CERTIFICATE;
+#ifdef _ENABLE_MULTIPLE_OWNER_
+        case OIC_PRECONFIG_PIN:
+            return OXM_PRECONF_PIN;
+#endif //_ENABLE_MULTIPLE_OWNER_
         default:
             return NULL;
     }

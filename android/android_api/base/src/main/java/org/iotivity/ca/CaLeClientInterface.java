@@ -47,9 +47,13 @@ public class CaLeClientInterface {
     private CaLeClientInterface(Context context) {
         caLeRegisterLeScanCallback(mLeScanCallback);
         caLeRegisterGattCallback(mGattCallback);
-        mContext = context;
+        synchronized(CaLeClientInterface.class) {
+            mContext = context;
+        }
         registerIntentFilter();
     }
+
+
 
     public static void getLeScanCallback() {
         caLeRegisterLeScanCallback(mLeScanCallback);
@@ -90,6 +94,11 @@ public class CaLeClientInterface {
             BluetoothGatt gatt, int status, int newState);
 
     private native static void caLeGattServicesDiscoveredCallback(BluetoothGatt gatt, int status);
+
+    private native static void caLeGattNWServicesDiscoveredCallback(BluetoothGatt gatt,
+                                                                    int status);
+
+    private native static void caLeGattNWDescriptorWriteCallback(BluetoothGatt gatt, int status);
 
     private native static void caLeGattCharacteristicWriteCallback(
             BluetoothGatt gatt, byte[] data, int status);
@@ -211,6 +220,7 @@ public class CaLeClientInterface {
 
             caLeGattServicesDiscoveredCallback(gatt, status);
             caManagerLeServicesDiscoveredCallback(gatt, status);
+            caLeGattNWServicesDiscoveredCallback(gatt, status);
         }
 
         @Override
@@ -247,6 +257,7 @@ public class CaLeClientInterface {
             super.onDescriptorWrite(gatt, descriptor, status);
 
             caLeGattDescriptorWriteCallback(gatt, status);
+            caLeGattNWDescriptorWriteCallback(gatt, status);
         }
 
         @Override

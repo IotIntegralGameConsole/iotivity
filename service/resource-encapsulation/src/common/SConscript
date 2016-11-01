@@ -27,10 +27,8 @@ import os
 gtest_env = SConscript('#extlibs/gtest/SConscript')
 lib_env = gtest_env.Clone()
 
-
-
 # Add third party libraries
-SConscript(lib_env.get('SRC_DIR') + '/service/third_party_libs.scons', exports = 'lib_env')
+SConscript('#service/third_party_libs.scons', exports = 'lib_env')
 rcs_common_env = lib_env.Clone()
 target_os = rcs_common_env.get('TARGET_OS')
 release = rcs_common_env.get('RELEASE')
@@ -50,25 +48,26 @@ rcs_common_env.AppendUnique(CPPPATH = [
 
 rcs_common_env.AppendUnique(LIBPATH = [rcs_common_env.get('BUILD_DIR')])
 
-if target_os not in ['windows', 'winrt']:
+if target_os not in ['windows']:
     rcs_common_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall'])
-    if target_os != 'android':
-        rcs_common_env.AppendUnique(CXXFLAGS = ['-pthread'])
-        rcs_common_env.AppendUnique(LIBS = ['pthread'])
 
-if target_os not in ['darwin', 'ios', 'windows', 'winrt']:
+if target_os not in ['darwin', 'ios', 'windows']:
     rcs_common_env.AppendUnique(LINKFLAGS = ['-Wl,--no-undefined'])
+    rcs_common_env.AppendUnique(LIBS = ['dl'])
 
 if target_os == 'android':
     rcs_common_env.AppendUnique(CXXFLAGS = ['-frtti', '-fexceptions'])
     rcs_common_env.PrependUnique(LIBS = ['gnustl_shared', 'log'])
 
-rcs_common_env.AppendUnique(LIBS = ['dl', 'oc'])
+rcs_common_env.AppendUnique(LIBS = ['oc'])
 
 if not release:
     rcs_common_env.AppendUnique(CXXFLAGS = ['--coverage'])
     rcs_common_env.PrependUnique(LIBS = ['gcov'])
 
+if rcs_common_env.get('SECURED') == '1':
+	if rcs_common_env.get('WITH_TCP') == True:
+		rcs_common_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509', 'mbedcrypto'])
 ######################################################################
 # Source files and Targets
 ######################################################################
@@ -76,13 +75,13 @@ TIMER_SRC_DIR = 'expiryTimer/src/'
 RESOURCE_SRC = 'primitiveResource/src/'
 rcs_common_src = [
         TIMER_SRC_DIR + 'ExpiryTimerImpl.cpp',
-		TIMER_SRC_DIR + 'ExpiryTimer.cpp',
-		RESOURCE_SRC + 'PresenceSubscriber.cpp',
-		RESOURCE_SRC + 'PrimitiveResource.cpp',
-		RESOURCE_SRC + 'RCSException.cpp',
-		RESOURCE_SRC + 'RCSAddress.cpp',
-		RESOURCE_SRC + 'RCSResourceAttributes.cpp',
-		RESOURCE_SRC + 'RCSRepresentation.cpp'
+        TIMER_SRC_DIR + 'ExpiryTimer.cpp',
+        RESOURCE_SRC + 'PresenceSubscriber.cpp',
+        RESOURCE_SRC + 'PrimitiveResource.cpp',
+        RESOURCE_SRC + 'RCSException.cpp',
+        RESOURCE_SRC + 'RCSAddress.cpp',
+        RESOURCE_SRC + 'RCSResourceAttributes.cpp',
+        RESOURCE_SRC + 'RCSRepresentation.cpp'
         ]
 
 rcs_common_static = rcs_common_env.StaticLibrary('rcs_common', rcs_common_src)
@@ -93,7 +92,7 @@ rcs_common_env.UserInstallTargetLib([rcs_common_static,rcs_common_shared], 'rcs_
 ######################################################################
 # Build Test Expiry Timer and primitive Resource
 ######################################################################
-if target_os == 'linux':
+if target_os in ['linux']:
 	rcs_common_test_env = rcs_common_env.Clone();
 
 	rcs_common_test_env.PrependUnique(CPPPATH = [
@@ -106,11 +105,7 @@ if target_os == 'linux':
 		'oc_logger',
 		'connectivity_abstraction',
 		'coap',
-		'rcs_common',
-		'gtest',
-		'gtest_main',
-		'pthread'
-		])
+		'rcs_common'])
 
 	rcs_common_test_src = [
 		rcs_common_test_env.Glob('primitiveResource/unittests/*.cpp'),

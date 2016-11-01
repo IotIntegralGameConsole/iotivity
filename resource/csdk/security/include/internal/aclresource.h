@@ -62,6 +62,20 @@ const OicSecAce_t* GetACLResourceData(const OicUuid_t* subjectId, OicSecAce_t **
  */
 OCStackResult AclToCBORPayload(const OicSecAcl_t * acl, uint8_t **outPayload, size_t *size);
 
+#ifdef _ENABLE_MULTIPLE_OWNER_
+/**
+ * Function to check the ACL access of SubOwner
+ *
+ * @param[in] uuid SubOwner's UUID
+ * @param[in] cborPayload CBOR payload of ACL
+ * @param[in] size Byte length of cborPayload
+ *
+ * @return ::true for valid access, otherwise invalid access
+ */
+bool IsValidAclAccessForSubOwner(const OicUuid_t* uuid, const uint8_t *cborPayload, const size_t size);
+#endif //_ENABLE_MULTIPLE_OWNER_
+
+
 /**
  * This method removes ACE for the subject and resource from the ACL
  *
@@ -83,6 +97,13 @@ OCStackResult RemoveACE(const OicUuid_t * subject, const char * resource);
 void DeleteACLList(OicSecAcl_t* acl);
 
 /**
+ * This function frees OicSecRsrc_t object's fields and object itself.
+ *
+ * @param rsrc instance of @ref OicSecRsrc_t structure to be deleted.
+ */
+void FreeRsrc(OicSecRsrc_t *rsrc);
+
+/**
  * Internal function to duplicate the ACE instance.
  *
  * @param ace instance of @ref OicSecAce_t structure to be duplicated.
@@ -100,6 +121,14 @@ OicSecAce_t* DuplicateACE(const OicSecAce_t* ace);
  */
 OCStackResult InstallNewACL(const uint8_t* payload, const size_t size);
 
+/**
+ * This function installs a new ACL.
+ *
+ * @param acl  new acl to install.
+ *
+ * @return ::OC_STACK_OK for Success, otherwise some error value
+ */
+OCStackResult InstallNewACL2(const OicSecAcl_t* acl);
 /**
  * This function updates default ACE which is required for ownership transfer.
  * This function should be invoked after OTM is complete to prevent anonymous user access.
@@ -125,6 +154,24 @@ OCStackResult SetAclRownerId(const OicUuid_t* newROwner);
  * @return ::OC_STACK_OK if rowneruuid is assigned correctly, else ::OC_STACK_ERROR.
  */
 OCStackResult GetAclRownerId(OicUuid_t *rowneruuid);
+
+/**
+ * This function converts CBOR data into ACL.
+ *
+ * @param cborPayload is the pointer to cbor payload to parse.
+ * @param size of the cbor payload.
+ *
+ * @return ::acl instance of @ref OicSecAcl_t structure or NULL if error occurs
+ */
+OicSecAcl_t* CBORPayloadToAcl2(const uint8_t *cborPayload, const size_t size);
+
+/**
+ * This function prints ACL to stdin
+ * For debug purposes only
+ *
+ * @param acl  acl to print
+ */
+void printACL(const OicSecAcl_t* acl);
 
 #ifdef __cplusplus
 }

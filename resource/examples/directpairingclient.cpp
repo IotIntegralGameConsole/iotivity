@@ -20,11 +20,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <string>
 #include <map>
 #include <cstdlib>
-#include <pthread.h>
 #include <mutex>
 #include <condition_variable>
 
@@ -34,7 +35,6 @@
 #include "OCPlatform.h"
 #include "OCApi.h"
 
-#define MAX_URI_LENGTH (64)
 #define MAX_PERMISSION_LENGTH (5)
 #define CREATE (1)
 #define READ (2)

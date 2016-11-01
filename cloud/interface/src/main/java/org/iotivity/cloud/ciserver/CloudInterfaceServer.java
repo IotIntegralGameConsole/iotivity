@@ -24,71 +24,107 @@ package org.iotivity.cloud.ciserver;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 
-import org.iotivity.cloud.base.CoapServer;
-import org.iotivity.cloud.base.ResourceManager;
-import org.iotivity.cloud.base.SessionManager;
-import org.iotivity.cloud.ciserver.protocols.CoapAuthHandler;
-import org.iotivity.cloud.ciserver.protocols.CoapRelayHandler;
+import org.iotivity.cloud.base.connector.ConnectorPool;
+import org.iotivity.cloud.base.server.CoapServer;
+import org.iotivity.cloud.ciserver.DeviceServerSystem.CoapDevicePool;
+import org.iotivity.cloud.ciserver.resources.DiResource;
 import org.iotivity.cloud.ciserver.resources.KeepAliveResource;
-import org.iotivity.cloud.util.CoapLogHandler;
-import org.iotivity.cloud.util.Logger;
+import org.iotivity.cloud.ciserver.resources.proxy.account.Account;
+import org.iotivity.cloud.ciserver.resources.proxy.account.AccountSession;
+import org.iotivity.cloud.ciserver.resources.proxy.account.Acl;
+import org.iotivity.cloud.ciserver.resources.proxy.account.AclGroup;
+import org.iotivity.cloud.ciserver.resources.proxy.account.AclInvite;
+import org.iotivity.cloud.ciserver.resources.proxy.account.Certificate;
+import org.iotivity.cloud.ciserver.resources.proxy.account.Crl;
+import org.iotivity.cloud.ciserver.resources.proxy.mq.MessageQueue;
+import org.iotivity.cloud.ciserver.resources.proxy.rd.DevicePresence;
+import org.iotivity.cloud.ciserver.resources.proxy.rd.ResourceDirectory;
+import org.iotivity.cloud.ciserver.resources.proxy.rd.ResourceFind;
+import org.iotivity.cloud.ciserver.resources.proxy.rd.ResourcePresence;
+import org.iotivity.cloud.util.Log;
 
 public class CloudInterfaceServer {
 
     public static void main(String[] args) throws Exception {
+        Log.Init();
 
         System.out.println("-----CI SERVER-------");
 
-        if (args.length != 5) {
-            Logger.e(
-                    "coap server port and RDServer_Address port AccountServer_Address Port required\n"
-                            + "ex) 5683 127.0.0.1 5684 127.0.0.1 5685\n");
+        if (args.length != 8) {
+            Log.e("coap server port and RDServer_Address port AccountServer_Address Port MQBroker_Address Port and TLS mode required\n"
+                    + "ex) 5683 127.0.0.1 5684 127.0.0.1 5685 127.0.0.1 5686 0\n");
             return;
         }
 
-        ResourceManager resourceManager = null;
-        SessionManager sessionManager = null;
-        CoapServer coapServer = null;
+        boolean tlsMode = Integer.parseInt(args[7]) == 1;
 
-        CoapRelayHandler relayHandler = null;
-        CoapAuthHandler authHandler = null;
+        ConnectorPool.addConnection("rd",
+                new InetSocketAddress(args[1], Integer.parseInt(args[2])),
+                tlsMode);
+        ConnectorPool.addConnection("account",
+                new InetSocketAddress(args[3], Integer.parseInt(args[4])),
+                tlsMode);
+        ConnectorPool.addConnection("mq",
+                new InetSocketAddress(args[5], Integer.parseInt(args[6])),
+                tlsMode);
 
-        KeepAliveResource keepAliveResource = null;
+        DeviceServerSystem deviceServer = new DeviceServerSystem();
 
-        coapServer = new CoapServer();
+        Account acHandler = new Account();
+        AccountSession acSessionHandler = new AccountSession();
+        ResourceDirectory rdHandler = new ResourceDirectory();
+        ResourceFind resHandler = new ResourceFind();
+        ResourcePresence adHandler = new ResourcePresence();
+        DevicePresence prsHandler = new DevicePresence();
+        MessageQueue mqHandler = new MessageQueue();
+        Acl aclHandler = new Acl();
+        AclGroup aclGroupHandler = new AclGroup();
+        Certificate certHandler = new Certificate();
+        AclInvite aclInviteHandler = new AclInvite();
+	Crl crlHandler = new Crl();
+        CoapDevicePool devicePool = deviceServer.getDevicePool();
 
-        sessionManager = new SessionManager();
+        deviceServer.addResource(acHandler);
 
-        resourceManager = new ResourceManager();
+        deviceServer.addResource(acSessionHandler);
 
-        relayHandler = new CoapRelayHandler(sessionManager);
+        deviceServer.addResource(rdHandler);
 
-        authHandler = new CoapAuthHandler();
+        deviceServer.addResource(resHandler);
 
-        keepAliveResource = new KeepAliveResource(sessionManager,
+        deviceServer.addResource(adHandler);
+
+        deviceServer.addResource(prsHandler);
+
+        deviceServer.addResource(mqHandler);
+
+        deviceServer.addResource(aclHandler);
+
+        deviceServer.addResource(aclGroupHandler);
+
+        deviceServer.addResource(certHandler);
+
+        deviceServer.addResource(aclInviteHandler);
+
+	deviceServer.addResource(crlHandler);
+
+        KeepAliveResource resKeepAlive = new KeepAliveResource(
                 new int[] { 1, 2, 4, 8 });
 
-        coapServer.addHandler(new CoapLogHandler());
+        deviceServer.addResource(resKeepAlive);
 
-        coapServer.addHandler(authHandler);
+        deviceServer.addResource(new DiResource(devicePool));
 
-        coapServer.addHandler(relayHandler);
+        deviceServer.addServer(new CoapServer(
+                new InetSocketAddress(Integer.parseInt(args[0]))));
 
-        coapServer.addHandler(resourceManager);
+        // deviceServer.addServer(new HttpServer(new InetSocketAddress(8080)));
 
-        resourceManager.registerResource(keepAliveResource);
+        deviceServer.startSystem(tlsMode);
 
-        authHandler.startHandler(args[3], Integer.parseInt(args[4]));
+        resKeepAlive.startSessionChecker(3000, 6000);
 
-        relayHandler.startHandler(args[1], Integer.parseInt(args[2]), args[3],
-                Integer.parseInt(args[4]));
-
-        coapServer
-                .startServer(new InetSocketAddress(Integer.parseInt(args[0])));
-
-        keepAliveResource.startSessionChecker();
-
-        Scanner in = new Scanner(System.in, "UTF-8");
+        Scanner in = new Scanner(System.in);
 
         System.out.println("press 'q' to terminate");
 
@@ -98,13 +134,9 @@ public class CloudInterfaceServer {
 
         System.out.println("Terminating...");
 
-        keepAliveResource.stopSessionChecker();
+        resKeepAlive.stopSessionChecker();
 
-        coapServer.stopServer();
-
-        relayHandler.stopHandler();
-
-        authHandler.stopHandler();
+        deviceServer.stopSystem();
 
         System.out.println("Terminated");
     }

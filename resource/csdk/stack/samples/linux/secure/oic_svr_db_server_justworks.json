@@ -55,36 +55,6 @@
                         }
                     ],
                     "permission": 6
-                },
-                {
-                    "subjectuuid": "*",
-                    "resources": [
-                        {
-                            "href": "/oic/sec/pconf",
-                            "rt": ["oic.r.pconf"],
-                            "if": ["oic.if.baseline"],
-                            "rel": ""
-                        },
-                        {
-                            "href": "/oic/sec/dpairing",
-                            "rt": ["oic.r.dpairing"],
-                            "if": ["oic.if.baseline"],
-                            "rel": ""
-                        }
-                    ],
-                    "permission": 6
-                },
-                {
-                    "subjectuuid": "*",
-                    "resources": [
-                        {
-                            "href": "/oic/sec/ver",
-                            "rt": ["oic.r.ver"],
-                            "if": ["oic.if.baseline"],
-                            "rel": ""
-                        }
-                    ],
-                    "permission":2
                 }
             ]
         },
@@ -95,8 +65,8 @@
         "deviceuuid": "6a757374-776f-726b-4465-765575696430",
         "cm": 2,
         "tm": 0,
-        "om": 3,
-        "sm": 3,
+        "om": 4,
+        "sm": 4,
         "rowneruuid": "6a757374-776f-726b-4465-765575696430"
     },
     "doxm": {

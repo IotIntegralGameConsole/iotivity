@@ -136,33 +136,6 @@ typedef struct
 } OCServerProtocolRequest;
 
 /**
- * This structure will be created in occoap and passed up the stack on the client side.
- */
-typedef struct
-{
-    /** handle is retrieved by comparing the token-handle pair in the PDU.*/
-    ClientCB * cbNode;
-
-    /** This is how long this response is valid for (in seconds).*/
-    uint32_t maxAge;
-
-    /** This is the Uri of the resource. (ex. "coap://192.168.1.1/a/led").*/
-    char * fullUri;
-
-    /** This is the relative Uri of the resource. (ex. "/a/led").*/
-    char * rcvdUri;
-
-    /** This is the received payload.*/
-    char * bufRes;
-
-    /** This is the token received OTA.*/
-    CAToken_t rcvdToken;
-
-    /** this structure will be passed to client.*/
-    OCClientResponse * clientResponse;
-} OCResponse;
-
-/**
  * This typedef is to represent our Server Instance identification.
  */
 typedef uint8_t ServerID[16];
@@ -202,7 +175,8 @@ OCStackResult HandleStackRequests(OCServerProtocolRequest * protocolRequest);
 OCStackResult SendDirectStackResponse(const CAEndpoint_t* endPoint, const uint16_t coapID,
         const CAResponseResult_t responseResult, const CAMessageType_t type,
         const uint8_t numOptions, const CAHeaderOption_t *options,
-        CAToken_t token, uint8_t tokenLength, const char *resourceUri);
+        CAToken_t token, uint8_t tokenLength, const char *resourceUri,
+        CADataType_t dataType);
 
 #ifdef WITH_PRESENCE
 
@@ -256,6 +230,14 @@ OCStackResult BindResourceInterfaceToResource(OCResource* resource,
 OCStackResult BindResourceTypeToResource(OCResource* resource,
                                             const char *resourceTypeName);
 
+/**
+ * Convert OCStackResult to CAResponseResult_t.
+ *
+ * @param ocCode OCStackResult code.
+ * @param method OCMethod method the return code replies to.
+ * @return ::CA_CONTENT on OK, some other value upon failure.
+ */
+CAResponseResult_t OCToCAStackResult(OCStackResult ocCode, OCMethod method);
 
 /**
  * Converts a CAResult_t type to a OCStackResult type.
@@ -300,6 +282,10 @@ OCStackResult OCChangeResourceProperty(OCResourceProperty * inputProperty,
 const char *convertTriggerEnumToString(OCPresenceTrigger trigger);
 
 OCPresenceTrigger convertTriggerStringToEnum(const char * triggerStr);
+
+OCStackResult encodeAddressForRFC6874(char * outputAddress,
+                                      size_t outputSize,
+                                      const char * inputAddress);
 
 void CopyEndpointToDevAddr(const CAEndpoint_t *in, OCDevAddr *out);
 

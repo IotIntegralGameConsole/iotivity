@@ -27,18 +27,28 @@
 #ifndef CA_ADAPTER_UTILS_H_
 #define CA_ADAPTER_UTILS_H_
 
+#include "iotivity_config.h"
+
 #include <stdbool.h>
 #ifdef __ANDROID__
 #include <jni.h>
 #endif
 
-#ifndef WITH_ARDUINO
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+
+#if defined(HAVE_WINSOCK2_H) && defined(HAVE_WS2TCPIP_H)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
 
 #include "cacommon.h"
 #include "logger.h"
-#include "pdu.h"
+#include <coap/pdu.h>
 #include "uarraylist.h"
 #include "cacommonutil.h"
 
@@ -253,6 +263,18 @@ void CANativeSetActivity(JNIEnv *env, jobject activity);
  * @return  Activity object.
  */
 jobject *CANativeGetActivity();
+
+/**
+ * get method ID for method Name and class
+ * @param[in]   env              JNI interface pointer.
+ * @param[in]   className        android class.
+ * @param[in]   methodName       android method name.
+ * @param[in]   methodFormat     method type of methodName.
+ * @return      jmethodID        iD of the method.
+ */
+jmethodID CAGetJNIMethodID(JNIEnv *env, const char* className,
+                           const char* methodName,
+                           const char* methodFormat);
 
 /**
  * To Delete other Global References

@@ -31,8 +31,7 @@
 extern "C" {
 #endif
 
-    void CAManagerConnectionStateChangedCB(CATransportAdapter_t adapter,
-                                           const char *remote_address, bool connected);
+    void CAManagerConnectionStateChangedCB(const CAEndpoint_t *info, bool connected);
 
     void CAManagerAdapterStateChangedCB(CATransportAdapter_t adapter, bool enabled);
 
@@ -120,6 +119,22 @@ extern "C" {
      */
     JNIEXPORT void JNICALL Java_org_iotivity_ca_CaInterface_initialize
         (JNIEnv *, jclass, jobject, jobject);
+
+    /*
+     * Class:     Java_org_iotivity_ca_CaInterface_setLeScanIntervalTimeImpl
+     * Method:    setLeScanIntervalTimeImpl
+     * Signature: (II)V
+     */
+    JNIEXPORT void JNICALL Java_org_iotivity_ca_CaInterface_setLeScanIntervalTimeImpl
+        (JNIEnv *, jclass, jint, jint);
+
+    /*
+     * Class:     org_iotivity_ca_CaInterface
+     * Method:    setCipherSuiteImpl
+     * Signature: (Lorg/iotivity/ca/OicCipher;Lorg/iotivity/ca/CATransportAdapter;)I
+     */
+    JNIEXPORT jint JNICALL Java_org_iotivity_ca_CaInterface_setCipherSuiteImpl
+     (JNIEnv *, jclass, jint, jint);
 
 #ifdef __cplusplus
 }

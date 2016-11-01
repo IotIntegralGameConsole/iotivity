@@ -53,36 +53,6 @@
                         }
                     ],
                     "permission": 6
-                },
-                {
-                    "subjectuuid": "*",
-                    "resources": [
-                        {
-                            "href": "/oic/sec/pconf",
-                            "rel": "",
-                            "rt": ["oic.r.pconf"],
-                            "if": ["oic.if.baseline"]
-                        },
-                        {
-                            "href": "/oic/sec/dpairing",
-                            "rel": "",
-                            "rt": ["oic.r.dpairing"],
-                            "if": ["oic.if.baseline"]
-                        }
-                    ],
-                    "permission": 6
-                },
-                {
-                    "subjectuuid": "*",
-                    "resources": [
-                        {
-                            "href": "/oic/sec/ver",
-                            "rel": "",
-                            "rt": ["oic.r.ver"],
-                            "if": ["oic.if.baseline"]
-                        }
-                    ],
-                    "permission": 2
                 }
             ]
         },
@@ -94,8 +64,8 @@
         "rowneruuid": "6A757374-776F-726B-4465-765575696430",
         "cm": 2,
         "tm": 0,
-        "om": 3,
-        "sm": 3
+        "om": 4,
+        "sm": 4
         },
     "doxm": {
         "oxms": [0],

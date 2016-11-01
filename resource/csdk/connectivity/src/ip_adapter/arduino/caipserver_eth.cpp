@@ -320,12 +320,7 @@ void CAIPSetPacketReceiveCallback(CAIPPacketReceivedCallback callback)
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
-void CAIPSetExceptionCallback(CAIPExceptionCallback callback)
-{
-    // TODO
-}
-
-void CAIPSetErrorHandleCallback(CAIPErrorHandleCallback ipErrorCallback)
+void CAIPSetErrorHandler(CAIPErrorHandleCallback errorHandleCallback)
 {
     OIC_LOG(DEBUG, TAG, "IN");
     OIC_LOG(DEBUG, TAG, "OUT");
@@ -367,12 +362,10 @@ CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
         {
             continue;
         }
-        unsigned char *addr=  (unsigned char *) &(ifitem->ipv4addr);
-        snprintf(eps[j].addr, MAX_ADDR_STR_SIZE_CA, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
-
+        OICStrcpy(eps[j].addr, MAX_ADDR_STR_SIZE_CA, ifitem->addr);
         eps[j].flags = CA_IPV4;
         eps[j].adapter = CA_ADAPTER_IP;
-        eps[j].interface = 0;
+        eps[j].ifindex = 0;
         eps[j].port = caglobals.ip.u4.port;
         j++;
     }

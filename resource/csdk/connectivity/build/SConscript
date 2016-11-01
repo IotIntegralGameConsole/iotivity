@@ -8,7 +8,7 @@ import platform
 # Map of host os and allowed target os (host: allowed target os)
 host_target_map = {
 		'linux': ['linux', 'android', 'arduino', 'yocto', 'tizen'],
-		'windows': ['windows', 'winrt', 'android', 'arduino'],
+		'windows': ['windows', 'android', 'arduino'],
 		'darwin': ['darwin', 'ios', 'android', 'arduino'],
 		}
 
@@ -18,11 +18,10 @@ os_arch_map = {
 		'tizen': ['x86', 'x86_64', 'arm', 'arm64'],
 		'android': ['x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'armeabi-v7a-hard', 'arm64-v8a'],
 		'windows': ['x86', 'amd64', 'arm'],
-		'winrt': ['arm'],
 		'darwin': ['i386', 'x86_64'],
 		'ios': ['i386', 'x86_64', 'armv7', 'armv7s', 'arm64'],
 		'arduino': ['avr', 'arm'],
-                'yocto': ['i586', 'x86_64', 'arm', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
+                'yocto': ['i586', 'i686', 'x86_64', 'arm', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
 		}
 
 host = platform.system().lower()
@@ -67,6 +66,7 @@ help_vars.Add(BoolVariable('UPLOAD', 'Upload binary ? (For Arduino)', require_up
 help_vars.Add(EnumVariable('ROUTING', 'Enable routing', 'EP', allowed_values=('GW', 'EP')))
 help_vars.Add(EnumVariable('BUILD_SAMPLE', 'Build with sample', 'ON', allowed_values=('ON', 'OFF')))
 help_vars.Add(BoolVariable('WITH_TCP', 'Enable TCP', False))
+help_vars.Add(ListVariable('WITH_MQ', 'Build with MQ publisher/subscriber/broker', 'OFF', ['OFF', 'SUB', 'PUB', 'BROKER']))
 
 help_vars.AddVariables(('DEVICE_NAME', 'Network display name for device', 'OIC-DEVICE', None, None),)
 
@@ -152,9 +152,9 @@ def __set_dir(env, dir):
 		Exit(1)
 
 	if env.get('RELEASE'):
-		build_dir = dir + '/out/' + target_os + '/' + target_arch + '/release/'
+		build_dir = os.path.join(dir, 'out', target_os, target_arch, 'release') + os.sep
 	else:
-		build_dir = dir + '/out/' + target_os + '/' + target_arch + '/debug/'
+		build_dir = os.path.join(dir, 'out', target_os, target_arch, 'debug') + os.sep
 	env.VariantDir(build_dir, dir, duplicate=0)
 
 	env.Replace(BUILD_DIR = build_dir)

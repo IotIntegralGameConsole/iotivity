@@ -17,10 +17,11 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#include "iotivity_config.h"
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_STRINGS_H
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 
@@ -51,6 +52,7 @@
 #include "pinoxmcommon.h"
 
 #define TAG  "SRM-DOXM"
+#define CHAR_ZERO ('0')
 
 /** Default cbor payload size. This value is increased in case of CborErrorOutOfMemory.
  * The value of payload size is increased until reaching belox max cbor size. */
@@ -58,9 +60,6 @@ static const uint16_t CBOR_SIZE = 512;
 
 /** Max cbor size payload. */
 static const uint16_t CBOR_MAX_SIZE = 4400;
-
-/** DOXM Map size - Number of mandatory items. */
-static const uint8_t DOXM_MAP_SIZE = 9;
 
 static OicSecDoxm_t        *gDoxm = NULL;
 static OCResourceHandle    gDoxmHandle = NULL;
@@ -78,6 +77,10 @@ static OicSecDoxm_t gDefaultDoxm =
     {.id = {0}},            /* OicUuid_t deviceID */
     false,                  /* bool dpc */
     {.id = {0}},            /* OicUuid_t owner */
+#ifdef _ENABLE_MULTIPLE_OWNER_
+    NULL,                   /* OicSecSubOwner_t sub-owner list */
+    NULL,                   /* OicSecMomType_t multiple owner mode */
+#endif //_ENABLE_MULTIPLE_OWNER_
     {.id = {0}},            /* OicUuid_t rownerID */
 };
 
@@ -102,6 +105,23 @@ void DeleteDoxmBinData(OicSecDoxm_t* doxm)
 
         //clean oxm
         OICFree(doxm->oxm);
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+        //clean mom
+        OICFree(doxm->mom);
+
+        //clean sub-owner list
+        if(NULL != doxm->subOwners)
+        {
+            OicSecSubOwner_t* subowner = NULL;
+            OicSecSubOwner_t* temp = NULL;
+            LL_FOREACH_SAFE(doxm->subOwners, subowner, temp)
+            {
+                LL_DELETE(doxm->subOwners, subowner);
+                OICFree(subowner);
+            }
+        }
+#endif //_ENABLE_MULTIPLE_OWNER_
 
         //Clean doxm itself
         OICFree(doxm);
@@ -130,21 +150,12 @@ OCStackResult DoxmToCBORPayload(const OicSecDoxm_t *doxm, uint8_t **payload, siz
     char* strUuid = NULL;
 
     int64_t cborEncoderResult = CborNoError;
-    uint8_t mapSize = DOXM_MAP_SIZE;
-    if (doxm->oxmTypeLen > 0)
-    {
-        mapSize++;
-    }
-    if (doxm->oxmLen > 0)
-    {
-        mapSize++;
-    }
 
     uint8_t *outPayload = (uint8_t *)OICCalloc(1, cborLen);
     VERIFY_NON_NULL(TAG, outPayload, ERROR);
     cbor_encoder_init(&encoder, outPayload, cborLen, 0);
 
-    cborEncoderResult = cbor_encoder_create_map(&encoder, &doxmMap, mapSize);
+    cborEncoderResult = cbor_encoder_create_map(&encoder, &doxmMap, CborIndefiniteLength);
     VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Adding Doxm Map.");
 
     //OxmType -- Not Mandatory
@@ -223,6 +234,49 @@ OCStackResult DoxmToCBORPayload(const OicSecDoxm_t *doxm, uint8_t **payload, siz
         OICFree(strUuid);
         strUuid = NULL;
     }
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+    //Device SubOwnerID -- Not Mandatory
+    if(doxm->subOwners)
+    {
+        size_t subOwnerLen = 0;
+        OicSecSubOwner_t* subOwner = NULL;
+        LL_FOREACH(doxm->subOwners, subOwner)
+        {
+            subOwnerLen++;
+        }
+
+        CborEncoder subOwners;
+        cborEncoderResult = cbor_encode_text_string(&doxmMap, OIC_JSON_SUBOWNERID_NAME,
+            strlen(OIC_JSON_SUBOWNERID_NAME));
+        VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Adding SubOwnerId Tag.");
+        cborEncoderResult = cbor_encoder_create_array(&doxmMap, &subOwners, subOwnerLen);
+        VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Adding SubOwner Array.");
+
+        subOwner = NULL;
+        LL_FOREACH(doxm->subOwners, subOwner)
+        {
+            char* strUuid = NULL;
+            ret = ConvertUuidToStr(&subOwner->uuid, &strUuid);
+            VERIFY_SUCCESS(TAG, OC_STACK_OK == ret , ERROR);
+            cborEncoderResult = cbor_encode_text_string(&subOwners, strUuid, strlen(strUuid));
+            OICFree(strUuid);
+            VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Adding SubOwnerId Value");
+        }
+        cborEncoderResult = cbor_encoder_close_container(&doxmMap, &subOwners);
+        VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Closing SubOwnerId.");
+    }
+
+    //Multiple Owner Mode -- Not Mandatory
+    if(doxm->mom)
+    {
+        cborEncoderResult = cbor_encode_text_string(&doxmMap, OIC_JSON_MOM_NAME,
+            strlen(OIC_JSON_MOM_NAME));
+        VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Adding mom Tag");
+        cborEncoderResult = cbor_encode_int(&doxmMap, (int64_t)doxm->mom->mode);
+        VERIFY_CBOR_SUCCESS(TAG, cborEncoderResult, "Failed Adding mom Value.");
+    }
+#endif //_ENABLE_MULTIPLE_OWNER_
 
     //devownerid -- Mandatory
     cborEncoderResult = cbor_encode_text_string(&doxmMap, OIC_JSON_DEVOWNERID_NAME,
@@ -355,7 +409,7 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
         CborValue oxmType;
 
         cborFindResult = cbor_value_get_array_length(&doxmMap, &doxm->oxmTypeLen);
-        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding oxmTypeLen.")
+        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding oxmTypeLen.");
         VERIFY_SUCCESS(TAG, doxm->oxmTypeLen != 0, ERROR);
 
         doxm->oxmType = (OicUrn_t *)OICCalloc(doxm->oxmTypeLen, sizeof(*doxm->oxmType));
@@ -370,9 +424,9 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
         {
             cborFindResult = cbor_value_dup_text_string(&oxmType, &doxm->oxmType[i++],
                                                         &len, NULL);
-            VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding omxType text string.")
+            VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding omxType text string.");
             cborFindResult = cbor_value_advance(&oxmType);
-            VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Advancing oxmType.")
+            VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Advancing oxmType.");
         }
     }
 
@@ -382,7 +436,7 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
     {
         CborValue oxm;
         cborFindResult = cbor_value_get_array_length(&doxmMap, &doxm->oxmLen);
-        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding oxmName array Length.")
+        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding oxmName array Length.");
         VERIFY_SUCCESS(TAG, doxm->oxmLen != 0, ERROR);
 
         doxm->oxm = (OicSecOxm_t *)OICCalloc(doxm->oxmLen, sizeof(*doxm->oxm));
@@ -394,8 +448,11 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
         int i = 0;
         while (cbor_value_is_valid(&oxm) && cbor_value_is_integer(&oxm))
         {
-            cborFindResult = cbor_value_get_int(&oxm, (int *) &doxm->oxm[i++]);
+            int tmp;
+
+            cborFindResult = cbor_value_get_int(&oxm, &tmp);
             VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding oxmName Value")
+            doxm->oxm[i++] = (OicSecOxm_t)tmp;
             cborFindResult = cbor_value_advance(&oxm);
             VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Advancing oxmName.")
         }
@@ -411,8 +468,7 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
         doxm->oxm = (OicSecOxm_t *) OICCalloc(gDoxm->oxmLen, sizeof(*doxm->oxm));
         VERIFY_NON_NULL(TAG, doxm->oxm, ERROR);
         doxm->oxmLen = gDoxm->oxmLen;
-        int i;
-        for (i = 0; i < gDoxm->oxmLen; i++)
+        for (size_t i = 0; i < gDoxm->oxmLen; i++)
         {
             doxm->oxm[i] = gDoxm->oxm[i];
         }
@@ -421,8 +477,11 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
     cborFindResult = cbor_value_map_find_value(&doxmCbor, OIC_JSON_OXM_SEL_NAME, &doxmMap);
     if (CborNoError == cborFindResult && cbor_value_is_integer(&doxmMap))
     {
-        cborFindResult = cbor_value_get_int(&doxmMap, (int *) &doxm->oxmSel);
+        int oxmSel;
+
+        cborFindResult = cbor_value_get_int(&doxmMap, &oxmSel);
         VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding Sel Name Value.")
+        doxm->oxmSel = (OicSecOxm_t)oxmSel;
     }
     else // PUT/POST JSON may not have oxmsel so set it to the gDoxm->oxmSel
     {
@@ -433,8 +492,11 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
     cborFindResult = cbor_value_map_find_value(&doxmCbor, OIC_JSON_SUPPORTED_CRED_TYPE_NAME, &doxmMap);
     if (CborNoError == cborFindResult && cbor_value_is_integer(&doxmMap))
     {
-        cborFindResult = cbor_value_get_int(&doxmMap, (int *) &doxm->sct);
+        int sct;
+
+        cborFindResult = cbor_value_get_int(&doxmMap, &sct);
         VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding Sct Name Value.")
+        doxm->sct = (OicSecCredType_t)sct;
 
         if (roParsed)
         {
@@ -507,6 +569,82 @@ static OCStackResult CBORPayloadToDoxmBin(const uint8_t *cborPayload, size_t siz
         VERIFY_NON_NULL(TAG, gDoxm, ERROR);
         memcpy(doxm->owner.id, gDoxm->owner.id, sizeof(doxm->owner.id));
     }
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+    cborFindResult = cbor_value_map_find_value(&doxmCbor, OIC_JSON_MOM_NAME, &doxmMap);
+    if(CborNoError == cborFindResult && cbor_value_is_integer(&doxmMap))
+    {
+        int mode = 0;
+        cborFindResult = cbor_value_get_int(&doxmMap, &mode);
+        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding mom Name Value.")
+        if(NULL == doxm->mom)
+        {
+            doxm->mom = (OicSecMom_t*)OICCalloc(1, sizeof(OicSecMom_t));
+            VERIFY_NON_NULL(TAG, doxm->mom, ERROR);
+        }
+        doxm->mom->mode = (OicSecMomType_t)mode;
+    }
+    else if(NULL != gDoxm && NULL != gDoxm->mom)
+    {
+        // PUT/POST JSON may not have 'mom' so set it to the gDomx->mom
+        if(NULL == doxm->mom)
+        {
+            doxm->mom = (OicSecMom_t*)OICCalloc(1, sizeof(OicSecMom_t));
+            VERIFY_NON_NULL(TAG, doxm->mom, ERROR);
+        }
+        doxm->mom->mode = gDoxm->mom->mode;
+    }
+
+    cborFindResult = cbor_value_map_find_value(&doxmCbor, OIC_JSON_SUBOWNERID_NAME, &doxmMap);
+    if(CborNoError == cborFindResult && cbor_value_is_array(&doxmMap))
+    {
+        size_t subOwnerLen = 0;
+        CborValue subOwnerCbor;
+        cborFindResult = cbor_value_get_array_length(&doxmMap, &subOwnerLen);
+        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding SubOwner array Length.");
+        VERIFY_SUCCESS(TAG, 0 != subOwnerLen, ERROR);
+
+        cborFindResult = cbor_value_enter_container(&doxmMap, &subOwnerCbor);
+        VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Entering SubOwner Array.")
+
+        while (cbor_value_is_valid(&subOwnerCbor) && cbor_value_is_text_string(&subOwnerCbor))
+        {
+            OCStackResult convertRes = OC_STACK_ERROR;
+            OicSecSubOwner_t* subOwner = NULL;
+            char* strUuid = NULL;
+            size_t uuidLen = 0;
+
+            cborFindResult = cbor_value_dup_text_string(&subOwnerCbor, &strUuid, &uuidLen, NULL);
+            VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding SubOwnerId Value");
+
+            subOwner = (OicSecSubOwner_t*)OICCalloc(1, sizeof(OicSecSubOwner_t));
+            VERIFY_NON_NULL(TAG, subOwner, ERROR);
+
+            convertRes = ConvertStrToUuid(strUuid, &subOwner->uuid);
+            VERIFY_SUCCESS(TAG, OC_STACK_OK == convertRes, ERROR);
+            subOwner->status = MOT_STATUS_DONE;
+            LL_APPEND(doxm->subOwners, subOwner);
+
+            cborFindResult = cbor_value_advance(&subOwnerCbor);
+            VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Advancing SubOwnerId.")
+        }
+    }
+    else if(NULL != gDoxm && NULL != gDoxm->subOwners)
+    {
+        // PUT/POST JSON may not have 'subOwners' so set it to the gDomx->subOwners
+        OicSecSubOwner_t* subOwnerItor = NULL;
+        LL_FOREACH(gDoxm->subOwners, subOwnerItor)
+        {
+            OicSecSubOwner_t* subOwnerId = (OicSecSubOwner_t*)OICCalloc(1, sizeof(OicSecSubOwner_t));
+            VERIFY_NON_NULL(TAG, subOwnerId, ERROR);
+
+            memcpy(&subOwnerId->uuid, &subOwnerItor->uuid, sizeof(OicUuid_t));
+            subOwnerId->status = MOT_STATUS_DONE;
+
+            LL_APPEND(doxm->subOwners, subOwnerId);
+        }
+    }
+#endif //_ENABLE_MULTIPLE_OWNER_
 
     cborFindResult = cbor_value_map_find_value(&doxmCbor, OIC_JSON_ROWNERID_NAME, &doxmMap);
     if (CborNoError == cborFindResult && cbor_value_is_text_string(&doxmMap))
@@ -593,6 +731,10 @@ static bool ValidateQuery(const char * query)
     bool bDeviceIDMatch = false;    // does 'deviceid' query matches with doxm.deviceid ?
     bool bInterfaceQry = false;      // does querystring contains 'if' query ?
     bool bInterfaceMatch = false;    // does 'if' query matches with oic.if.baseline ?
+#ifdef _ENABLE_MULTIPLE_OWNER_
+    bool bMotQry = false;         // does querystring contains 'mom' and 'owned' query ?
+    bool bMotMatch = false;       // does 'mom' query value is not '0' && does query value matches with doxm.owned status?
+#endif //_ENABLE_MULTIPLE_OWNER_
 
     OicParseQueryIter_t parseIter = {.attrPos = NULL};
 
@@ -614,6 +756,29 @@ static bool ValidateQuery(const char * query)
                 bOwnedMatch = true;
             }
         }
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+        if (strncasecmp((char *)parseIter.attrPos, OIC_JSON_MOM_NAME, strlen(OIC_JSON_MOM_NAME)) == 0)
+        {
+            bMotQry = true;
+            OicSecMomType_t momMode = (OicSecMomType_t)(parseIter.valPos[0] - CHAR_ZERO);
+            if(NULL != gDoxm->mom && momMode != gDoxm->mom->mode)
+            {
+                if(GetNextQuery(&parseIter))
+                {
+                    if (strncasecmp((char *)parseIter.attrPos, OIC_JSON_OWNED_NAME, parseIter.attrLen) == 0)
+                    {
+                        if ((strncasecmp((char *)parseIter.valPos, OIC_SEC_TRUE, parseIter.valLen) == 0) &&
+                                (gDoxm->owned))
+                        {
+                            bMotMatch = true;
+                        }
+                    }
+                }
+            }
+            return bMotMatch;
+        }
+#endif //_ENABLE_MULTIPLE_OWNER_
 
         if (strncasecmp((char *)parseIter.attrPos, OIC_JSON_DEVICE_ID_NAME, parseIter.attrLen) == 0)
         {
@@ -638,7 +803,14 @@ static bool ValidateQuery(const char * query)
         }
     }
 
-    return ((bOwnedQry ? bOwnedMatch : true) && (bDeviceIDQry ? bDeviceIDMatch : true));
+#ifdef _ENABLE_MULTIPLE_OWNER_
+    return ((bOwnedQry ? bOwnedMatch : true) &&
+            (bDeviceIDQry ? bDeviceIDMatch : true) &&
+            (bMotQry ? bMotMatch : true));
+#else
+    return ((bOwnedQry ? bOwnedMatch : true) &&
+            (bDeviceIDQry ? bDeviceIDMatch : true));
+#endif //_ENABLE_MULTIPLE_OWNER_
 }
 
 static OCEntityHandlerResult HandleDoxmGetRequest (const OCEntityHandlerRequest * ehRequest)
@@ -675,6 +847,9 @@ static OCEntityHandlerResult HandleDoxmGetRequest (const OCEntityHandlerRequest 
         }
     }
 
+    OIC_LOG(DEBUG, TAG, "Send payload for doxm GET request");
+    OIC_LOG_BUFFER(DEBUG, TAG, payload, size);
+
     // Send response payload to request originator
     ehRet = ((SendSRMResponse(ehRequest, ehRet, payload, size)) == OC_STACK_OK) ?
                    OC_EH_OK : OC_EH_ERROR;
@@ -683,6 +858,100 @@ static OCEntityHandlerResult HandleDoxmGetRequest (const OCEntityHandlerRequest 
 
     return ehRet;
 }
+
+static void updateWriteableProperty(const OicSecDoxm_t* src, OicSecDoxm_t* dst)
+{
+    if(src && dst)
+   {
+        // update oxmsel
+        dst->oxmSel = src->oxmSel;
+
+        //update owner
+        memcpy(&(dst->owner), &(src->owner), sizeof(OicUuid_t));
+
+        //update rowner
+        memcpy(&(dst->rownerID), &(src->rownerID), sizeof(OicUuid_t));
+
+        //Update owned status
+        if(dst->owned != src->owned)
+        {
+            dst->owned = src->owned;
+        }
+
+        //update oxms
+        if(0 < src->oxmLen)
+        {
+            OicSecOxm_t* tempOxm = (OicSecOxm_t*)OICMalloc(sizeof(OicSecOxm_t) * src->oxmLen);
+            if(NULL != tempOxm)
+            {
+                for(size_t i = 0; i < src->oxmLen; i++)
+                {
+                    tempOxm[i] = src->oxm[i];
+                }
+                OICFree(dst->oxm);
+
+                dst->oxm = tempOxm;
+                dst->oxmLen = src->oxmLen;
+            }
+        }
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+        if(src->mom)
+        {
+            OIC_LOG(DEBUG, TAG, "dectected 'mom' property");
+            if(NULL == dst->mom)
+            {
+                dst->mom = (OicSecMom_t*)OICCalloc(1, sizeof(OicSecMom_t));
+                if(NULL != dst->mom)
+                {
+                    dst->mom->mode = src->mom->mode;
+                }
+            }
+        }
+#endif //_ENABLE_MULTIPLE_OWNER_
+    }
+}
+
+#if defined(__WITH_DTLS__) || defined (__WITH_TLS__)
+#ifdef _ENABLE_MULTIPLE_OWNER_
+/**
+ * Callback function to handle MOT DTLS handshake result.
+ * @param[out]   object           remote device information.
+ * @param[out]   errorInfo        CA Error information.
+ */
+void MultipleOwnerDTLSHandshakeCB(const CAEndpoint_t *object,
+                                const CAErrorInfo_t *errorInfo)
+{
+    OIC_LOG(DEBUG, TAG, "IN MultipleOwnerDTLSHandshakeCB");
+
+    if(CA_STATUS_OK == errorInfo->result)
+    {
+        const CASecureEndpoint_t* authenticatedSubOwnerInfo = CAGetSecureEndpointData(object);
+        if(authenticatedSubOwnerInfo)
+        {
+            OicSecSubOwner_t* subOwnerInst = (OicSecSubOwner_t*)OICMalloc(sizeof(OicSecSubOwner_t));
+            if(subOwnerInst)
+            {
+                OIC_LOG(DEBUG, TAG, "Adding New SubOwner");
+                memcpy(subOwnerInst->uuid.id, authenticatedSubOwnerInfo->identity.id, authenticatedSubOwnerInfo->identity.id_length);
+                LL_APPEND(gDoxm->subOwners, subOwnerInst);
+                if(!UpdatePersistentStorage(gDoxm))
+                {
+                    OIC_LOG(ERROR, TAG, "Failed to register SubOwner UUID into Doxm");
+                }
+            }
+        }
+    }
+
+    if(CA_STATUS_OK != CAregisterPskCredentialsHandler(GetDtlsPskCredentials))
+    {
+        OIC_LOG(WARNING, TAG, "Failed to revert the DTLS credential handler");
+    }
+
+    OIC_LOG(DEBUG, TAG, "OUT MultipleOwnerDTLSHandshakeCB");
+}
+#endif //_ENABLE_MULTIPLE_OWNER_
+#endif // defined(__WITH_DTLS__) || defined (__WITH_TLS__)
 
 static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest * ehRequest)
 {
@@ -716,15 +985,73 @@ static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest 
             // in owned state
             if (true == gDoxm->owned)
             {
-                // update writable properties
-                gDoxm->oxmSel = newDoxm->oxmSel;
-                memcpy(&(gDoxm->owner), &(newDoxm->owner), sizeof(OicUuid_t));
-                memcpy(&(gDoxm->rownerID), &(newDoxm->rownerID), sizeof(OicUuid_t));
+                //Update gDoxm based on newDoxm
+                updateWriteableProperty(newDoxm, gDoxm);
 
-                if(gDoxm->owned != newDoxm->owned)
+#if defined(__WITH_DTLS__) || defined (__WITH_TLS__)
+#ifdef _ENABLE_MULTIPLE_OWNER_
+                //handle mom
+                if(gDoxm->mom)
                 {
-                    gDoxm->owned = newDoxm->owned;
+                    if(OIC_MULTIPLE_OWNER_DISABLE != gDoxm->mom->mode)
+                    {
+                        CAResult_t caRes = CA_STATUS_FAILED;
+                        if(OIC_PRECONFIG_PIN == gDoxm->oxmSel || OIC_RANDOM_DEVICE_PIN == gDoxm->oxmSel)
+                        {
+                            caRes = CAEnableAnonECDHCipherSuite(false);
+                            VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
+                            OIC_LOG(INFO, TAG, "ECDH_ANON CipherSuite is DISABLED");
+
+                            caRes = CASelectCipherSuite((uint16_t)TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256, ehRequest->devAddr.adapter);
+                            VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
+                            OIC_LOG(INFO, TAG, "ECDHE_PSK CipherSuite will be used for MOT");
+
+                            //Set the device id to derive temporal PSK
+                            SetUuidForPinBasedOxm(&gDoxm->deviceID);
+                        }
+                        else
+                        {
+                            OIC_LOG(WARNING, TAG, "Unsupported OxM for Multiple Ownership Transfer.");
+                        }
+
+                        CAregisterSslHandshakeCallback(MultipleOwnerDTLSHandshakeCB);
+                    }
+                    else
+                    {
+                        //if MOM is disabled, revert the DTLS handshake callback
+                        if(CA_STATUS_OK != CAregisterSslHandshakeCallback(NULL))
+                        {
+                            OIC_LOG(WARNING, TAG, "Error while revert the DTLS Handshake Callback.");
+                        }
+                    }
                 }
+
+                if(newDoxm->subOwners)
+                {
+                    OicSecSubOwner_t* subowner = NULL;
+                    OicSecSubOwner_t* temp = NULL;
+
+                    OIC_LOG(DEBUG, TAG, "dectected 'subowners' property");
+
+                    if(gDoxm->subOwners)
+                    {
+                        LL_FOREACH_SAFE(gDoxm->subOwners, subowner, temp)
+                        {
+                            LL_DELETE(gDoxm->subOwners, subowner);
+                            OICFree(subowner);
+                        }
+                    }
+
+                    subowner = NULL;
+                    temp = NULL;
+                    LL_FOREACH_SAFE(newDoxm->subOwners, subowner, temp)
+                    {
+                        LL_DELETE(newDoxm->subOwners, subowner);
+                        LL_APPEND(gDoxm->subOwners, subowner);
+                    }
+                }
+#endif //_ENABLE_MULTIPLE_OWNER_
+#endif // defined(__WITH_DTLS__) || defined (__WITH_TLS__)
 
                 //Update new state in persistent storage
                 if (UpdatePersistentStorage(gDoxm) == true)
@@ -752,14 +1079,14 @@ static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest 
                     if (memcmp(&(newDoxm->owner), &emptyOwner, sizeof(OicUuid_t)) == 0)
                     {
                         OIC_LOG (INFO, TAG, "Doxm EntityHandle  enabling AnonECDHCipherSuite");
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
                         ehRet = (CAEnableAnonECDHCipherSuite(true) == CA_STATUS_OK) ? OC_EH_OK : OC_EH_ERROR;
-#endif //__WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
                         goto exit;
                     }
                     else
                     {
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
                         //Save the owner's UUID to derive owner credential
                         memcpy(&(gDoxm->owner), &(newDoxm->owner), sizeof(OicUuid_t));
 
@@ -783,11 +1110,7 @@ static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest 
                         VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
                         OIC_LOG(INFO, TAG, "ECDH_ANON CipherSuite is DISABLED");
 
-#ifdef __WITH_X509__
-#define TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8 0xC0AE
-                        CASelectCipherSuite(TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8);
-#endif //__WITH_X509__
-#endif //__WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
                     }
                 }
                 else if (OIC_RANDOM_DEVICE_PIN == newDoxm->oxmSel)
@@ -811,30 +1134,32 @@ static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest 
                             ehRet = OC_EH_ERROR;
                         }
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
                         CAResult_t caRes = CA_STATUS_OK;
 
                         caRes = CAEnableAnonECDHCipherSuite(false);
                         VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
                         OIC_LOG(INFO, TAG, "ECDH_ANON CipherSuite is DISABLED");
 
-                        caRes = CASelectCipherSuite(TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256);
+                        caRes = CASelectCipherSuite(TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256,
+                                                    ehRequest->devAddr.adapter);
                         VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
 
-                        if(previousMsgId != ehRequest->messageID)
+                        char ranPin[OXM_RANDOM_PIN_SIZE + 1] = {0,};
+                         //TODO ehRequest->messageID for copa over TCP always is null. Find reason why.
+                        if(ehRequest->devAddr.adapter == OC_ADAPTER_IP && previousMsgId != ehRequest->messageID)
                         {
-                            char ranPin[OXM_RANDOM_PIN_SIZE + 1] = {0,};
                             if(OC_STACK_OK == GeneratePin(ranPin, OXM_RANDOM_PIN_SIZE + 1))
                             {
                                 //Set the device id to derive temporal PSK
-                                SetUuidForRandomPinOxm(&gDoxm->deviceID);
+                                SetUuidForPinBasedOxm(&gDoxm->deviceID);
 
                                 /**
                                  * Since PSK will be used directly by DTLS layer while PIN based ownership transfer,
                                  * Credential should not be saved into SVR.
                                  * For this reason, use a temporary get_psk_info callback to random PIN OxM.
                                  */
-                                caRes = CARegisterDTLSCredentialsHandler(GetDtlsPskForRandomPinOxm);
+                                caRes = CAregisterPskCredentialsHandler(GetDtlsPskForRandomPinOxm);
                                 VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
                                 ehRet = OC_EH_OK;
                             }
@@ -844,11 +1169,34 @@ static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest 
                                 ehRet = OC_EH_ERROR;
                             }
                         }
-#endif //__WITH_DTLS__
+                        else if(previousMsgId != ehRequest->messageID)
+                        {
+                            if(OC_STACK_OK == GeneratePin(ranPin, OXM_RANDOM_PIN_SIZE + 1))
+                            {
+                                //Set the device id to derive temporal PSK
+                                SetUuidForPinBasedOxm(&gDoxm->deviceID);
+
+                                /**
+                                 * Since PSK will be used directly by DTLS layer while PIN based ownership transfer,
+                                 * Credential should not be saved into SVR.
+                                 * For this reason, use a temporary get_psk_info callback to random PIN OxM.
+                                 */
+                                caRes = CAregisterPskCredentialsHandler(GetDtlsPskForRandomPinOxm);
+                                VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
+                                ehRet = OC_EH_OK;
+                            }
+                            else
+                            {
+                                OIC_LOG(ERROR, TAG, "Failed to generate random PIN");
+                                ehRet = OC_EH_ERROR;
+                            }
+
+                        }
+#endif // __WITH_DTLS__ or __WITH_TLS__
                     }
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
                     else
                     {
-#ifdef __WITH_DTLS__
                         //Save the owner's UUID to derive owner credential
                         memcpy(&(gDoxm->owner), &(newDoxm->owner), sizeof(OicUuid_t));
 
@@ -862,8 +1210,8 @@ static OCEntityHandlerResult HandleDoxmPostRequest(const OCEntityHandlerRequest 
                             OIC_LOG(ERROR, TAG, "Failed to update DOXM in persistent storage");
                             ehRet = OC_EH_ERROR;
                         }
-#endif
                     }
+#endif // __WITH_DTLS__ or __WITH_TLS__
                 }
             }
 
@@ -1087,6 +1435,54 @@ const OicSecDoxm_t* GetDoxmResourceData()
     return gDoxm;
 }
 
+#if defined(__WITH_DTLS__) && defined(_ENABLE_MULTIPLE_OWNER_)
+/**
+ * Internal API to prepare MOT
+ */
+static void PrepareMOT(const OicSecDoxm_t* doxm)
+{
+    OIC_LOG(INFO, TAG, "IN PrepareMOT");
+    VERIFY_NON_NULL(TAG, doxm, ERROR);
+
+    if(true == doxm->owned && NULL != doxm->mom && OIC_MULTIPLE_OWNER_DISABLE != doxm->mom->mode)
+    {
+        CAResult_t caRes = CA_STATUS_FAILED;
+
+        OIC_LOG(INFO, TAG, "Multiple Ownership Transfer Enabled!");
+
+        if(OIC_PRECONFIG_PIN == doxm->oxmSel)
+        {
+            caRes = CAEnableAnonECDHCipherSuite(false);
+            VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
+            OIC_LOG(INFO, TAG, "ECDH_ANON CipherSuite is DISABLED");
+
+            caRes = CASelectCipherSuite((uint16_t)TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256, CA_ADAPTER_IP);
+            VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
+#ifdef __WITH_TLS__
+            caRes = CASelectCipherSuite((uint16_t)TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256, CA_ADAPTER_TCP);
+            VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
+#endif
+            OIC_LOG(INFO, TAG, "ECDHE_PSK CipherSuite will be used for MOT");
+
+            //Set the device id to derive temporal PSK
+            SetUuidForPinBasedOxm(&doxm->deviceID);
+        }
+        else
+        {
+            OIC_LOG(ERROR, TAG, "Unsupported OxM for Multiple Ownership Transfer.");
+            return;
+        }
+
+        CAregisterSslHandshakeCallback(MultipleOwnerDTLSHandshakeCB);
+    }
+
+    OIC_LOG(INFO, TAG, "OUT PrepareMOT");
+    return;
+exit:
+    OIC_LOG(WARNING, TAG, "Error in PrepareMOT");
+}
+#endif //defined(__WITH_DTLS__) && defined(_ENABLE_MULTIPLE_OWNER_)
+
 OCStackResult InitDoxmResource()
 {
     OCStackResult ret = OC_STACK_ERROR;
@@ -1134,6 +1530,15 @@ OCStackResult InitDoxmResource()
         OIC_LOG (ERROR, TAG, "CheckDeviceID failed");
     }
     OICFree(data);
+
+#if defined(__WITH_DTLS__) && defined(_ENABLE_MULTIPLE_OWNER_)
+    //if MOT is enabled, MOT should be prepared.
+    if(gDoxm && gDoxm->owned)
+    {
+        PrepareMOT(gDoxm);
+    }
+#endif // defined(__WITH_DTLS__) && defined(_ENABLE_MULTIPLE_OWNER_)
+
     return ret;
 }
 
@@ -1166,6 +1571,71 @@ OCStackResult GetDoxmDeviceID(OicUuid_t *deviceID)
     return OC_STACK_ERROR;
 }
 
+OCStackResult GetDoxmIsOwned(bool *isOwned)
+{
+    if (isOwned && gDoxm)
+    {
+       *isOwned = gDoxm->owned;
+        return OC_STACK_OK;
+    }
+    return OC_STACK_ERROR;
+}
+
+OCStackResult SetDoxmDeviceID(const OicUuid_t *deviceID)
+{
+    bool isPT = false;
+
+    if(NULL == deviceID)
+    {
+        return OC_STACK_INVALID_PARAM;
+    }
+    if(NULL == gDoxm)
+    {
+        OIC_LOG(ERROR, TAG, "Doxm resource is not initialized.");
+        return OC_STACK_NO_RESOURCE;
+    }
+
+    //Check the device's OTM state
+
+#ifdef __WITH_DTLS__
+    //for normal device.
+    if(true == gDoxm->owned)
+    {
+        OIC_LOG(ERROR, TAG, "This device owned by owner's device.");
+        OIC_LOG(ERROR, TAG, "Device UUID cannot be changed to guarantee the reliability of the connection.");
+        return OC_STACK_ERROR;
+    }
+#endif //__WITH_DTLS
+
+    //Save the previous UUID
+    OicUuid_t tempUuid;
+    memcpy(tempUuid.id, gDoxm->deviceID.id, sizeof(tempUuid.id));
+
+    //Change the UUID
+    memcpy(gDoxm->deviceID.id, deviceID->id, sizeof(deviceID->id));
+    if(isPT)
+    {
+        memcpy(gDoxm->owner.id, deviceID->id, sizeof(deviceID->id));
+        memcpy(gDoxm->rownerID.id, deviceID->id, sizeof(deviceID->id));
+    }
+
+    //Update PS
+    if(!UpdatePersistentStorage(gDoxm))
+    {
+        //revert UUID in case of update error
+        memcpy(gDoxm->deviceID.id, tempUuid.id, sizeof(tempUuid.id));
+        if(isPT)
+        {
+            memcpy(gDoxm->owner.id, tempUuid.id, sizeof(tempUuid.id));
+            memcpy(gDoxm->rownerID.id, tempUuid.id, sizeof(tempUuid.id));
+        }
+
+        OIC_LOG(ERROR, TAG, "Failed to update persistent storage");
+        return OC_STACK_ERROR;
+    }
+    return OC_STACK_OK;
+}
+
 OCStackResult GetDoxmDevOwnerId(OicUuid_t *devownerid)
 {
     OCStackResult retVal = OC_STACK_ERROR;
@@ -1195,6 +1665,38 @@ OCStackResult GetDoxmRownerId(OicUuid_t *rowneruuid)
     }
     return retVal;
 }
+
+#ifdef _ENABLE_MULTIPLE_OWNER_
+/**
+ * Compare the UUID to SubOwner.
+ *
+ * @param[in] uuid device UUID
+ *
+ * @return true if context->subjectId exist subowner list, else false.
+ */
+bool IsSubOwner(const OicUuid_t* uuid)
+{
+    bool retVal = false;
+
+    if(NULL == uuid)
+    {
+        return retVal;
+    }
+
+    if (gDoxm && gDoxm->subOwners)
+    {
+        OicSecSubOwner_t* subOwner = NULL;
+        LL_FOREACH(gDoxm->subOwners, subOwner)
+        {
+            if(memcmp(subOwner->uuid.id, uuid->id, sizeof(uuid->id)) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    return retVal;
+}
+#endif //_ENABLE_MULTIPLE_OWNER_
 
 /**
  * Function to restore doxm resurce to initial status.

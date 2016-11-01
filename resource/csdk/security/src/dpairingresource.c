@@ -18,6 +18,7 @@
  *
  * *****************************************************************/
 
+#include "iotivity_config.h"
 #include <stdlib.h>
 #include <string.h>
 #include "ocstack.h"
@@ -42,9 +43,7 @@
 #include "ocpayload.h"
 #include "payload_logging.h"
 #include <stdlib.h>
-#ifdef WITH_ARDUINO
-#include <string.h>
-#else
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 
@@ -105,7 +104,7 @@ void SetDpairingResourceOwner(OicUuid_t *rowner)
     }
 }
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
 /**
  * Function to save PairingPSK.
  *
@@ -154,7 +153,7 @@ OCStackResult SavePairingPSK(OCDevAddr *endpoint,
 
         OicSecCred_t *cred = GenerateCredential(peerDevID,
                 SYMMETRIC_PAIR_WISE_KEY, NULL,
-                &pairingKey, owner);
+                &pairingKey, owner, NULL);
         VERIFY_NON_NULL(TAG, cred, ERROR);
 
         res = AddCredential(cred);
@@ -173,7 +172,7 @@ OCStackResult SavePairingPSK(OCDevAddr *endpoint,
 exit:
     return res;
 }
-#endif // __WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
 OCStackResult DpairingToCBORPayload(const OicSecDpairing_t *dpair, uint8_t **payload, size_t *size)
 {
@@ -310,8 +309,11 @@ OCStackResult CBORPayloadToDpair(const uint8_t *cborPayload, size_t size,
         type = cbor_value_get_type(&dpairMap);
         if (0 == strcmp(OIC_JSON_SPM_NAME, name) && cbor_value_is_integer(&dpairMap))
         {
-            cborFindResult = cbor_value_get_int(&dpairMap, (int *) &dpair->spm);
+            int spm;
+
+            cborFindResult = cbor_value_get_int(&dpairMap, &spm);
             VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed Finding SPM Value");
+            dpair->spm = (OicSecPrm_t)spm;
         }
 
         if (0 == strcmp(OIC_JSON_PDEVICE_ID_NAME, name))
@@ -382,9 +384,9 @@ void DPairingDTLSHandshakeCB(const CAEndpoint_t *endpoint, const CAErrorInfo_t *
 
         }
 
-#ifdef __WITH_DTLS__
-        CARegisterDTLSHandshakeCallback(NULL);
-#endif // __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+        CAregisterSslHandshakeCallback(NULL);
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
         // delete temporary key
         RemoveCredential(&gDpair->pdeviceID);
@@ -442,7 +444,7 @@ static OCEntityHandlerResult HandleDpairingPostRequest (const OCEntityHandlerReq
             memcpy(&gDpair->pdeviceID, &newDpair->pdeviceID, sizeof(OicUuid_t));
             memcpy(&gDpair->rownerID, &pconf->rownerID, sizeof(OicUuid_t));
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
             // Add temporary psk
             OCStackResult res;
             OicUuid_t subjectId = {.id={0}};
@@ -459,24 +461,24 @@ static OCEntityHandlerResult HandleDpairingPostRequest (const OCEntityHandlerReq
 
             // Prepare to establish a secure channel with Pin-based PSK cipher suite
             if (CA_STATUS_OK != CAEnableAnonECDHCipherSuite(false) ||
-                CA_STATUS_OK != CASelectCipherSuite(TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256))
+                CA_STATUS_OK != CASelectCipherSuite(TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256, CA_ADAPTER_IP))
             {
                 OIC_LOG_V(ERROR, TAG, "Failed to select TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256");
                 goto exit;
             }
 
-            if(CA_STATUS_OK != CARegisterDTLSHandshakeCallback(DPairingDTLSHandshakeCB))
+            if(CA_STATUS_OK != CAregisterSslHandshakeCallback(DPairingDTLSHandshakeCB))
             {
                 OIC_LOG(WARNING, TAG, "DirectPairingHandler : Failed to register"
                         " DTLS handshake callback.");
                 goto exit;
             }
-#endif // __WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
             // should be lock /oic/sec/dpairing resource if Direct-Pairing starts normally ?
             OIC_LOG (DEBUG, TAG, "/oic/sec/dpairing resource created");
 
-            ehRet = OC_EH_CHANGED;
+            ehRet = OC_EH_RESOURCE_CREATED;
         }
         else
         {
@@ -485,9 +487,9 @@ static OCEntityHandlerResult HandleDpairingPostRequest (const OCEntityHandlerReq
     }
 
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
 exit:
-#endif // __WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
     // Send payload to request originator
     if(OC_STACK_OK != SendSRMResponse(ehRequest, ehRet, NULL, 0))
@@ -543,7 +545,7 @@ static OCEntityHandlerResult HandleDpairingPutRequest (const OCEntityHandlerRequ
         const OicSecPconf_t *pconf = GetPconfResourceData();
         VERIFY_NON_NULL(TAG, pconf, ERROR);
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
         OCServerRequest * request = (OCServerRequest *)ehRequest->requestHandle;
         VERIFY_SUCCESS(TAG, (request->devAddr.flags | OC_FLAG_SECURE), ERROR);
 
@@ -553,7 +555,7 @@ static OCEntityHandlerResult HandleDpairingPutRequest (const OCEntityHandlerRequ
         OCStackResult res = SavePairingPSK(&request->devAddr, &newDpair->pdeviceID,
                 (OicUuid_t *)&pconf->rownerID, true);
         VERIFY_SUCCESS(TAG, OC_STACK_OK == res, ERROR);
-#endif //__WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
         //Generate new acl
         OicSecPdAcl_t *pdAcl;

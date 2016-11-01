@@ -23,6 +23,9 @@ package org.iotivity.cloud.util;
 
 import java.io.IOException;
 
+import org.iotivity.cloud.base.exception.ServerException.BadRequestException;
+import org.iotivity.cloud.base.exception.ServerException.InternalServerErrorException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
@@ -40,10 +43,12 @@ public class Cbor<T> {
     public T parsePayloadFromCbor(byte[] cborPayload,
             Class<? extends Object> class1) {
         T payload = null;
+        if (cborPayload == null) {
+            throw new BadRequestException("cborPayload is null");
+        }
         try {
             payload = (T) mapper.readValue(cborPayload, class1);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -52,10 +57,12 @@ public class Cbor<T> {
 
     public byte[] encodingPayloadToCbor(Object payload) {
         byte[] cborData = null;
+        if (payload == null) {
+            throw new InternalServerErrorException("payload must be initialized");
+        }
         try {
             cborData = mapper.writeValueAsBytes(payload);
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return cborData;

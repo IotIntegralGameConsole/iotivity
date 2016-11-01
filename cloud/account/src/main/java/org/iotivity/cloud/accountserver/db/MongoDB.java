@@ -21,17 +21,23 @@
  */
 package org.iotivity.cloud.accountserver.db;
 
+import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bson.Document;
-import org.iotivity.cloud.accountserver.Constants;
-import org.iotivity.cloud.util.Logger;
+import org.iotivity.cloud.util.Log;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  *
@@ -45,7 +51,7 @@ public class MongoDB {
 
     /**
      * API creating MongoClient and initializing MongoDatabase
-     * 
+     *
      * @param dbname
      *            database name to create MongoDatabase
      * @throws Exception
@@ -58,8 +64,8 @@ public class MongoDB {
     }
 
     /**
-     * API creating collection
-     * 
+     * API for creating collection
+     *
      * @param tableName
      *            collection name
      */
@@ -69,8 +75,31 @@ public class MongoDB {
     }
 
     /**
-     * API deleting collection
-     * 
+     * API for creating index
+     *
+     * @param tableName
+     *            collection name
+     * @param keys
+     *            key fields of collection
+     */
+    public void createIndex(String tablename, ArrayList<String> keys) {
+
+        Document doc = new Document();
+
+        for (String key : keys) {
+
+            doc.append(key, 1);
+        }
+
+        IndexOptions options = new IndexOptions();
+        options.unique(true);
+
+        db.getCollection(tablename).createIndex(doc, options);
+    }
+
+    /**
+     * API for deleting collection
+     *
      * @param tableName
      *            collection name
      */
@@ -80,8 +109,8 @@ public class MongoDB {
     }
 
     /**
-     * API getting database object
-     * 
+     * API for getting database object
+     *
      */
     public MongoDatabase getMongoDatabase() {
 
@@ -89,77 +118,176 @@ public class MongoDB {
     }
 
     /**
-     * API for storing session information of user
+     * API for inserting a record into DB table. the record will not be inserted
+     * if duplicated one.
      * 
-     * @param UserSession
-     *            session information of user
+     * @param tableName
+     *            table name to be inserted
+     * @param doc
+     *            document to be inserted
      */
-    public void createResource(UserSession userSession) {
+    public Boolean insertRecord(String tableName, Document doc) {
 
-        Document doc = createDocument(userSession);
-        MongoCollection<Document> collection = db
-                .getCollection(Constants.SESSION_TABLE);
+        if (tableName == null || doc == null)
+            return false;
 
-        if (collection.findOneAndReplace(Filters.and(
-                Filters.eq(Constants.USER_ID, doc.get(Constants.USER_ID)),
-                Filters.eq(Constants.SESSION_CODE, doc.get(Constants.SESSION_CODE))),
-                doc) == null) {
+        MongoCollection<Document> collection = db.getCollection(tableName);
 
-            collection.insertOne(doc);
+        try {
+
+            if (collection.find(doc).first() == null) {
+
+                collection.insertOne(doc);
+
+            } else {
+
+                Log.w("DB insert failed due to duplecated one.");
+                return false;
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return false;
         }
 
-        return;
+        showRecord(tableName);
+
+        return true;
     }
 
     /**
-     * API for inserting device information of user
+     * API for inserting a record into DB table. the record will be replaced if
+     * duplicated one.
      * 
-     * @param UserDevice
-     *            device information of user
+     * @param tableName
+     *            table name to be inserted
+     * @param filter
+     *            document filter
+     * @param doc
+     *            document to be inserted
+     * @return returns true if the record is inserted and replaced successfully,
+     *         or returns false
      */
-    public void createResource(UserDevice userDevice) {
+    public Boolean insertAndReplaceRecord(String tableName, Document filter,
+            Document doc) {
 
-        Document doc = createDocument(userDevice);
-        MongoCollection<Document> collection = db
-                .getCollection(Constants.DEVICE_TABLE);
+        if (tableName == null || filter == null || doc == null)
+            return false;
 
-        if (collection.findOneAndReplace(Filters.and(
-                Filters.eq(Constants.USER_ID, doc.get(Constants.USER_ID)),
-                Filters.eq(Constants.DEVICE_ID, doc.get(Constants.DEVICE_ID))), doc) == null) {
+        MongoCollection<Document> collection = db.getCollection(tableName);
 
-            collection.insertOne(doc);
+        try {
+
+            if (collection.findOneAndReplace(filter, doc) == null) {
+
+                collection.insertOne(doc);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return false;
         }
 
-        return;
+        showRecord(tableName);
+
+        return true;
     }
 
     /**
-     * API for getting user identifier corresponding with session code from
-     * database
+     * API for updating a record into DB table.
      * 
-     * @param sessionCode
-     *            session code
-     * @return String - user identifier
+     * @param tableName
+     *            table name to be updated
+     * @param filter
+     *            document filter
+     * @param record
+     *            record to be updated
+     * @return returns true if the record is updated successfully, or returns
+     *         false
      */
-    public String getUserId(String sessionCode) {
+    public Boolean updateRecord(String tableName, Document filter,
+            Document record) {
 
-        String userId = null;
+        if (tableName == null || filter == null || record == null)
+            return false;
 
-        MongoCollection<Document> collection = db
-                .getCollection(Constants.SESSION_TABLE);
+        MongoCollection<Document> collection = db.getCollection(tableName);
 
-        MongoCursor<Document> cursor = collection.find(
-                Filters.eq(Constants.SESSION_CODE, sessionCode)).iterator();
+        if (collection.findOneAndReplace(filter, record) == null) {
+
+            Log.w("DB updateX509CRL failed due to no matched record!");
+            return false;
+        }
+
+        showRecord(tableName);
+
+        return true;
+    }
+
+    /**
+     * API for deleting records from DB table.
+     * 
+     * @param tableName
+     *            table name for the record to be deleted
+     * @param record
+     *            record filter to be deleted
+     * @return returns true if the record is deleted successfully, or returns
+     *         false
+     */
+    public Boolean deleteRecord(String tableName, Document record) {
+
+        if (tableName == null || record == null)
+            return false;
+
+        MongoCollection<Document> collection = db.getCollection(tableName);
+
+        try {
+
+            DeleteResult result = collection.deleteMany(record);
+
+            if (result.getDeletedCount() == 0) {
+                Log.w("DB delete failed due to no mached record!");
+                return false;
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return false;
+        }
+
+        showRecord(tableName);
+
+        return true;
+    }
+
+    /**
+     * API for selecting records from DB table.
+     * 
+     * @param tableName
+     *            table name for the record to be selected
+     * @param doc
+     *            document filter to be selected
+     * @return record list according to the filter document
+     */
+    public ArrayList<HashMap<String, Object>> selectRecord(String tableName,
+            Document doc) {
+
+        if (tableName == null || doc == null)
+            return null;
+
+        MongoCollection<Document> collection = db.getCollection(tableName);
+        MongoCursor<Document> cursor = collection.find(doc).iterator();
+
+        ArrayList<HashMap<String, Object>> recordList = new ArrayList<HashMap<String, Object>>();
 
         try {
 
             while (cursor.hasNext()) {
-
-                Document doc = cursor.next();
-                UserSession userSession = convertSessionDocToResource(doc);
-
-                userId = userSession.getUserId();
-                break;
+                Document selectedDoc = cursor.next();
+                recordList.add(convertDocumentToHashMap(selectedDoc));
             }
 
         } finally {
@@ -167,144 +295,62 @@ public class MongoDB {
             cursor.close();
         }
 
-        return userId;
+        return recordList;
     }
 
-    /**
-     * API for getting devices corresponding with user identifier from database
-     * 
-     * @param userId
-     *            user identifier
-     */
-    public ArrayList<String> getDevices(String userId) {
+    private HashMap<String, Object> convertDocumentToHashMap(Document doc) {
+        HashMap<String, Object> resourceMap = new HashMap<String, Object>();
 
-        ArrayList<String> deviceList = new ArrayList<String>();
+        Set<Entry<String, Object>> entrySet = doc.entrySet();
+        Iterator<Entry<String, Object>> entryIter = entrySet.iterator();
 
-        MongoCollection<Document> collection = db
-                .getCollection(Constants.DEVICE_TABLE);
+        while (entryIter.hasNext()) {
 
-        MongoCursor<Document> cursor = collection.find(
-                Filters.eq(Constants.USER_ID, userId)).iterator();
+            Map.Entry<String, Object> entry = (Map.Entry<String, Object>) entryIter.next();
 
-        try {
+            String entryKey = entry.getKey();
 
-            while (cursor.hasNext()) {
+            // remove a mongoDB index
+            if (entry.getValue() != null && !entryKey.equals("_id")) {
 
-                Document doc = cursor.next();
-                UserDevice userDeivce = convertDeviceDocToResource(doc);
+                // if value is Array
+                if (entry.getValue() instanceof List && !((List) entry.getValue()).isEmpty()
+                        && ((List) entry.getValue()).get(0) instanceof Document)
 
-                deviceList.add(userDeivce.getDeviceId());
+                {
+                    List<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
+
+                    for (Document document : (List<Document>) entry.getValue()) {
+                        list.add(convertDocumentToHashMap(document));
+                    }
+                    resourceMap.put(entry.getKey(), list);
+                } else {
+                    resourceMap.put(entry.getKey(), entry.getValue());
+                }
             }
-
-        } finally {
-
-            cursor.close();
         }
 
-        return deviceList;
+        return resourceMap;
     }
 
-    public void printResources() {
+    private void showRecord(String tableName) {
 
-        ArrayList<UserDevice> dlist = readDeviceResources();
-        int size = dlist.size();
-
-        Logger.i("*Table: " + Constants.DEVICE_TABLE);
-        for (int i = 0; i < size; i++) {
-
-            UserDevice item = dlist.get(i);
-
-            Logger.i("[" + i + "]" + item.getUserId() + ", "
-                    + item.getDeviceId());
-        }
-
-        ArrayList<UserSession> slist = readSessionResources();
-        size = slist.size();
-
-        Logger.i("*Table: " + Constants.SESSION_TABLE);
-
-        for (int i = 0; i < size; i++) {
-
-            UserSession item = slist.get(i);
-
-            Logger.i("[" + i + "]" + item.getUserId() + ", "
-                    + item.getSessionCode());
-
-        }
-    }
-
-    private Document createDocument(UserSession userSession) {
-
-        Document doc = new Document(Constants.USER_ID, userSession.getUserId())
-                .append(Constants.SESSION_CODE, userSession.getSessionCode());
-
-        return doc;
-    }
-
-    private Document createDocument(UserDevice userDevice) {
-
-        Document doc = new Document(Constants.USER_ID, userDevice.getUserId())
-                .append(Constants.DEVICE_ID, userDevice.getDeviceId());
-
-        return doc;
-    }
-
-    private UserSession convertSessionDocToResource(Document doc) {
-
-        UserSession userSession = new UserSession();
-
-        userSession.setUserId(doc.getString(Constants.USER_ID));
-        userSession.setSessionCode(doc.getString(Constants.SESSION_CODE));
-
-        return userSession;
-    }
-
-    private UserDevice convertDeviceDocToResource(Document doc) {
-
-        UserDevice userDevice = new UserDevice();
-
-        userDevice.setUserId(doc.getString(Constants.USER_ID));
-        userDevice.setDeviceId(doc.getString(Constants.DEVICE_ID));
-
-        return userDevice;
-    }
-
-    private ArrayList<UserSession> readSessionResources() {
-
-        ArrayList<UserSession> userSessionList = new ArrayList<UserSession>();
-
-        MongoCollection<Document> collection = db
-                .getCollection(Constants.SESSION_TABLE);
+        MongoCollection<Document> collection = db.getCollection(tableName);
         MongoCursor<Document> cursor = collection.find().iterator();
 
+        Log.i("<" + tableName + ">");
+
+        HashMap<String, Object> records = null;
+        int index = 0;
         while (cursor.hasNext()) {
 
             Document doc = cursor.next();
-            userSessionList.add(convertSessionDocToResource(doc));
+            records = convertDocumentToHashMap(doc);
+
+            Log.i("[" + index + "] " + records.toString());
+            index++;
         }
 
         cursor.close();
-
-        return userSessionList;
     }
-
-    private ArrayList<UserDevice> readDeviceResources() {
-
-        ArrayList<UserDevice> userDeviceList = new ArrayList<UserDevice>();
-
-        MongoCollection<Document> collection = db
-                .getCollection(Constants.DEVICE_TABLE);
-        MongoCursor<Document> cursor = collection.find().iterator();
-
-        while (cursor.hasNext()) {
-
-            Document doc = cursor.next();
-            userDeviceList.add(convertDeviceDocToResource(doc));
-        }
-
-        cursor.close();
-
-        return userDeviceList;
-    }
-
 }

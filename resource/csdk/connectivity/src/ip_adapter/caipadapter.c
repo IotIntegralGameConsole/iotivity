@@ -28,7 +28,7 @@
 #include "caqueueingthread.h"
 #include "caadapterutils.h"
 #ifdef __WITH_DTLS__
-#include "caadapternetdtls.h"
+#include "ca_adapter_net_ssl.h"
 #endif
 #include "camutex.h"
 #include "uarraylist.h"
@@ -239,14 +239,20 @@ CAResult_t CAInitializeIP(CARegisterConnectivityCallback registerCallback,
     CAInitializeIPGlobals();
     caglobals.ip.threadpool = handle;
 
+    CAIPSetErrorHandler(CAIPErrorHandler);
     CAIPSetPacketReceiveCallback(CAIPPacketReceivedCB);
 #ifndef SINGLE_THREAD
     CAIPSetConnectionStateChangeCallback(CAIPConnectionStateCB);
 #endif
 #ifdef __WITH_DTLS__
-    CAAdapterNetDtlsInit();
-
-    CADTLSSetAdapterCallbacks(CAIPPacketReceivedCB, CAIPPacketSendCB, 0);
+    if (CA_STATUS_OK != CAinitSslAdapter())
+    {
+        OIC_LOG(ERROR, TAG, "Failed to init SSL adapter");
+    }
+    else
+    {
+        CAsetSslAdapterCallbacks(CAIPPacketReceivedCB, CAIPPacketSendCB, CA_ADAPTER_IP);
+    }
 #endif
 
     static const CAConnectivityHandler_t ipHandler =
@@ -271,6 +277,12 @@ CAResult_t CAInitializeIP(CARegisterConnectivityCallback registerCallback,
 
 CAResult_t CAStartIP()
 {
+    // Specific the port number received from application.
+    caglobals.ip.u6.port  = caglobals.ports.udp.u6;
+    caglobals.ip.u6s.port = caglobals.ports.udp.u6s;
+    caglobals.ip.u4.port  = caglobals.ports.udp.u4;
+    caglobals.ip.u4s.port = caglobals.ports.udp.u4s;
+
     CAIPStartNetworkMonitor();
 #ifdef SINGLE_THREAD
     uint16_t unicastPort = 55555;
@@ -372,13 +384,17 @@ static int32_t CAQueueIPData(bool isMulticast, const CAEndpoint_t *endpoint,
 }
 
 int32_t CASendIPUnicastData(const CAEndpoint_t *endpoint,
-                            const void *data, uint32_t dataLength)
+                            const void *data, uint32_t dataLength,
+                            CADataType_t dataType)
 {
+    (void)dataType;
     return CAQueueIPData(false, endpoint, data, dataLength);
 }
 
-int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data, uint32_t dataLength)
+int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data, uint32_t dataLength,
+                              CADataType_t dataType)
 {
+    (void)dataType;
     return CAQueueIPData(true, endpoint, data, dataLength);
 }
 
@@ -391,7 +407,7 @@ CAResult_t CAReadIPData()
 CAResult_t CAStopIP()
 {
 #ifdef __WITH_DTLS__
-    CAAdapterNetDtlsDeInit();
+    CAdeinitSslAdapter();
 #endif
 
 #ifndef SINGLE_THREAD
@@ -412,7 +428,7 @@ CAResult_t CAStopIP()
 void CATerminateIP()
 {
 #ifdef __WITH_DTLS__
-    CADTLSSetAdapterCallbacks(NULL, NULL, 0);
+    CAsetSslAdapterCallbacks(NULL, NULL, CA_ADAPTER_IP);
 #endif
 
     CAIPSetPacketReceiveCallback(NULL);
@@ -446,15 +462,13 @@ void CAIPSendDataThread(void *threadData)
 #ifdef __WITH_DTLS__
         if (ipData->remoteEndpoint && ipData->remoteEndpoint->flags & CA_SECURE)
         {
-            OIC_LOG(DEBUG, TAG, "CAAdapterNetDtlsEncrypt called!");
-            CAResult_t result = CAAdapterNetDtlsEncrypt(ipData->remoteEndpoint,
-                                               ipData->data, ipData->dataLen);
+            OIC_LOG(DEBUG, TAG, "DTLS encrypt called");
+            CAResult_t result = CAencryptSsl(ipData->remoteEndpoint, ipData->data, ipData->dataLen);
             if (CA_STATUS_OK != result)
             {
-                OIC_LOG(ERROR, TAG, "CAAdapterNetDtlsEncrypt failed!");
+                OIC_LOG(ERROR, TAG, "CAencryptSsl failed!");
             }
-            OIC_LOG_V(DEBUG, TAG,
-                      "CAAdapterNetDtlsEncrypt returned with result[%d]", result);
+            OIC_LOG_V(DEBUG, TAG, "CAencryptSsl returned with result[%d]", result);
         }
         else
         {

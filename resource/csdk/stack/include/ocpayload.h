@@ -27,9 +27,15 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+
 #include <stdbool.h>
 #include <inttypes.h>
 #include "octypes.h"
+#include <cbor.h>
+
+#if defined(__WITH_TLS__) || defined(__WITH_DTLS__)
+#include "securevirtualresourcetypes.h"
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -74,11 +80,11 @@ void OCRepPayloadAppend(OCRepPayload* parent, OCRepPayload* child);
 bool OCRepPayloadSetUri(OCRepPayload* payload, const char* uri);
 
 bool OCRepPayloadAddResourceType(OCRepPayload* payload, const char* resourceType);
-bool OCRepPayloadAddInterface(OCRepPayload* payload, const char* interface);
+bool OCRepPayloadAddInterface(OCRepPayload* payload, const char* iface);
 bool OCRepPayloadAddModelVersion(OCRepPayload* payload, const char* dmv);
 
 bool OCRepPayloadAddResourceTypeAsOwner(OCRepPayload* payload, char* resourceType);
-bool OCRepPayloadAddInterfaceAsOwner(OCRepPayload* payload, char* interface);
+bool OCRepPayloadAddInterfaceAsOwner(OCRepPayload* payload, char* iface);
 
 bool OCRepPayloadIsNull(const OCRepPayload* payload, const char* name);
 bool OCRepPayloadSetNull(OCRepPayload* payload, const char* name);
@@ -134,9 +140,14 @@ bool OCRepPayloadSetPropBool(OCRepPayload* payload, const char* name, bool value
 bool OCRepPayloadGetPropBool(const OCRepPayload* payload, const char* name, bool* value);
 
 bool OCRepPayloadSetPropObject(OCRepPayload* payload, const char* name, const OCRepPayload* value);
-bool OCRepPayloadSetPropObjectAsOwner(OCRepPayload* payload, const char* name,
-        OCRepPayload* value);
+bool OCRepPayloadSetPropObjectAsOwner(OCRepPayload* payload, const char* name, OCRepPayload* value);
 bool OCRepPayloadGetPropObject(const OCRepPayload* payload, const char* name, OCRepPayload** value);
+
+#ifdef __WITH_TLS__
+bool OCRepPayloadSetPropPubDataType(OCRepPayload *payload, const char *name, const OicSecKey_t *value);
+bool OCRepPayloadSetPropPubDataTypeAsOwner(OCRepPayload *payload, const char *name, const OicSecKey_t *value);
+bool OCRepPayloadGetPropPubDataType(const OCRepPayload *payload, const char *name, OicSecKey_t *value);
+#endif
 
 /**
  * This function allocates memory for the byte string array and sets it in the payload.
@@ -223,8 +234,13 @@ OCDiscoveryPayload* OCDiscoveryPayloadCreate();
 OCSecurityPayload* OCSecurityPayloadCreate(const uint8_t* securityData, size_t size);
 void OCSecurityPayloadDestroy(OCSecurityPayload* payload);
 
+#ifndef TCP_ADAPTER
+void OCDiscoveryPayloadAddResource(OCDiscoveryPayload* payload, const OCResource* res,
+                                   uint16_t securePort);
+#else
 void OCDiscoveryPayloadAddResource(OCDiscoveryPayload* payload, const OCResource* res,
                                    uint16_t securePort, uint16_t tcpPort);
+#endif
 void OCDiscoveryPayloadAddNewResource(OCDiscoveryPayload* payload, OCResourcePayload* res);
 bool OCResourcePayloadAddStringLL(OCStringLL **payload, const char* type);
 
@@ -269,6 +285,14 @@ OCStringLL* OCCreateOCStringLL(const char* text);
  * @note separator is ',' (according to rfc4180)
  **/
 char* OCCreateString(const OCStringLL* ll);
+
+/**
+ * This function copies contents (and allocates if necessary)
+ * @param dest existing bytestring (or null to allocate here)
+ * @param source existing bytestring
+ * @return true of success false on any errors
+ **/
+bool OCByteStringCopy(OCByteString *dest, const OCByteString *source);
 
 #ifdef __cplusplus
 }

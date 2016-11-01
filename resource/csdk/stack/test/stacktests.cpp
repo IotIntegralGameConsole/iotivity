@@ -21,6 +21,7 @@
 
 extern "C"
 {
+    #include "ocpayload.h"
     #include "ocstack.h"
     #include "ocstackinternal.h"
     #include "logger.h"
@@ -32,7 +33,9 @@ extern "C"
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 
 //-----------------------------------------------------------------------------
@@ -222,6 +225,24 @@ TEST(StackStart, StackStartSuccessClientServer)
 {
     itst::DeadmanTimer killSwitch(SHORT_TEST_TIMEOUT);
     EXPECT_EQ(OC_STACK_OK, OCInit("127.0.0.1", 5683, OC_CLIENT_SERVER));
+    EXPECT_EQ(OC_STACK_OK, OCStop());
+}
+
+TEST(StackStart, StackStartSuccessServerThenClient)
+{
+    itst::DeadmanTimer killSwitch(SHORT_TEST_TIMEOUT);
+    EXPECT_EQ(OC_STACK_OK, OCInit("127.0.0.1", 5683, OC_SERVER));
+    EXPECT_EQ(OC_STACK_OK, OCStop());
+    EXPECT_EQ(OC_STACK_OK, OCInit("127.0.0.1", 5683, OC_CLIENT));
+    EXPECT_EQ(OC_STACK_OK, OCStop());
+}
+
+TEST(StackStart, StackStartSuccessClientThenServer)
+{
+    itst::DeadmanTimer killSwitch(SHORT_TEST_TIMEOUT);
+    EXPECT_EQ(OC_STACK_OK, OCInit("127.0.0.1", 5683, OC_CLIENT));
+    EXPECT_EQ(OC_STACK_OK, OCStop());
+    EXPECT_EQ(OC_STACK_OK, OCInit("127.0.0.1", 5683, OC_SERVER));
     EXPECT_EQ(OC_STACK_OK, OCStop());
 }
 
@@ -443,7 +464,7 @@ TEST(StackResource, CreateResourceBadParams)
                                             "/a/led",
                                             0,
                                             NULL,
-                                            128));// invalid bitmask for OCResourceProperty
+                                            255));// invalid bitmask for OCResourceProperty
 
     EXPECT_EQ(OC_STACK_OK, OCStop());
 }
@@ -454,7 +475,7 @@ TEST(StackResource, CreateResourceBadUri)
     OIC_LOG(INFO, TAG, "Starting CreateResourceBadUri test");
     InitStack(OC_SERVER);
 
-    const char *uri65 = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKL";
+    const char *uri257 = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVW";
 
     OCResourceHandle handle;
 
@@ -477,7 +498,7 @@ TEST(StackResource, CreateResourceBadUri)
     EXPECT_EQ(OC_STACK_INVALID_URI, OCCreateResource(&handle,
                                             "core.led",
                                             "core.rw",
-                                            uri65, //"/a/led",
+                                            uri257, //"/a/led",
                                             0,
                                             0,
                                             OC_DISCOVERABLE|OC_OBSERVABLE));
@@ -877,7 +898,11 @@ TEST(StackResource, GetResourceProperties)
                                             NULL,
                                             OC_DISCOVERABLE|OC_OBSERVABLE));
 
+#ifdef MQ_PUBLISHER
+    EXPECT_EQ(OC_ACTIVE|OC_DISCOVERABLE|OC_OBSERVABLE|OC_MQ_PUBLISHER, OCGetResourceProperties(handle));
+#else
     EXPECT_EQ(OC_ACTIVE|OC_DISCOVERABLE|OC_OBSERVABLE, OCGetResourceProperties(handle));
+#endif
     EXPECT_EQ(OC_STACK_OK, OCDeleteResource(handle));
 
     EXPECT_EQ(OC_STACK_OK, OCStop());
@@ -1022,6 +1047,8 @@ TEST(StackBind, BindResourceTypeNameBad)
     EXPECT_STREQ("core.led", resourceTypeName);
 
     EXPECT_EQ(OC_STACK_INVALID_PARAM, OCBindResourceTypeToResource(handle, NULL));
+    EXPECT_EQ(OC_STACK_INVALID_PARAM, OCBindResourceTypeToResource(handle, "core.nameBad"));
+    EXPECT_EQ(OC_STACK_INVALID_PARAM, OCBindResourceTypeToResource(handle, "core.name bad"));
 
     EXPECT_EQ(OC_STACK_OK, OCStop());
 }
@@ -1058,6 +1085,12 @@ TEST(StackBind, BindResourceTypeNameGood)
     EXPECT_EQ(3, numResourceTypes);
     resourceTypeName = OCGetResourceTypeName(handle, 2);
     EXPECT_STREQ("core.reallybrightled", resourceTypeName);
+
+    EXPECT_EQ(OC_STACK_OK, OCBindResourceTypeToResource(handle, "x.ReallyReallyBrightLED"));
+    EXPECT_EQ(OC_STACK_OK, OCGetNumberOfResourceTypes(handle, &numResourceTypes));
+    EXPECT_EQ(4, numResourceTypes);
+    resourceTypeName = OCGetResourceTypeName(handle, 3);
+    EXPECT_STREQ("x.ReallyReallyBrightLED", resourceTypeName);
 
     EXPECT_EQ(OC_STACK_OK, OCStop());
 }
@@ -1669,6 +1702,8 @@ TEST(StackResourceAccess, DeleteMiddleResource)
     EXPECT_EQ(OC_STACK_OK, OCStop());
 }
 
+// Visual Studio versions earlier than 2015 have bugs in is_pod and report the wrong answer.
+#if !defined(_MSC_VER) || (_MSC_VER >= 1900)
 TEST(PODTests, OCHeaderOption)
 {
     EXPECT_TRUE(std::is_pod<OCHeaderOption>::value);
@@ -1676,8 +1711,9 @@ TEST(PODTests, OCHeaderOption)
 
 TEST(PODTests, OCCallbackData)
 {
-    EXPECT_TRUE(std::is_pod<OCHeaderOption>::value);
+    EXPECT_TRUE(std::is_pod<OCCallbackData>::value);
 }
+#endif
 
 TEST(OCDoDirectPairingTests, Nullpeer)
 {
@@ -1745,4 +1781,173 @@ TEST(StackResource, MultipleResourcesDiscovery)
                                         0));
 
     EXPECT_EQ(OC_STACK_OK, OCStop());
+}
+
+TEST(StackPayload, CloneByteString)
+{
+    uint8_t bytes[] = { 0, 1, 2, 3 };
+    OCByteString byteString;
+    byteString.bytes = bytes;
+    byteString.len = sizeof(bytes);
+
+    OCRepPayload *original = OCRepPayloadCreate();
+    ASSERT_TRUE(original != NULL);
+    EXPECT_TRUE(OCRepPayloadSetPropByteString(original, "name", byteString));
+
+    OCRepPayload *clone = OCRepPayloadClone(original);
+    ASSERT_TRUE(clone != NULL);
+
+    OCRepPayloadDestroy(original);
+
+    OCByteString cloneByteString;
+    EXPECT_TRUE(OCRepPayloadGetPropByteString(clone, "name", &cloneByteString));
+    ASSERT_TRUE(cloneByteString.bytes != NULL);
+    EXPECT_EQ(sizeof(bytes), cloneByteString.len);
+    EXPECT_TRUE(0 == memcmp(bytes, cloneByteString.bytes, sizeof(bytes)));
+    OICFree(cloneByteString.bytes);
+
+    OCRepPayloadDestroy(clone);
+}
+
+TEST(StackUri, Rfc6874_Noop_1)
+{
+    char validIPv6Address[] = "FF01:0:0:0:0:0:0:FB";
+    char bytes[100] = {0};
+    strncpy(bytes, validIPv6Address, sizeof(bytes));
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), validIPv6Address);
+
+    // No % sign, should do nothing
+    EXPECT_STREQ(bytes, validIPv6Address);
+    EXPECT_EQ(OC_STACK_OK, result);
+}
+
+TEST(StackUri, Rfc6874_Noop_2)
+{
+    char validIPv6Address[] = "3812:a61::4:1";
+    char bytes[100] = {0};
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), validIPv6Address);
+
+    // No % sign, should do nothing
+    EXPECT_STREQ(bytes, validIPv6Address);
+    EXPECT_EQ(OC_STACK_OK, result);
+}
+
+TEST(StackUri, Rfc6874_WithEncoding)
+{
+    char validIPv6Address[] =        "fe80::dafe:e3ff:fe00:ebfa%wlan0";
+    char validIPv6AddressEncoded[] = "fe80::dafe:e3ff:fe00:ebfa%25wlan0";
+    char bytes[100] = "";
+    strncpy(bytes, validIPv6Address, sizeof(bytes));
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), validIPv6Address);
+
+    // Encoding should have occured
+    EXPECT_STREQ(bytes, validIPv6AddressEncoded);
+    EXPECT_EQ(OC_STACK_OK, result);
+}
+
+TEST(StackUri, Rfc6874_WithEncoding_ExtraPercent)
+{
+    char validIPv6Address[] = "fe80::dafe:e3ff:fe00:ebfa%%wlan0";
+    char bytes[100] = {0};
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), validIPv6Address);
+
+    // Encoding should have failed due to extra '%' character
+    EXPECT_STREQ(bytes, "");
+    EXPECT_EQ(OC_STACK_ERROR, result);
+}
+
+TEST(StackUri, Rfc6874_AlreadyEncoded)
+{
+    char validIPv6AddressEncoded[] = "fe80::dafe:e3ff:fe00:ebfa%25wlan0";
+    char bytes[100] = {0};
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), validIPv6AddressEncoded);
+
+    // Encoding should have failed due to extra '%' character
+    EXPECT_STREQ(bytes, "");
+    EXPECT_EQ(OC_STACK_ERROR, result);
+}
+
+TEST(StackUri, Rfc6874_NoOverflow)
+{
+    char validIPv6Address[] = "fe80::dafe:e3ff:fe00:ebfa%wlan0";
+    char addrBuffer[100];
+    char bytes[100] = {0};
+    memset(addrBuffer, sizeof(addrBuffer), '_');
+
+    // Just enough room to encode
+    addrBuffer[sizeof(addrBuffer) - sizeof(validIPv6Address) - 3] = '\0';
+    strcat(addrBuffer, validIPv6Address);
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), addrBuffer);
+
+    // Encoding should have succeeded
+    EXPECT_EQ(OC_STACK_OK, result);
+}
+
+TEST(StackUri, Rfc6874_NoOverflow_2)
+{
+    char validIPv6Address[] = "fe80::dafe:e3ff:fe00:ebfa%wlan0";
+    char addrBuffer[100];
+    char bytes[100] = {0};
+    memset(addrBuffer, sizeof(addrBuffer), '_');
+
+    // Not enough room to encode
+    addrBuffer[sizeof(addrBuffer) - sizeof(validIPv6Address) - 1] = '\0';
+    strcat(addrBuffer, validIPv6Address);
+
+    OCStackResult result = encodeAddressForRFC6874(bytes, sizeof(bytes), addrBuffer);
+
+    // Encoding should have failed due to output size limitations
+    EXPECT_STREQ(bytes, "");
+    EXPECT_EQ(OC_STACK_ERROR, result);
+}
+
+TEST(StackHeaderOption, setHeaderOption)
+{
+    uint8_t optionValue1[MAX_HEADER_OPTION_DATA_LENGTH] =
+    { 1 };
+    OCHeaderOption options[MAX_HEADER_OPTIONS] =
+    {
+    { OC_COAP_ID, 6, 8, optionValue1 }, };
+    uint8_t optionData = 255;
+    size_t optionDataSize = sizeof(optionData);
+    size_t numOptions = 1;
+    uint16_t optionID = 2048;
+    EXPECT_EQ(OC_STACK_OK, OCSetHeaderOption(options,
+                                             &numOptions,
+                                             optionID,
+                                             &optionData,
+                                             optionDataSize));
+    EXPECT_EQ(options[1].optionID, optionID);
+    EXPECT_EQ(options[1].optionData[0], 255);
+}
+
+TEST(StackHeaderOption, getHeaderOption)
+{
+    uint8_t optionValue1[MAX_HEADER_OPTION_DATA_LENGTH] =
+    { 1 };
+    uint8_t optionValue2[MAX_HEADER_OPTION_DATA_LENGTH] =
+    { 255 };
+    OCHeaderOption options[MAX_HEADER_OPTIONS] =
+    {
+    { OC_COAP_ID, 6, 8, optionValue1 },
+    { OC_COAP_ID, 2048, 16, optionValue2 }, };
+    uint8_t optionData[MAX_HEADER_OPTION_DATA_LENGTH];
+    size_t optionDataSize = sizeof(optionData);
+    size_t numOptions = 2;
+    uint16_t optionID = 6;
+    uint16_t actualDataSize = 0;
+    EXPECT_EQ(OC_STACK_OK, OCGetHeaderOption(options,
+                                             numOptions,
+                                             optionID,
+                                             optionData,
+                                             optionDataSize,
+                                             &actualDataSize));
+    EXPECT_EQ(optionData[0], 1);
+    EXPECT_EQ(actualDataSize, 8);
 }

@@ -18,6 +18,7 @@
  *
  * *****************************************************************/
 
+#include "iotivity_config.h"
 #include <stdlib.h>
 #include <string.h>
 #include "ocstack.h"
@@ -39,9 +40,7 @@
 #include <stdlib.h>
 #include "psinterface.h"
 #include "security_internals.h"
-#ifdef WITH_ARDUINO
-#include <string.h>
-#else
+#ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 
@@ -507,8 +506,11 @@ OCStackResult CBORPayloadToPconf(const uint8_t *cborPayload, size_t size, OicSec
 
                 while (cbor_value_is_valid(&prm) && cbor_value_is_integer(&prm))
                 {
-                    cborFindResult = cbor_value_get_int(&prm, (int *)&pconf->prm[i++]);
+                    int prm_val;
+
+                    cborFindResult = cbor_value_get_int(&prm, &prm_val);
                     VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed to get value");
+                    pconf->prm[i++] = (OicSecPrm_t)prm_val;
                     cborFindResult = cbor_value_advance(&prm);
                     VERIFY_CBOR_SUCCESS(TAG, cborFindResult, "Failed to advance value");
                 }
@@ -890,7 +892,7 @@ static OCEntityHandlerResult HandlePconfPostRequest (const OCEntityHandlerReques
     OCStackResult res=OC_STACK_OK;
     OicSecPconf_t* newPconf = NULL;
 
-    if (true == GetDoxmResourceData()->dpc)
+    if (NULL != GetDoxmResourceData() && true == GetDoxmResourceData()->dpc)
     {
         // Convert CBOR PCONF data into binary. This will also validate the PCONF data received.
         uint8_t *payload = ((OCSecurityPayload *) ehRequest->payload)->securityData;

@@ -1,3 +1,4 @@
+# -*- mode: python; python-indent-offset: 4; indent-tabs-mode: nil -*-
 ##
 # This script includes generic build options:
 #    release/debug, target os, target arch, cross toolchain, build environment etc
@@ -5,27 +6,35 @@
 import os
 import platform
 
+project_version = '1.2.0'
+
 # Map of host os and allowed target os (host: allowed target os)
 host_target_map = {
 		'linux': ['linux', 'android', 'arduino', 'yocto', 'tizen'],
-		'windows': ['windows', 'winrt', 'android', 'arduino'],
+		'windows': ['windows', 'android', 'arduino'],
 		'darwin': ['darwin', 'ios', 'android', 'arduino'],
+		'msys_nt' :['msys_nt'],
 		}
 
 # Map of os and allowed archs (os: allowed archs)
 os_arch_map = {
-		'linux': ['x86', 'x86_64', 'arm', 'arm-v7a', 'arm64'],
+		'linux': ['x86', 'x86_64', 'arm', 'arm-v7a', 'armeabi-v7a', 'arm64'],
 		'tizen': ['x86', 'x86_64', 'arm', 'arm-v7a', 'armeabi-v7a', 'arm64'],
 		'android': ['x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'armeabi-v7a-hard', 'arm64-v8a'],
 		'windows': ['x86', 'amd64', 'arm'],
-		'winrt': ['arm'],
+		'msys_nt':['x86', 'x86_64'],
 		'darwin': ['i386', 'x86_64'],
 		'ios': ['i386', 'x86_64', 'armv7', 'armv7s', 'arm64'],
 		'arduino': ['avr', 'arm'],
-		'yocto': ['i586', 'x86_64', 'arm', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
+		'yocto': ['i586', 'i686', 'x86_64', 'arm', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
 		}
 
 host = platform.system().lower()
+
+# the host string contains version of windows. 6.3, 6.4, 10.0 which is 8.0, 8.1, and 10 respectively.
+# Let's canonicalize the msys_nt-XX.X system name by stripping version off.
+if 'msys_nt' in host:
+	host = 'msys_nt'
 
 if not host_target_map.has_key(host):
 	print "\nError: Current system (%s) isn't supported\n" % host
@@ -57,6 +66,8 @@ require_upload = ARGUMENTS.get('UPLOAD', False)
 # Get the device name. This name can be used as network display name wherever possible
 device_name = ARGUMENTS.get('DEVICE_NAME', "OIC-DEVICE")
 
+default_with_upstream_libcoap = 0
+
 if ARGUMENTS.get('TEST'):
 	logging_default = False
 else:
@@ -65,7 +76,11 @@ else:
 		release_mode = True
 	logging_default = (release_mode == False)
 
-
+# targets that do not support the DTLS build (SECURED=1 build option)
+targets_without_dtls_support = ['arduino'];
+if ARGUMENTS.get('SECURED') == '1' and target_os in targets_without_dtls_support:
+	print "\nError: DTLS not supported on target os: %s MUST build with SECURED=0\n" % (target_os)
+	Exit(1)
 
 ######################################################################
 # Common build options (release, target os, target arch)
@@ -80,8 +95,10 @@ help_vars.Add(EnumVariable('TARGET_OS', 'Target platform', host, host_target_map
 
 help_vars.Add(BoolVariable('WITH_RA', 'Build with Remote Access module', False))
 help_vars.Add(BoolVariable('WITH_TCP', 'Build with TCP adapter', False))
-help_vars.Add(EnumVariable('WITH_RD', 'Build including Resource Directory', '0', allowed_values=('0', '1')))
-help_vars.Add(BoolVariable('WITH_CLOUD', 'Build including Cloud client sample', False))
+help_vars.Add(BoolVariable('WITH_PROXY', 'Build with CoAP-HTTP Proxy', False))
+help_vars.Add(ListVariable('WITH_MQ', 'Build with MQ publisher/broker', 'OFF', ['OFF', 'SUB', 'PUB', 'BROKER']))
+help_vars.Add(BoolVariable('WITH_CLOUD', 'Build including AccountManager class and Cloud Client sample', False))
+help_vars.Add(ListVariable('RD_MODE', 'Resource Directory build mode', 'CLIENT', ['CLIENT', 'SERVER']))
 
 help_vars.Add(BoolVariable('SIMULATOR', 'Build with simulator module', False))
 
@@ -95,7 +112,7 @@ else:
 
 help_vars.Add(EnumVariable('TARGET_ARCH', 'Target architecture', default_arch, os_arch_map[target_os]))
 help_vars.Add(EnumVariable('SECURED', 'Build with DTLS', '0', allowed_values=('0', '1')))
-help_vars.Add(EnumVariable('DTLS_WITH_X509', 'DTLS with X.509 support', '0', allowed_values=('0', '1')))
+help_vars.Add(EnumVariable('MULTIPLE_OWNER', 'Enable multiple owner', '0', allowed_values=('0', '1')))
 help_vars.Add(EnumVariable('TEST', 'Run unit tests', '0', allowed_values=('0', '1')))
 help_vars.Add(BoolVariable('LOGGING', 'Enable stack logging', logging_default))
 help_vars.Add(BoolVariable('UPLOAD', 'Upload binary ? (For Arduino)', require_upload))
@@ -105,12 +122,7 @@ help_vars.AddVariables(('DEVICE_NAME', 'Network display name for device (For Ard
 help_vars.Add(PathVariable('ANDROID_NDK', 'Android NDK path', None, PathVariable.PathAccept))
 help_vars.Add(PathVariable('ANDROID_HOME', 'Android SDK path', None, PathVariable.PathAccept))
 help_vars.Add(PathVariable('ANDROID_GRADLE', 'Gradle binary file', None, PathVariable.PathIsFile))
-#ES_TARGET_ENROLLEE is for specifying what is our target enrollee (Arduino or rest of platforms which support Multicast)
-help_vars.Add(EnumVariable('ES_TARGET_ENROLLEE', 'Target Enrollee', 'arduino', allowed_values=('arduino', 'tizen', 'linux')))
-#ES_ROLE is for specifying the role (Enrollee or Mediator) for which scons is being executed
-help_vars.Add(EnumVariable('ES_ROLE', 'Target build mode', 'mediator', allowed_values=('mediator', 'enrollee')))
-#ES_SOFT_MODE is for specifying MODE (Mode 1 : Enrollee with  Soft AP or Mode 2  : Mediator with Soft AP)
-help_vars.Add(EnumVariable('ES_SOFTAP_MODE', 'Target build mode', 'ENROLLEE_SOFTAP', allowed_values=('ENROLLEE_SOFTAP', 'MEDIATOR_SOFTAP')))
+help_vars.Add(EnumVariable('WITH_UPSTREAM_LIBCOAP', 'Use latest stable version of LibCoAP downloaded from github', default_with_upstream_libcoap, allowed_values=('0','1')))
 
 AddOption('--prefix',
                   dest='prefix',
@@ -238,6 +250,9 @@ def __installlib(ienv, targets, name):
 		else:
 			i_n = ienv.Install(user_prefix + '/lib', targets)
 		ienv.Alias("install", i_n)
+	else:
+		i_n = ienv.Install(env.get('BUILD_DIR'), targets)
+	ienv.Alias("install", i_n)
 
 def __installbin(ienv, targets, name):
 	user_prefix = env.get('PREFIX')
@@ -249,7 +264,9 @@ def __installheader(ienv, targets, dir, name):
 	user_prefix = env.get('PREFIX')
 	if user_prefix:
 		i_n = ienv.Install(user_prefix + '/include/' + dir ,targets)
-		ienv.Alias("install", i_n)
+	else:
+		i_n = ienv.Install(os.path.join(env.get('BUILD_DIR'), 'include', dir), targets)
+	ienv.Alias("install", i_n)
 
 def __installpcfile(ienv, targets, name):
 	user_prefix = env.get('PREFIX')
@@ -259,7 +276,9 @@ def __installpcfile(ienv, targets, name):
 			i_n = ienv.Install(user_lib + '/pkgconfig', targets)
 		else:
 			i_n = ienv.Install(user_prefix + '/lib/pkgconfig', targets)
-		ienv.Alias("install", i_n)
+	else:
+		i_n = ienv.Install(env.get('BUILD_DIR') + 'lib/pkgconfig', targets)
+	ienv.Alias("install", i_n)
 
 def __append_target(ienv, name, targets = None):
 	if targets:
@@ -298,30 +317,31 @@ Export('env')
 ######################################################################
 pc_file = env.get('SRC_DIR') + '/iotivity.pc.in'
 
-if env.get('ROUTING') == 'GW':
-	routing_define = 'ROUTING_GATEWAY'
-elif env.get('ROUTING') == 'EP':
-	routing_define = 'ROUTING_EP'
-
 user_prefix = env.get('PREFIX')
 user_lib = env.get('LIB_INSTALL_DIR')
-if not user_lib:
-	user_lib = '$${prefix}/lib'
 
-if user_prefix:
-	pc_vars = {'\@PREFIX\@': user_prefix,
-				'\@EXEC_PREFIX\@':user_prefix,
-				'\@VERSION\@': '1.1.1',
-				'\@LIB_INSTALL_DIR\@': user_lib,
-				'\@ROUTING_DEFINE\@': routing_define
-				}
-else:
-	pc_vars = {'\@PREFIX\@': env.get('BUILD_DIR'),
-				'\@EXEC_PREFIX\@': env.get('BUILD_DIR'),
-				'\@VERSION\@': '1.1.1',
-				'\@LIB_INSTALL_DIR\@': user_lib,
-				'\@ROUTING_DEFINE\@': routing_define
-				}
+if not user_prefix:
+    user_prefix = env.get('BUILD_DIR').encode('string_escape')
+
+if not user_lib:
+    user_lib = '$${prefix}/lib'
+
+defines = []
+if env.get('LOGGING'):
+    defines.append('-DTB_LOG=1')
+
+if env.get('ROUTING') == 'GW':
+    defines.append('-DROUTING_GATEWAY=1')
+elif env.get('ROUTING') == 'EP':
+    defines.append('-DROUTING_EP=1')
+
+pc_vars = {
+    '\@VERSION\@': project_version,
+    '\@PREFIX\@': user_prefix,
+    '\@EXEC_PREFIX\@': user_prefix,
+    '\@LIB_INSTALL_DIR\@': user_lib,
+    '\@DEFINES\@': " ".join(defines)
+}
 
 env.Substfile(pc_file, SUBST_DICT = pc_vars)
 
@@ -360,6 +380,8 @@ if target_os == "yocto":
                         env[tool] = os.path.join(path, os.environ[tool])
                         break
         env['CROSS_COMPILE'] = target_prefix[:len(target_prefix) - 1]
+        if os.environ['LDFLAGS'] != None:
+            env.AppendUnique(LINKFLAGS = Split(os.environ['LDFLAGS']))
     except:
         print "ERROR in Yocto cross-toolchain environment"
         Exit(1)

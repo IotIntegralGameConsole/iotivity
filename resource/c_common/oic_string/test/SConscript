@@ -29,14 +29,13 @@ target_os = stringtest_env.get('TARGET_OS')
 ######################################################################
 # Build flags
 ######################################################################
-stringtest_env.PrependUnique(CPPPATH = [
-        '../include'])
+stringtest_env.PrependUnique(CPPPATH = ['../include'])
 
 stringtest_env.AppendUnique(LIBPATH = [os.path.join(stringtest_env.get('BUILD_DIR'), 'resource', 'c_common')])
-stringtest_env.PrependUnique(LIBS = ['c_common', 'gtest', 'gtest_main', 'pthread'])
+stringtest_env.PrependUnique(LIBS = ['c_common'])
 
 if stringtest_env.get('LOGGING'):
-	stringtest_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
+    stringtest_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
 #
 ######################################################################
 # Source files and Targets
@@ -47,7 +46,7 @@ Alias("test", [stringtests])
 
 stringtest_env.AppendTarget('test')
 if stringtest_env.get('TEST') == '1':
-	if target_os == 'linux':
+    if target_os in ['linux']:
                 from tools.scons.RunTest import *
                 run_test(stringtest_env,
                          'resource_ccommon_string_test.memcheck',

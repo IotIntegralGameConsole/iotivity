@@ -23,9 +23,6 @@ package org.iotivity.cloud.base.protocols.coap;
 
 import java.util.List;
 
-import org.iotivity.cloud.base.protocols.coap.enums.CoapMethod;
-import org.iotivity.cloud.base.protocols.coap.enums.CoapStatus;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -46,6 +43,7 @@ public class CoapDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in,
             List<Object> out) throws Exception {
 
+        // TODO: need exceptional case handling
         while (in.isReadable(bufferToRead)) {
 
             switch (nextState) {
@@ -104,9 +102,9 @@ public class CoapDecoder extends ByteToMessageDecoder {
                     int code = in.readByte() & 0xFF;
 
                     if (code <= 31) {
-                        partialMsg = new CoapRequest(CoapMethod.valueOf(code));
+                        partialMsg = new CoapRequest(code);
                     } else {
-                        partialMsg = new CoapResponse(CoapStatus.valueOf(code));
+                        partialMsg = new CoapResponse(code);
                     }
 
                     if (tokenLength > 0) {

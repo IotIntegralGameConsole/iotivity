@@ -18,13 +18,14 @@
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# SConscript file for Local PKI google tests
-gtest_env = SConscript('#extlibs/gtest/SConscript')
-lib_env = gtest_env.Clone()
-
 ##
 # ResourceClient Unit Test build script
 ##
+# SConscript file for Local PKI google tests
+gtest_env = SConscript('#extlibs/gtest/SConscript')
+lib_env = gtest_env.Clone()
+target_os = lib_env.get('TARGET_OS')
+
 if lib_env.get('RELEASE'):
     lib_env.AppendUnique(CCFLAGS = ['-Os'])
     lib_env.AppendUnique(CPPDEFINES = ['NDEBUG'])
@@ -35,13 +36,12 @@ if lib_env.get('LOGGING'):
     lib_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
 
 # Add third party libraries
-SConscript(lib_env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
+SConscript('#service/third_party_libs.scons', 'lib_env')
 
-target_os = lib_env.get('TARGET_OS')
-if target_os == 'linux':
+if target_os in ['linux']:
     # Verify that 'hippomocks' mocking code is installed.  If not,
     # get it and install it
-    SConscript(lib_env.get('SRC_DIR') + '/extlibs/hippomocks.scons')
+    SConscript('#extlibs/hippomocks.scons')
 
 rcs_test_env = lib_env.Clone()
 
@@ -60,12 +60,6 @@ rcs_test_env.AppendUnique(
                 '../src/common/utils/include',
         ])
 
-if target_os not in ['windows', 'winrt']:
-        rcs_test_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall'])
-        if target_os != 'android':
-                rcs_test_env.AppendUnique(CXXFLAGS = ['-pthread'])
-                rcs_test_env.AppendUnique(LIBS = ['pthread'])
-
 rcs_test_env.PrependUnique(LIBS = [
     'connectivity_abstraction',
     'oc_logger',
@@ -74,11 +68,11 @@ rcs_test_env.PrependUnique(LIBS = [
     'oc',
     'rcs_client',
     'rcs_server',
-    'rcs_common',
-    'gtest',
-    'gtest_main'])
+    'rcs_common'])
 
-rcs_test_env.AppendUnique(LIBS = ['dl'])
+if lib_env.get('SECURED') == '1':
+	if lib_env.get('WITH_TCP') == True:
+		rcs_test_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509', 'mbedcrypto'])
 
 ######################################################################
 # Build Test
@@ -91,6 +85,6 @@ rcs_test_env.AppendTarget('rcs_client_test')
 
 if rcs_test_env.get('TEST') == '1':
     target_os = rcs_test_env.get('TARGET_OS')
-    if target_os == 'linux':
+    if target_os in ['linux']:
         from tools.scons.RunTest import *
         run_test(rcs_test_env, '', 'service/resource-encapsulation/unittests/rcs_client_test')

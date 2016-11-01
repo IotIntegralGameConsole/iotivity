@@ -25,6 +25,17 @@
 
 namespace OC
 {
+
+#if defined(_WIN32)
+/** @todo: Remove temporary hacks to solve error C2059: syntax error: 'constant'*/
+#ifdef NO_ERROR
+#undef NO_ERROR
+#endif
+#ifdef DELETE
+#undef DELETE
+#endif
+#endif
+
     namespace InitException
     {
         static const char NO_ERROR[]                   = "No Error";
@@ -65,6 +76,7 @@ namespace OC
                             "and from 2048 to 3000 inclusive.";
         static const char NO_ERROR[]                   = "No Error";
         static const char RESOURCE_CREATED[]           = "Resource Created";
+        static const char RESOURCE_CHANGED[]           = "Resource Changed";
         static const char RESOURCE_DELETED[]           = "Resource Deleted";
         static const char INVALID_URI[]                = "Invalid URI";
         static const char INVALID_IP[]                 = "Invalid IP";
@@ -107,10 +119,12 @@ namespace OC
         static const char INVALID_ATTRIBUTE[]          = "Invalid Attribute: ";
         static const char INVALID_DEVICE_INFO[]        = "Invalid Device Information";
         static const char UNAUTHORIZED_REQUEST[]       = "Unauthorized Request";
+        static const char TOO_LARGE_REQ[]              = "Request Too Large";
         static const char PDM_DB_NOT_INITIALIZED[]     = "Provisioning DB is not initialized";
         static const char DUPLICATE_UUID[]             = "Duplicate UUID in DB";
         static const char INCONSISTENT_DB[]            = "Data in provisioning DB is inconsistent";
         static const char AUTHENTICATION_FAILURE[]     = "Authentication failure";
+        static const char PUBLISH_RESOURCE_FAILED[]    = "Publish Resource failure";
     }
 
     namespace Error
