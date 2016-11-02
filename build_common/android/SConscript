@@ -222,6 +222,8 @@ env.AppendUnique(LIBS = ['log', 'coap'])
 
 if env.get('SECURED') == '1':
 	env.AppendUnique(LIBS = ['tinydtls'])
+	env.SConscript('#extlibs/mbedtls/SConscript')
+	env.AppendUnique(LIBS = ['mbedtls','mbedx509','mbedcrypto'])
 
 # From android-5 (API > 20), all application must be built with flags '-fPIE' '-pie'.
 # Due to the limitation of Scons, it's required to added it into the command line
@@ -237,4 +239,4 @@ if platform_ver == '' or int(platform_ver) > 20:
 SConscript('compatibility/cpp11_compat.scons')
 
 # Make sure that boost for android is available
-SConscript(env.get('SRC_DIR') + '/extlibs/boost/SConscript')
+SConscript('#extlibs/boost/SConscript')

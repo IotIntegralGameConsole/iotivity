@@ -152,21 +152,21 @@ static OCStackResult DeleteKeepAliveResource();
 
 /**
  * API to handle the GET request received for a KeepAlive resource.
- * @param[in]   endPoint        RemoteEndpoint which sent the packet.
- * @param[in]   requestInfo     Received coap packet.
+ * @param[in]   request     Request Received.
+ * @param[in]   resource    Resource handle used for sending the response.
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
-static OCStackResult HandleKeepAliveGETRequest(const CAEndpoint_t* endPoint,
-                                        const CARequestInfo_t* requestInfo);
+static OCStackResult HandleKeepAliveGETRequest(OCServerRequest *request,
+                                               const OCResource *resource);
 
 /**
  * API to handle the PUT request received for a KeepAlive resource.
- * @param[in]   endPoint        RemoteEndpoint which sent the packet.
- * @param[in]   requestInfo     Received coap packet.
+ * @param[in]   request     Request Received.
+ * @param[in]   resource    Resource handle used for sending the response.
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
-static OCStackResult HandleKeepAlivePUTRequest(const CAEndpoint_t* endPoint,
-                                        const CARequestInfo_t* requestInfo);
+static OCStackResult HandleKeepAlivePUTRequest(OCServerRequest *request,
+                                               const OCResource *resource);
 
 /**
  * API to handle the Response payload.
@@ -314,66 +314,92 @@ OCStackResult DeleteKeepAliveResource()
     return result;
 }
 
-OCStackResult HandleKeepAliveRequest(const CAEndpoint_t* endPoint,
-                                     const CARequestInfo_t* requestInfo)
+OCStackResult HandleKeepAliveRequest(OCServerRequest *request,
+                                     const OCResource *resource)
 {
-    VERIFY_NON_NULL(endPoint, FATAL, OC_STACK_INVALID_PARAM);
-    VERIFY_NON_NULL(requestInfo, FATAL, OC_STACK_INVALID_PARAM);
+    VERIFY_NON_NULL(request, FATAL, OC_STACK_INVALID_PARAM);
+    VERIFY_NON_NULL(resource, FATAL, OC_STACK_INVALID_PARAM);
 
     OIC_LOG(DEBUG, TAG, "HandleKeepAliveRequest IN");
 
-    OCStackResult result = OC_STACK_OK;
-    if (CA_PUT == requestInfo->method)
+    OCStackResult result = OC_STACK_ERROR;
+    if (OC_REST_GET == request->method)
     {
-        result = HandleKeepAlivePUTRequest(endPoint, requestInfo);
+        switch ((OCObserveAction)request->observationOption)
+        {
+            case OC_OBSERVE_NO_OPTION:
+                OIC_LOG(DEBUG, TAG, "Received GET request");
+                result = HandleKeepAliveGETRequest(request, resource);
+                break;
+            default:
+                OIC_LOG(DEBUG, TAG, "Not Supported by KeepAlive");
+                result = OC_STACK_UNAUTHORIZED_REQ;
+        }
     }
-    else if (CA_GET == requestInfo->method)
+    else if (OC_REST_PUT == request->method)
     {
-        result = HandleKeepAliveGETRequest(endPoint, requestInfo);
+        OIC_LOG(DEBUG, TAG, "Received PUT request");
+        result = HandleKeepAlivePUTRequest(request, resource);
     }
+    else
+    {
+        OIC_LOG(DEBUG, TAG, "Not Supported by KeepAlive");
+        result = OC_STACK_UNAUTHORIZED_REQ;
+    }
+
+    // convert OCStackResult to CAResponseResult_t.
+    CAResponseResult_t caResult = OCToCAStackResult(result, request->method);
+    CAEndpoint_t endpoint = {.adapter = CA_DEFAULT_ADAPTER};
+    CopyDevAddrToEndpoint(&request->devAddr, &endpoint);
+
+    // Send response message.
+    SendDirectStackResponse(&endpoint, request->coapID, caResult,
+                           qualityOfServiceToMessageType(request->qos),
+                           request->numRcvdVendorSpecificHeaderOptions,
+                           request->rcvdVendorSpecificHeaderOptions,
+                           request->requestToken, request->tokenLength,
+                           request->resourceUrl, CA_RESPONSE_DATA);
 
     OIC_LOG(DEBUG, TAG, "HandleKeepAliveRequest OUT");
-    return result;
+    return OC_STACK_OK;
 }
 
-OCStackResult HandleKeepAliveGETRequest(const CAEndpoint_t* endPoint,
-                                        const CARequestInfo_t* requestInfo)
+OCStackResult HandleKeepAliveGETRequest(OCServerRequest *request,
+                                        const OCResource *resource)
 {
-    VERIFY_NON_NULL(endPoint, FATAL, OC_STACK_INVALID_PARAM);
-    VERIFY_NON_NULL(requestInfo, FATAL, OC_STACK_INVALID_PARAM);
+    VERIFY_NON_NULL(request, FATAL, OC_STACK_INVALID_PARAM);
+    VERIFY_NON_NULL(resource, FATAL, OC_STACK_INVALID_PARAM);
 
-    OIC_LOG_V(DEBUG, TAG, "Find Ping resource [%s]", requestInfo->info.resourceUri);
+    OIC_LOG_V(DEBUG, TAG, "Find Ping resource [%s]", request->resourceUrl);
 
     CAResponseResult_t result = CA_CONTENT;
-    OCResource *resourcePtr = FindResourceByUri(requestInfo->info.resourceUri);
+    OCResource *resourcePtr = FindResourceByUri(request->resourceUrl);
     if (!resourcePtr)
     {
         // Resource URL not specified
-        OIC_LOG_V(DEBUG, TAG, "There is no Ping resource [%s]", requestInfo->info.resourceUri);
-        result = CA_NOT_FOUND;
+        OIC_LOG_V(DEBUG, TAG, "There is no Ping resource [%s]", request->resourceUrl);
+        return OC_STACK_NO_RESOURCE;
     }
-
-    SendDirectStackResponse(endPoint, requestInfo->info.messageId, result, requestInfo->info.type,
-                            requestInfo->info.numOptions, requestInfo->info.options,
-                            requestInfo->info.token, requestInfo->info.tokenLength,
-                            requestInfo->info.resourceUri);
 
     return OC_STACK_OK;
 }
 
-OCStackResult HandleKeepAlivePUTRequest(const CAEndpoint_t* endPoint,
-                                        const CARequestInfo_t* requestInfo)
+OCStackResult HandleKeepAlivePUTRequest(OCServerRequest *request,
+                                        const OCResource *resource)
 {
-    VERIFY_NON_NULL(endPoint, FATAL, OC_STACK_INVALID_PARAM);
-    VERIFY_NON_NULL(requestInfo, FATAL, OC_STACK_INVALID_PARAM);
+    VERIFY_NON_NULL(request, FATAL, OC_STACK_INVALID_PARAM);
+    VERIFY_NON_NULL(resource, FATAL, OC_STACK_INVALID_PARAM);
 
     // Get entry from KeepAlive table.
+    CAEndpoint_t endpoint = { .adapter = CA_DEFAULT_ADAPTER };
+    CopyDevAddrToEndpoint(&request->devAddr, &endpoint);
+
     uint32_t index = 0;
-    KeepAliveEntry_t *entry = GetEntryFromEndpoint(endPoint, &index);
+    KeepAliveEntry_t *entry = GetEntryFromEndpoint(&endpoint, &index);
     if (!entry)
     {
         OIC_LOG(ERROR, TAG, "Received the first keepalive message from client");
-        entry = AddKeepAliveEntry(endPoint, OC_SERVER, NULL);
+        entry = AddKeepAliveEntry(&endpoint, OC_SERVER, NULL);
         if (!entry)
         {
             OIC_LOG(ERROR, TAG, "Failed to add new keepalive entry");
@@ -383,7 +409,7 @@ OCStackResult HandleKeepAlivePUTRequest(const CAEndpoint_t* endPoint,
 
     OCPayload *ocPayload = NULL;
     OCParsePayload(&ocPayload, PAYLOAD_TYPE_REPRESENTATION,
-                   requestInfo->info.payload, requestInfo->info.payloadSize);
+                   request->payload, request->payloadSize);
     OCRepPayload *repPayload = (OCRepPayload *)ocPayload;
 
     int64_t interval = 0;
@@ -392,11 +418,7 @@ OCStackResult HandleKeepAlivePUTRequest(const CAEndpoint_t* endPoint,
     OIC_LOG_V(DEBUG, TAG, "Received interval is [%d]", entry->interval);
     entry->timeStamp = OICGetCurrentTime(TIME_IN_US);
 
-    // Send response message.
-    SendDirectStackResponse(endPoint, requestInfo->info.messageId, CA_VALID, requestInfo->info.type,
-                            requestInfo->info.numOptions, requestInfo->info.options,
-                            requestInfo->info.token, requestInfo->info.tokenLength,
-                            requestInfo->info.resourceUri);
+    OCPayloadDestroy(ocPayload);
 
     return OC_STACK_OK;
 }
@@ -468,7 +490,8 @@ void ProcessKeepAlive()
 
     for (uint32_t i = 0; i < len; i++)
     {
-        KeepAliveEntry_t *entry = u_arraylist_get(g_keepAliveConnectionTable, i);
+        KeepAliveEntry_t *entry = (KeepAliveEntry_t *)u_arraylist_get(g_keepAliveConnectionTable,
+                                                                      i);
         if (NULL == entry)
         {
             continue;
@@ -530,8 +553,8 @@ void IncreaseInterval(KeepAliveEntry_t *entry)
 {
     VERIFY_NON_NULL_NR(entry, FATAL);
 
-    OIC_LOG_V(DEBUG, TAG, "Total interval counts: %d", entry->intervalSize);
-    if (entry->intervalSize > entry->currIndex + 1)
+    OIC_LOG_V(DEBUG, TAG, "Total interval counts: %zu", entry->intervalSize);
+    if (entry->intervalSize > (size_t)entry->currIndex + 1)
     {
         entry->currIndex++;
         entry->interval = entry->intervalInfo[entry->currIndex];
@@ -547,8 +570,16 @@ OCStackResult SendDisconnectMessage(const KeepAliveEntry_t *entry)
      * Send empty message to disconnect a connection.
      * If CA get the empty message from RI, CA will disconnect a connection.
      */
+
+    OCStackResult result = RemoveKeepAliveEntry(&entry->remoteAddr);
+    if (result != OC_STACK_OK)
+    {
+        return result;
+    }
+
     CARequestInfo_t requestInfo = { .method = CA_PUT };
-    return CASendRequest(&entry->remoteAddr, &requestInfo);
+    result = CASendRequest(&entry->remoteAddr, &requestInfo);
+    return CAResultToOCResult(result);
 }
 
 OCStackResult SendPingMessage(KeepAliveEntry_t *entry)
@@ -556,7 +587,7 @@ OCStackResult SendPingMessage(KeepAliveEntry_t *entry)
     VERIFY_NON_NULL(entry, FATAL, OC_STACK_INVALID_PARAM);
 
     // Send ping message.
-    OCCallbackData pingData = { .cb = PingRequestCallback };
+    OCCallbackData pingData = { .context = NULL, .cb = PingRequestCallback };
     OCDevAddr devAddr = { .adapter = OC_ADAPTER_TCP };
     CopyEndpointToDevAddr(&(entry->remoteAddr), &devAddr);
 
@@ -569,8 +600,14 @@ OCStackResult SendPingMessage(KeepAliveEntry_t *entry)
     payload->base.type = PAYLOAD_TYPE_REPRESENTATION;
     OCRepPayloadSetPropInt(payload, INTERVAL, entry->interval);
 
-    OCDoResource(NULL, OC_REST_PUT, KEEPALIVE_RESOURCE_URI, &devAddr,
-                 (OCPayload *) payload, CT_ADAPTER_TCP, OC_LOW_QOS, &pingData, NULL, 0);
+    OCStackResult result = OCDoResource(NULL, OC_REST_PUT, KEEPALIVE_RESOURCE_URI, &devAddr,
+                                        (OCPayload *) payload, CT_ADAPTER_TCP, OC_LOW_QOS,
+                                        &pingData, NULL, 0);
+    if (OC_STACK_OK != result)
+    {
+        OIC_LOG(ERROR, TAG, "OCDoResource has failed");
+        return result;
+    }
 
     // Update timeStamp with time sent ping message for next ping message.
     entry->timeStamp = OICGetCurrentTime(TIME_IN_US);
@@ -590,7 +627,7 @@ OCStackApplicationResult PingRequestCallback(void* ctx, OCDoHandle handle,
     if (NULL == clientResponse)
     {
         OIC_LOG(ERROR, TAG, "clientResponse is NULL");
-        return OC_STACK_KEEP_TRANSACTION;
+        return OC_STACK_DELETE_TRANSACTION;
     }
 
     CAEndpoint_t endpoint = { .adapter = CA_ADAPTER_TCP };
@@ -600,7 +637,7 @@ OCStackApplicationResult PingRequestCallback(void* ctx, OCDoHandle handle,
                             (OCRepPayload *)clientResponse->payload);
 
     OIC_LOG(DEBUG, TAG, "PingRequestCallback OUT");
-    return OC_STACK_KEEP_TRANSACTION;
+    return OC_STACK_DELETE_TRANSACTION;
 }
 
 KeepAliveEntry_t *GetEntryFromEndpoint(const CAEndpoint_t *endpoint, uint32_t *index)
@@ -615,7 +652,8 @@ KeepAliveEntry_t *GetEntryFromEndpoint(const CAEndpoint_t *endpoint, uint32_t *i
 
     for (uint32_t i = 0; i < len; i++)
     {
-        KeepAliveEntry_t *entry = u_arraylist_get(g_keepAliveConnectionTable, i);
+        KeepAliveEntry_t *entry = (KeepAliveEntry_t *)u_arraylist_get(g_keepAliveConnectionTable,
+                                                                      i);
         if (NULL == entry)
         {
             continue;
@@ -659,7 +697,7 @@ KeepAliveEntry_t *AddKeepAliveEntry(const CAEndpoint_t *endpoint, OCMode mode,
     entry->timeStamp = OICGetCurrentTime(TIME_IN_US);
     entry->remoteAddr.adapter = endpoint->adapter;
     entry->remoteAddr.flags = endpoint->flags;
-    entry->remoteAddr.interface = endpoint->interface;
+    entry->remoteAddr.ifindex = endpoint->ifindex;
     entry->remoteAddr.port = endpoint->port;
     strncpy(entry->remoteAddr.addr, endpoint->addr, sizeof(entry->remoteAddr.addr));
 
@@ -699,7 +737,8 @@ OCStackResult RemoveKeepAliveEntry(const CAEndpoint_t *endpoint)
         return OC_STACK_ERROR;
     }
 
-    KeepAliveEntry_t *removedEntry = u_arraylist_remove(g_keepAliveConnectionTable, index);
+    KeepAliveEntry_t *removedEntry = (KeepAliveEntry_t *)
+                                        u_arraylist_remove(g_keepAliveConnectionTable, index);
     if (NULL == removedEntry)
     {
         OIC_LOG(ERROR, TAG, "Removed Entry is NULL");
@@ -725,12 +764,18 @@ void HandleKeepAliveConnCB(const CAEndpoint_t *endpoint, bool isConnected)
         OIC_LOG(DEBUG, TAG, "Received the connected device information from CA");
 
         // Send discover message to find ping resource
-        OCCallbackData pingData = { .cb = PingRequestCallback };
+        OCCallbackData pingData = {.context = NULL, .cb = PingRequestCallback };
         OCDevAddr devAddr = { .adapter = OC_ADAPTER_TCP };
         CopyEndpointToDevAddr(endpoint, &devAddr);
 
-        OCDoResource(NULL, OC_REST_DISCOVER, KEEPALIVE_RESOURCE_URI, &devAddr, NULL,
-                     OC_ADAPTER_TCP, OC_HIGH_QOS, &pingData, NULL, 0);
+        OCStackResult result = OCDoResource(NULL, OC_REST_DISCOVER, KEEPALIVE_RESOURCE_URI,
+                                            &devAddr, NULL, CT_ADAPTER_TCP, OC_HIGH_QOS,
+                                            &pingData, NULL, 0);
+        if (OC_STACK_OK != result)
+        {
+            OIC_LOG(ERROR, TAG, "OCDoResource has failed");
+            return;
+        }
     }
     else
     {
@@ -739,7 +784,6 @@ void HandleKeepAliveConnCB(const CAEndpoint_t *endpoint, bool isConnected)
         OCStackResult result = RemoveKeepAliveEntry(endpoint);
         if(result != OC_STACK_OK)
         {
-            OIC_LOG(ERROR, TAG, "Failed to remove entry");
             return;
         }
     }

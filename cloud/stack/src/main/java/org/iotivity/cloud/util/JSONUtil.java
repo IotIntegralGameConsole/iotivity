@@ -22,13 +22,9 @@
 package org.iotivity.cloud.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -37,78 +33,58 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * JSON string.
  * 
  */
-public class JSONUtil {
+public class JSONUtil<T> {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
-    public static String parseJSON(String jsonString, String key) {
+    @SuppressWarnings("unchecked")
+    public T parseJSON(byte[] data, Class<? extends Object> class1) {
 
-        if (jsonString == null || jsonString.equals(""))
-            return null;
-
-        String value = null;
-
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, String> jsonMap = mapper.readValue(jsonString,
-                    Map.class);
-            value = jsonMap.get(key);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-
-        return value;
-    }
-    
-    public static ArrayList<String> parseJSON(byte[] payload, String key) {
-
-        if (payload == null)
-            return null;
-
-        ArrayList<String> value = null;
-
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, ArrayList<String>> jsonMap = mapper.readValue(payload,
-                    Map.class);
-            value = jsonMap.get(key);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-
-        return value;
-    }
-
-    public static Map<String, String> parseJSON(String jsonString)
-            throws JsonParseException, JsonMappingException, IOException {
-
-        Map<String, String> map = null;
-
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, String> jsonMap = mapper.readValue(jsonString,
-                    Map.class);
-            map = jsonMap;
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-
-        return map;
-    }
-
-    public static String writeJSON(HashMap<Object, Object> data) {
         if (data == null)
             return null;
 
-        String json = null;
+        T parsedData = null;
+
         try {
-            json = mapper.writeValueAsString(data);
+            parsedData = (T) mapper.readValue(data, class1);
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        return parsedData;
+    }
+
+    public T parseJSON(String data, Class<? extends Object> class1) {
+
+        if (data == null || data.equals(""))
+            return null;
+
+        T parsedData = null;
+
+        try {
+            parsedData = (T) mapper.readValue(data, class1);
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        return parsedData;
+    }
+
+    public T writeJSON(HashMap<Object, Object> data) {
+        if (data == null)
+            return null;
+
+        T json = null;
+        try {
+            json = (T) mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
         if (json == null)
-            json = "{}";
+            json = (T) "{}";
 
         return json;
     }

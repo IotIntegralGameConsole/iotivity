@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 Intel Corporation
+** Copyright (C) 2016 Intel Corporation
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,60 @@ private slots:
 
 #include "tst_encoder.moc"
 
+static float myNaNf()
+{
+    uint32_t v = 0x7fc00000;
+    float f;
+    memcpy(&f, &v, sizeof(f));
+    Q_ASSERT(qIsNaN(f));
+    return f;
+}
+
+static float myInff()
+{
+    uint32_t v = 0x7f800000;
+    float f;
+    memcpy(&f, &v, sizeof(f));
+    Q_ASSERT(qIsInf(f));
+    return f;
+}
+
+static float myNInff()
+{
+    uint32_t v = 0xff800000;
+    float f;
+    memcpy(&f, &v, sizeof(f));
+    Q_ASSERT(qIsInf(f));
+    return f;
+}
+
+static double myNaN()
+{
+    uint64_t v = UINT64_C(0x7ff8000000000000);
+    double f;
+    memcpy(&f, &v, sizeof(f));
+    Q_ASSERT(qIsNaN(f));
+    return f;
+}
+
+static double myInf()
+{
+    uint64_t v = UINT64_C(0x7ff0000000000000);
+    double f;
+    memcpy(&f, &v, sizeof(f));
+    Q_ASSERT(qIsInf(f));
+    return f;
+}
+
+static double myNInf()
+{
+    uint64_t v = UINT64_C(0xfff0000000000000);
+    double f;
+    memcpy(&f, &v, sizeof(f));
+    Q_ASSERT(qIsInf(f));
+    return f;
+}
+
 template <size_t N> QByteArray raw(const char (&data)[N])
 {
     return QByteArray::fromRawData(data, N - 1);
@@ -73,6 +127,12 @@ Q_DECLARE_METATYPE(Float16Standin)
 
 struct Tag { CborTag tag; QVariant tagged; };
 Q_DECLARE_METATYPE(Tag)
+
+template <typename... Args>
+QVariant make_list(const Args &... args)
+{
+    return QVariantList{args...};
+}
 
 typedef QVector<QPair<QVariant, QVariant>> Map;
 Q_DECLARE_METATYPE(Map)
@@ -196,12 +256,16 @@ bool compareFailed;
 void compare(const QVariant &input, const QByteArray &output)
 {
     QByteArray buffer(output.length(), Qt::Uninitialized);
+    uint8_t *bufptr = reinterpret_cast<quint8 *>(buffer.data());
     CborEncoder encoder;
-    cbor_encoder_init(&encoder, reinterpret_cast<quint8 *>(buffer.data()), buffer.length(), 0);
+    cbor_encoder_init(&encoder, bufptr, buffer.length(), 0);
+
     QCOMPARE(int(encodeVariant(&encoder, input)), int(CborNoError));
-    buffer.resize(encoder.ptr - reinterpret_cast<const quint8 *>(buffer.constData()));
-    QCOMPARE(buffer, output);
     QCOMPARE(encoder.added, size_t(1));
+    QCOMPARE(cbor_encoder_get_extra_bytes_needed(&encoder), size_t(0));
+
+    buffer.resize(int(cbor_encoder_get_buffer_size(&encoder, bufptr)));
+    QCOMPARE(buffer, output);
 }
 
 void addColumns()
@@ -275,14 +339,12 @@ void addFixedData()
     QTest::newRow("-16777215.f") << raw("\xfa\xcb\x7f\xff\xff") << QVariant(-16777215.f);
     QTest::newRow("-16777215.") << raw("\xfb\xc1\x6f\xff\xff\xe0\0\0\0") << QVariant::fromValue(-16777215.);
 
-    QTest::newRow("qnan_f") << raw("\xfa\xff\xc0\0\0") << QVariant::fromValue<float>(qQNaN());
-    QTest::newRow("qnan") << raw("\xfb\xff\xf8\0\0\0\0\0\0") << QVariant(qQNaN());
-    QTest::newRow("snan_f") << raw("\xfa\x7f\xc0\0\0") << QVariant::fromValue<float>(qSNaN());
-    QTest::newRow("snan") << raw("\xfb\x7f\xf8\0\0\0\0\0\0") << QVariant(qSNaN());
-    QTest::newRow("-inf_f") << raw("\xfa\xff\x80\0\0") << QVariant::fromValue<float>(-qInf());
-    QTest::newRow("-inf") << raw("\xfb\xff\xf0\0\0\0\0\0\0") << QVariant(-qInf());
-    QTest::newRow("+inf_f") << raw("\xfa\x7f\x80\0\0") << QVariant::fromValue<float>(qInf());
-    QTest::newRow("+inf") << raw("\xfb\x7f\xf0\0\0\0\0\0\0") << QVariant(qInf());
+    QTest::newRow("nan_f") << raw("\xfa\x7f\xc0\0\0") << QVariant::fromValue<float>(myNaNf());
+    QTest::newRow("nan") << raw("\xfb\x7f\xf8\0\0\0\0\0\0") << QVariant(myNaN());
+    QTest::newRow("-inf_f") << raw("\xfa\xff\x80\0\0") << QVariant::fromValue<float>(myNInff());
+    QTest::newRow("-inf") << raw("\xfb\xff\xf0\0\0\0\0\0\0") << QVariant(myNInf());
+    QTest::newRow("+inf_f") << raw("\xfa\x7f\x80\0\0") << QVariant::fromValue<float>(myInff());
+    QTest::newRow("+inf") << raw("\xfb\x7f\xf0\0\0\0\0\0\0") << QVariant(myInf());
 }
 
 void addStringsData()
@@ -310,27 +372,27 @@ void addStringsData()
 
 void addArraysAndMaps()
 {
-    QTest::newRow("emptyarray") << raw("\x80") << QVariant(QVariantList{});
+    QTest::newRow("emptyarray") << raw("\x80") << make_list();
     QTest::newRow("emptymap") << raw("\xa0") << make_map({});
 
-    QTest::newRow("array-0") << raw("\x81\0") << QVariant(QVariantList{0});
-    QTest::newRow("array-{0-0}") << raw("\x82\0\0") << QVariant(QVariantList{0, 0});
-    QTest::newRow("array-Hello") << raw("\x81\x65Hello") << QVariant(QVariantList{"Hello"});
-    QTest::newRow("array-array-0") << raw("\x81\x81\0") << QVariant(QVariantList{QVariantList{0}});
-    QTest::newRow("array-array-{0-0}") << raw("\x81\x82\0\0") << QVariant(QVariantList{QVariantList{0, 0}});
-    QTest::newRow("array-array-0-0") << raw("\x82\x81\0\0") << QVariant(QVariantList{QVariantList{0},0});
-    QTest::newRow("array-array-Hello") << raw("\x81\x81\x65Hello") << QVariant(QVariantList{QVariantList{"Hello"}});
+    QTest::newRow("array-0") << raw("\x81\0") << make_list(0);
+    QTest::newRow("array-{0-0}") << raw("\x82\0\0") << make_list(0, 0);
+    QTest::newRow("array-Hello") << raw("\x81\x65Hello") << make_list("Hello");
+    QTest::newRow("array-array-0") << raw("\x81\x81\0") << make_list(make_list(0));
+    QTest::newRow("array-array-{0-0}") << raw("\x81\x82\0\0") << make_list(make_list(0, 0));
+    QTest::newRow("array-array-0-0") << raw("\x82\x81\0\0") << make_list(make_list(0),0);
+    QTest::newRow("array-array-Hello") << raw("\x81\x81\x65Hello") << make_list(make_list("Hello"));
 
     QTest::newRow("map-0:0") << raw("\xa1\0\0") << make_map({{0,0}});
     QTest::newRow("map-0:0-1:1") << raw("\xa2\0\0\1\1") << make_map({{0,0}, {1,1}});
     QTest::newRow("map-0:{map-0:0-1:1}") << raw("\xa1\0\xa2\0\0\1\1") << make_map({{0, make_map({{0,0}, {1,1}})}});
 
-    QTest::newRow("array-map1") << raw("\x81\xa1\0\0") << QVariant(QVariantList{make_map({{0,0}})});
-    QTest::newRow("array-map2") << raw("\x82\xa1\0\0\xa1\1\1") << QVariant(QVariantList{make_map({{0,0}}), make_map({{1,1}})});
+    QTest::newRow("array-map1") << raw("\x81\xa1\0\0") << make_list(make_map({{0,0}}));
+    QTest::newRow("array-map2") << raw("\x82\xa1\0\0\xa1\1\1") << make_list(make_map({{0,0}}), make_map({{1,1}}));
 
-    QTest::newRow("map-array1") << raw("\xa1\x62oc\x81\0") << make_map({{"oc", QVariantList{0}}});
-    QTest::newRow("map-array2") << raw("\xa1\x62oc\x84\0\1\2\3") << make_map({{"oc", QVariantList{0, 1, 2, 3}}});
-    QTest::newRow("map-array3") << raw("\xa2\x62oc\x82\0\1\2\3") << make_map({{"oc", QVariantList{0, 1}}, {2, 3}});
+    QTest::newRow("map-array1") << raw("\xa1\x62oc\x81\0") << make_map({{"oc", make_list(0)}});
+    QTest::newRow("map-array2") << raw("\xa1\x62oc\x84\0\1\2\3") << make_map({{"oc", make_list(0, 1, 2, 3)}});
+    QTest::newRow("map-array3") << raw("\xa2\x62oc\x82\0\1\2\3") << make_map({{"oc", make_list(0, 1)}, {2, 3}});
 
     // indeterminate length
     QTest::newRow("_emptyarray") << raw("\x9f\xff") << QVariant::fromValue(IndeterminateLengthArray{});
@@ -339,7 +401,7 @@ void addArraysAndMaps()
     QTest::newRow("_array-0") << raw("\x9f\0\xff") << make_ilarray({0});
     QTest::newRow("_array-{0-0}") << raw("\x9f\0\0\xff") << make_ilarray({0, 0});
     QTest::newRow("_array-Hello") << raw("\x9f\x65Hello\xff") << make_ilarray({"Hello"});
-    QTest::newRow("_array-array-0") << raw("\x9f\x81\0\xff") << make_ilarray({QVariantList{0}});
+    QTest::newRow("_array-array-0") << raw("\x9f\x81\0\xff") << make_ilarray({make_list(0)});
     QTest::newRow("_array-_array-0") << raw("\x9f\x9f\0\xff\xff") << make_ilarray({make_ilarray({0})});
     QTest::newRow("_array-_array-{0-0}") << raw("\x9f\x9f\0\0\xff\xff") << make_ilarray({make_ilarray({0, 0})});
     QTest::newRow("_array-_array-0-0") << raw("\x9f\x9f\0\xff\0\xff") << make_ilarray({make_ilarray({0}),0});
@@ -355,16 +417,16 @@ void addArraysAndMaps()
     QTest::newRow("_array-map2") << raw("\x9f\xa1\0\0\xa1\1\1\xff") << make_ilarray({make_map({{0,0}}), make_map({{1,1}})});
     QTest::newRow("_array-_map2") << raw("\x9f\xbf\0\0\xff\xbf\1\1\xff\xff") << make_ilarray({make_ilmap({{0,0}}), make_ilmap({{1,1}})});
 
-    QTest::newRow("_map-array1") << raw("\xbf\x62oc\x81\0\xff") << make_ilmap({{"oc", QVariantList{0}}});
+    QTest::newRow("_map-array1") << raw("\xbf\x62oc\x81\0\xff") << make_ilmap({{"oc", make_list(0)}});
     QTest::newRow("_map-_array1") << raw("\xbf\x62oc\x9f\0\xff\xff") << make_ilmap({{"oc", make_ilarray({0})}});
-    QTest::newRow("_map-array2") << raw("\xbf\x62oc\x84\0\1\2\3\xff") << make_ilmap({{"oc", QVariantList{0, 1, 2, 3}}});
+    QTest::newRow("_map-array2") << raw("\xbf\x62oc\x84\0\1\2\3\xff") << make_ilmap({{"oc", make_list(0, 1, 2, 3)}});
     QTest::newRow("_map-_array2") << raw("\xbf\x62oc\x9f\0\1\2\3\xff\xff") << make_ilmap({{"oc", make_ilarray({0, 1, 2, 3})}});
-    QTest::newRow("_map-array3") << raw("\xbf\x62oc\x82\0\1\2\3\xff") << make_ilmap({{"oc", QVariantList{0, 1}}, {2, 3}});
+    QTest::newRow("_map-array3") << raw("\xbf\x62oc\x82\0\1\2\3\xff") << make_ilmap({{"oc", make_list(0, 1)}, {2, 3}});
     QTest::newRow("_map-_array3") << raw("\xbf\x62oc\x9f\0\1\xff\2\3\xff") << make_ilmap({{"oc", make_ilarray({0, 1})}, {2, 3}});
 
     // tagged
-    QTest::newRow("array-1(0)") << raw("\x81\xc1\0") << QVariant(QVariantList{QVariant::fromValue(Tag{1, 0})});
-    QTest::newRow("array-1(map)") << raw("\x81\xc1\xa0") << QVariant(QVariantList{QVariant::fromValue(Tag{1, make_map({})})});
+    QTest::newRow("array-1(0)") << raw("\x81\xc1\0") << make_list(QVariant::fromValue(Tag{1, 0}));
+    QTest::newRow("array-1(map)") << raw("\x81\xc1\xa0") << make_list(QVariant::fromValue(Tag{1, make_map({})}));
     QTest::newRow("map-1(2):3(4)") << raw("\xa1\xc1\2\xc3\4") << make_map({{QVariant::fromValue(Tag{1, 2}), QVariant::fromValue(Tag{3, 4})}});
 }
 
@@ -445,10 +507,10 @@ void tst_Encoder::arrays()
     QFETCH(QVariant, input);
     QFETCH(QByteArray, output);
 
-    compare(QVariantList{input}, "\x81" + output);
+    compare(make_list(input), "\x81" + output);
     if (compareFailed) return;
 
-    compare(QVariantList{input, input}, "\x82" + output + output);
+    compare(make_list(input, input), "\x82" + output + output);
     if (compareFailed) return;
 
     {
@@ -473,16 +535,16 @@ void tst_Encoder::arrays()
     }
 
     // nested lists
-    compare(QVariantList{QVariantList{input}}, "\x81\x81" + output);
+    compare(make_list(make_list(input)), "\x81\x81" + output);
     if (compareFailed) return;
 
-    compare(QVariantList{QVariantList{input, input}}, "\x81\x82" + output + output);
+    compare(make_list(make_list(input, input)), "\x81\x82" + output + output);
     if (compareFailed) return;
 
-    compare(QVariantList{QVariantList{input}, input}, "\x82\x81" + output + output);
+    compare(make_list(make_list(input), input), "\x82\x81" + output + output);
     if (compareFailed) return;
 
-    compare(QVariantList{QVariantList{input}, QVariantList{input}}, "\x82\x81" + output + "\x81" + output);
+    compare(make_list(make_list(input), make_list(input)), "\x82\x81" + output + "\x81" + output);
 }
 
 void tst_Encoder::maps()
@@ -537,11 +599,12 @@ void tst_Encoder::shortBuffer()
     QFETCH(QByteArray, output);
     QByteArray buffer(output.length(), Qt::Uninitialized);
 
-    for (int len = 0; len < output.length() - 1; ++len) {
+    for (int len = 0; len < output.length(); ++len) {
         CborEncoder encoder;
         cbor_encoder_init(&encoder, reinterpret_cast<quint8 *>(buffer.data()), len, 0);
         QCOMPARE(int(encodeVariant(&encoder, input)), int(CborErrorOutOfMemory));
-        QCOMPARE(len + int(encoder.ptr - encoder.end), output.length());
+        QVERIFY(cbor_encoder_get_extra_bytes_needed(&encoder) != 0);
+        QCOMPARE(len + cbor_encoder_get_extra_bytes_needed(&encoder), size_t(output.length()));
     }
 }
 

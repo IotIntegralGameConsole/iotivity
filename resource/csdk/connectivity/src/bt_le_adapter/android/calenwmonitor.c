@@ -36,6 +36,8 @@
 
 #define TAG PCF("OIC_CA_LE_MONITOR")
 
+static const jint CONNECTION_FAILED_TO_BE_EASTABLISHED = 62;
+
 static JavaVM *g_jvm;
 
 /**
@@ -156,7 +158,7 @@ CAResult_t CAGetLEAdapterState()
     }
 
     bool isAttached = false;
-    JNIEnv* env;
+    JNIEnv* env = NULL;
     jint res = (*g_jvm)->GetEnv(g_jvm, (void**) &env, JNI_VERSION_1_6);
     if (JNI_OK != res)
     {
@@ -259,6 +261,33 @@ CAResult_t CAUnsetLENWConnectionStateChangedCb()
     return CA_STATUS_OK;
 }
 
+static CAResult_t CALEStateConnectedCallback(JNIEnv *env, jstring jni_address,
+                                             jboolean isDescriptorFound)
+{
+    VERIFY_NON_NULL(env, TAG, "env");
+    VERIFY_NON_NULL(jni_address, TAG, "jni_address");
+
+    if (CALEClientGetFlagFromState(env, jni_address, CA_LE_DESCRIPTOR_FOUND) == isDescriptorFound)
+    {
+        if (g_bleConnectionStateChangedCallback)
+        {
+            const char* address = (*env)->GetStringUTFChars(env, jni_address, NULL);
+            if (!address)
+            {
+                OIC_LOG(ERROR, TAG, "address is null");
+                return CA_STATUS_FAILED;
+            }
+
+            g_bleConnectionStateChangedCallback(CA_ADAPTER_GATT_BTLE, address, true);
+            OIC_LOG(DEBUG, TAG, "BLE is connected");
+
+            (*env)->ReleaseStringUTFChars(env, jni_address, address);
+        }
+    }
+
+    return CA_STATUS_OK;
+}
+
 JNIEXPORT void JNICALL
 Java_org_iotivity_ca_CaLeClientInterface_caLeStateChangedCallback(JNIEnv *env, jobject obj,
                                                                    jint status)
@@ -314,8 +343,6 @@ Java_org_iotivity_ca_CaLeClientInterface_caLeStateChangedCallback(JNIEnv *env, j
             OIC_LOG(ERROR, TAG, "CALEServerRemoveAllDevices has failed");
         }
 
-        CALEClientSetScanFlag(false);
-
         CANetworkStatus_t newStatus = CA_INTERFACE_DOWN;
         g_bleDeviceStateChangedCallback(newStatus);
     }
@@ -365,18 +392,17 @@ Java_org_iotivity_ca_CaLeClientInterface_caLeGattNWConnectionStateChangeCallback
                                                                                  jobject obj,
                                                                                  jobject gatt,
                                                                                  jint status,
-                                                                                 jint newstate)
+                                                                                 jint newState)
 {
-    VERIFY_NON_NULL_VOID(env, TAG, "env is null");
-    VERIFY_NON_NULL_VOID(obj, TAG, "obj is null");
-    VERIFY_NON_NULL_VOID(gatt, TAG, "gatt is null");
-
     OIC_LOG_V(DEBUG, TAG, "CALeGattNWConnectionStateChangeCallback - status %d, newstate %d",
-              status, newstate);
+              status, newState);
+    VERIFY_NON_NULL_VOID(env, TAG, "env");
+    VERIFY_NON_NULL_VOID(obj, TAG, "obj");
+    VERIFY_NON_NULL_VOID(gatt, TAG, "gatt");
 
     jint state_disconnected = CALEGetConstantsValue(env, CLASSPATH_BT_PROFILE,
                                                     "STATE_DISCONNECTED");
-    if (state_disconnected == newstate)
+    if (state_disconnected == newState)
     {
         jstring jni_address = CALEClientGetAddressFromGattObj(env, gatt);
         if (!jni_address)
@@ -392,9 +418,13 @@ Java_org_iotivity_ca_CaLeClientInterface_caLeGattNWConnectionStateChangeCallback
             return;
         }
 
-        if (g_bleConnectionStateChangedCallback)
+        if (CONNECTION_FAILED_TO_BE_EASTABLISHED != status)
         {
-            g_bleConnectionStateChangedCallback(CA_ADAPTER_GATT_BTLE, address, false);
+            if (g_bleConnectionStateChangedCallback)
+            {
+                OIC_LOG_V(DEBUG, TAG, "LE Disconnected state is %d, %s", newState, address);
+                g_bleConnectionStateChangedCallback(CA_ADAPTER_GATT_BTLE, address, false);
+            }
         }
 
         (*env)->ReleaseStringUTFChars(env, jni_address, address);
@@ -405,37 +435,112 @@ JNIEXPORT void JNICALL
 Java_org_iotivity_ca_CaLeServerInterface_caLeGattServerNWConnectionStateChangeCallback(
         JNIEnv *env, jobject obj, jobject device, jint status, jint newState)
 {
-    OIC_LOG(DEBUG, TAG, " Gatt Server NWConnectionStateChange Callback");
-
+    OIC_LOG_V(DEBUG, TAG, "caLeGattServerNWConnectionStateChangeCallback - status %d, newstate %d",
+              status, newState);
     VERIFY_NON_NULL_VOID(env, TAG, "env");
     VERIFY_NON_NULL_VOID(obj, TAG, "obj");
     VERIFY_NON_NULL_VOID(device, TAG, "device");
-    (void)status;
 
-    // STATE_DISCONNECTED
-    jint state_disconnected = CALEGetConstantsValue(env, CLASSPATH_BT_PROFILE,
-                                                    "STATE_DISCONNECTED");
-    if (state_disconnected == newState)
+    if (CONNECTION_FAILED_TO_BE_EASTABLISHED != status)
     {
-        jstring jni_remoteAddress = CALEGetAddressFromBTDevice(env, device);
-        if (!jni_remoteAddress)
-        {
-            OIC_LOG(ERROR, TAG, "jni_remoteAddress is null");
-            return;
-        }
-
-        const char* address = (*env)->GetStringUTFChars(env, jni_remoteAddress, NULL);
-        if (!address)
-        {
-            OIC_LOG(ERROR, TAG, "address is null");
-            return;
-        }
-
         if (g_bleConnectionStateChangedCallback)
         {
-            g_bleConnectionStateChangedCallback(CA_ADAPTER_GATT_BTLE, address, false);
+            jstring jni_remoteAddress = CALEGetAddressFromBTDevice(env, device);
+            if (!jni_remoteAddress)
+            {
+                OIC_LOG(ERROR, TAG, "jni_remoteAddress is null");
+                return;
+            }
+
+            const char* address = (*env)->GetStringUTFChars(env, jni_remoteAddress, NULL);
+            if (!address)
+            {
+                OIC_LOG(ERROR, TAG, "address is null");
+                return;
+            }
+
+            // STATE_DISCONNECTED
+            jint state_disconnected = CALEGetConstantsValue(env, CLASSPATH_BT_PROFILE,
+                                                            "STATE_DISCONNECTED");
+
+            // STATE_CONNECTED
+            jint state_connected = CALEGetConstantsValue(env, CLASSPATH_BT_PROFILE,
+                                                         "STATE_CONNECTED");
+
+            if (state_disconnected == newState)
+            {
+                OIC_LOG_V(DEBUG, TAG, "LE Disconnected state is %d, %s", newState, address);
+                g_bleConnectionStateChangedCallback(CA_ADAPTER_GATT_BTLE, address, false);
+            }
+            else if (state_connected == newState)
+            {
+                OIC_LOG_V(DEBUG, TAG, "LE Connected state is %d, %s", newState, address);
+                g_bleConnectionStateChangedCallback(CA_ADAPTER_GATT_BTLE, address, true);
+            }
+            else
+            {
+                OIC_LOG_V(DEBUG, TAG, "Unknown state : %d, %s", newState, address);
+            }
+
+            (*env)->ReleaseStringUTFChars(env, jni_remoteAddress, address);
+        }
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_org_iotivity_ca_CaLeClientInterface_caLeGattNWServicesDiscoveredCallback(JNIEnv *env,
+                                                                              jobject obj,
+                                                                              jobject gatt,
+                                                                              jint status)
+{
+    OIC_LOG_V(DEBUG, TAG, "caLeGattNWServicesDiscoveredCallback - status %d", status);
+    VERIFY_NON_NULL_VOID(env, TAG, "env");
+    VERIFY_NON_NULL_VOID(obj, TAG, "obj");
+    VERIFY_NON_NULL_VOID(gatt, TAG, "gatt");
+
+    if (GATT_SUCCESS == status)
+    {
+        jstring jni_address = CALEGetAddressFromGatt(env, gatt);
+        if (!jni_address)
+        {
+            OIC_LOG(ERROR, TAG, "jni_address is null");
+            return;
         }
 
-        (*env)->ReleaseStringUTFChars(env, jni_remoteAddress, address);
+        if (CA_STATUS_OK != CALEStateConnectedCallback(env, jni_address, JNI_FALSE))
+        {
+            OIC_LOG(ERROR, TAG, "CALEStateConnectedCallback has failed");
+        }
+
+        (*env)->DeleteLocalRef(env, jni_address);
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_org_iotivity_ca_CaLeClientInterface_caLeGattNWDescriptorWriteCallback(JNIEnv *env,
+                                                                           jobject obj,
+                                                                           jobject gatt,
+                                                                           jint status)
+{
+    OIC_LOG_V(DEBUG, TAG, "caLeGattNWDescriptorWriteCallback - status %d", status);
+    VERIFY_NON_NULL_VOID(env, TAG, "env");
+    VERIFY_NON_NULL_VOID(obj, TAG, "obj");
+    VERIFY_NON_NULL_VOID(gatt, TAG, "gatt");
+
+    if (GATT_SUCCESS == status)
+    {
+        jstring jni_address = CALEGetAddressFromGatt(env, gatt);
+        if (!jni_address)
+        {
+            OIC_LOG(ERROR, TAG, "jni_address is null");
+            return;
+        }
+
+        if (CA_STATUS_OK != CALEStateConnectedCallback(env, jni_address, JNI_TRUE))
+        {
+            OIC_LOG(ERROR, TAG, "CALEStateConnectedCallback has failed");
+        }
+
+        (*env)->DeleteLocalRef(env, jni_address);
     }
 }

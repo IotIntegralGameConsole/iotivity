@@ -27,6 +27,9 @@
 #include <map>
 #include <memory>
 #include <iterator>
+#if defined(_MSC_VER)
+#include <functional>
+#endif
 
 #include "octypes.h"
 #include "OCHeaderOption.h"
@@ -46,6 +49,9 @@ namespace OC
 
 namespace OC
 {
+#if defined(_MSC_VER)
+    extern std::ostream& oclog();
+#else
     typedef boost::iostreams::stream<OC::oc_log_stream>     log_target_t;
 
     namespace detail
@@ -66,7 +72,7 @@ namespace OC
     {
         return detail::oclog_target();
     };
-
+#endif
 } // namespace OC
 
 namespace OC
@@ -207,15 +213,27 @@ namespace OC
         Observe,
         ObserveAll
     };
-    //
-    // Typedef for header option vector
-    // OCHeaderOption class is in HeaderOption namespace
+#ifdef WITH_CLOUD
+    enum class AclGroupType
+    {
+        PUBLIC,
+        PRIVATE
+    };
+#endif
+    // Typedef for list of resource handles.
+    typedef std::vector<OCResourceHandle> ResourceHandles;
+
+    // Typedef for header option vector.
+    // OCHeaderOption class is in HeaderOption namespace.
     typedef std::vector<HeaderOption::OCHeaderOption> HeaderOptions;
 
-    // Typedef for query parameter map
+    // Typedef for query parameter map.
     typedef std::map<std::string, std::string> QueryParamsMap;
 
-    // Typedef for list of observation IDs
+    // Typedef for query parameter map with Vector
+    typedef std::map< std::string, std::vector<std::string> > QueryParamsList;
+
+    // Typedef for list of observation IDs.
     typedef std::vector<OCObservationId> ObservationIds;
 
     enum class ObserveAction
@@ -255,6 +273,10 @@ namespace OC
 
     typedef std::function<void(std::shared_ptr<OCResource>)> FindCallback;
 
+    typedef std::function<void(const std::string&, const int)> FindErrorCallback;
+
+    typedef std::function<void(std::vector<std::shared_ptr<OCResource>>)> FindResListCallback;
+
     typedef std::function<void(const OCRepresentation&)> FindDeviceCallback;
 
     typedef std::function<void(const OCRepresentation&)> FindPlatformCallback;
@@ -283,6 +305,13 @@ namespace OC
 
     typedef std::function<void(const PairedDevices&)> GetDirectPairedCallback;
 
+    typedef std::function<void(const int, const std::string&,
+                               std::shared_ptr<OCResource>)> MQTopicCallback;
+#ifdef RD_CLIENT
+    typedef std::function<void(const OCRepresentation&, const int)> PublishResourceCallback;
+
+    typedef std::function<void(const int)> DeleteResourceCallback;
+#endif
 } // namespace OC
 
 #endif

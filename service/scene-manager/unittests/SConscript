@@ -18,13 +18,13 @@
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+##
+# SceneManager Unit Test build script
+##
 # SConscript file for Local PKI google tests
 gtest_env = SConscript('#extlibs/gtest/SConscript')
 lib_env = gtest_env.Clone()
 
-##
-# SceneManager Unit Test build script
-##
 if lib_env.get('RELEASE'):
     lib_env.AppendUnique(CCFLAGS = ['-Os'])
     lib_env.AppendUnique(CPPDEFINES = ['NDEBUG'])
@@ -34,7 +34,7 @@ else:
 if lib_env.get('LOGGING'):
     lib_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
 
-SConscript(lib_env.get('SRC_DIR') + '/service/third_party_libs.scons', 'lib_env')
+SConscript('#service/third_party_libs.scons', 'lib_env')
 
 ######################################################################
 #unit test setting
@@ -51,15 +51,10 @@ target_os = scene_test_env.get('TARGET_OS')
 scene_test_env.AppendUnique(LIBPATH = [lib_env.get('BUILD_DIR')])
 scene_test_env.AppendUnique(LIBS = [
     'scene_manager', 'rcs_server', 'rcs_client','rcs_common',
-    'oc', 'octbstack', 'oc_logger', 'connectivity_abstraction', 'coap',
-    'gtest_main',  'gtest'])
+    'oc', 'octbstack', 'oc_logger', 'connectivity_abstraction', 'coap'])
 
-if target_os not in ['windows', 'winrt']:
-    scene_test_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0', '-std=c++0x'])
-
-if target_os == 'linux':
-    scene_test_env.AppendUnique(CXXFLAGS = ['-pthread'])
-    scene_test_env.AppendUnique(LIBS = ['pthread'])
+if target_os not in ['windows']:
+    scene_test_env.AppendUnique(CXXFLAGS = ['-O2', '-g', '-Wall', '-fmessage-length=0'])
 
 if not scene_test_env.get('RELEASE'):
     scene_test_env.PrependUnique(LIBS = ['gcov'])
@@ -71,6 +66,10 @@ scene_test_env.AppendUnique(CPPPATH = ['../src'])
 scene_test_env.AppendUnique(CPPPATH = ['../../resource-encapsulation/include'])
 scene_test_env.AppendUnique(CPPPATH = ['../../resource-encapsulation/src/common/primitiveResource/include'])
 scene_test_env.AppendUnique(CPPPATH = ['../../resource-encapsulation/src/common/utils/include'])
+
+if scene_test_env.get('SECURED') == '1':
+	if scene_test_env.get('WITH_TCP') == True:
+		scene_test_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509', 'mbedcrypto'])
 ######################################################################
 # Build Test
 ######################################################################

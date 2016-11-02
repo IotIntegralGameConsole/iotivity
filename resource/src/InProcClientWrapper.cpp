@@ -165,22 +165,76 @@ namespace OC
             return OC_STACK_KEEP_TRANSACTION;
         }
 
-        try{
+        try
+        {
             ListenOCContainer container(clientWrapper, clientResponse->devAddr,
                                     reinterpret_cast<OCDiscoveryPayload*>(clientResponse->payload));
             // loop to ensure valid construction of all resources
+
             for(auto resource : container.Resources())
             {
                 std::thread exec(context->callback, resource);
                 exec.detach();
             }
         }
-        catch (std::exception &e){
+        catch (std::exception &e)
+        {
             oclog() << "Exception in listCallback, ignoring response: "
                     << e.what() << std::flush;
         }
 
 
+        return OC_STACK_KEEP_TRANSACTION;
+    }
+
+    OCStackApplicationResult listenErrorCallback(void* ctx, OCDoHandle /*handle*/,
+        OCClientResponse* clientResponse)
+    {
+        if (!ctx || !clientResponse)
+        {
+            return OC_STACK_KEEP_TRANSACTION;
+        }
+
+        ClientCallbackContext::ListenErrorContext* context =
+            static_cast<ClientCallbackContext::ListenErrorContext*>(ctx);
+        if (!context)
+        {
+            return OC_STACK_KEEP_TRANSACTION;
+        }
+
+        OCStackResult result = clientResponse->result;
+        if (result == OC_STACK_OK)
+        {
+            if (!clientResponse->payload || clientResponse->payload->type != PAYLOAD_TYPE_DISCOVERY)
+            {
+                oclog() << "listenCallback(): clientResponse payload was null or the wrong type"
+                    << std::flush;
+                return OC_STACK_KEEP_TRANSACTION;
+            }
+
+            auto clientWrapper = context->clientWrapper.lock();
+
+            if (!clientWrapper)
+            {
+                oclog() << "listenCallback(): failed to get a shared_ptr to the client wrapper"
+                        << std::flush;
+                return OC_STACK_KEEP_TRANSACTION;
+            }
+
+            ListenOCContainer container(clientWrapper, clientResponse->devAddr,
+                                        reinterpret_cast<OCDiscoveryPayload*>(clientResponse->payload));
+            // loop to ensure valid construction of all resources
+            for (auto resource : container.Resources())
+            {
+                std::thread exec(context->callback, resource);
+                exec.detach();
+            }
+            return OC_STACK_KEEP_TRANSACTION;
+        }
+
+        std::string resourceURI = clientResponse->resourceUri;
+        std::thread exec(context->errorCallback, resourceURI, result);
+        exec.detach();
         return OC_STACK_KEEP_TRANSACTION;
     }
 
@@ -201,11 +255,10 @@ namespace OC
 
         ClientCallbackContext::ListenContext* context =
             new ClientCallbackContext::ListenContext(callback, shared_from_this());
-        OCCallbackData cbdata(
-                static_cast<void*>(context),
-                listenCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::ListenContext*>(c);}
-            );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(context),
+        cbdata.cb      = listenCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::ListenContext*)c;};
 
         auto cLock = m_csdkLock.lock();
         if (cLock)
@@ -225,6 +278,249 @@ namespace OC
         }
         return result;
     }
+
+    OCStackResult InProcClientWrapper::ListenErrorForResource(
+            const std::string& serviceUrl,
+            const std::string& resourceType,
+            OCConnectivityType connectivityType,
+            FindCallback& callback, FindErrorCallback& errorCallback,
+            QualityOfService QoS)
+    {
+        if (!callback)
+        {
+            return OC_STACK_INVALID_PARAM;
+        }
+
+        ostringstream resourceUri;
+        resourceUri << serviceUrl << resourceType;
+
+        ClientCallbackContext::ListenErrorContext* context =
+            new ClientCallbackContext::ListenErrorContext(callback, errorCallback,
+                                                          shared_from_this());
+        if (!context)
+        {
+            return OC_STACK_ERROR;
+        }
+
+        OCCallbackData cbdata(
+                static_cast<void*>(context),
+                listenErrorCallback,
+                [](void* c){delete static_cast<ClientCallbackContext::ListenErrorContext*>(c);}
+            );
+
+        OCStackResult result;
+        auto cLock = m_csdkLock.lock();
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            result = OCDoResource(nullptr, OC_REST_DISCOVER,
+                                  resourceUri.str().c_str(),
+                                  nullptr, nullptr, connectivityType,
+                                  static_cast<OCQualityOfService>(QoS),
+                                  &cbdata,
+                                  nullptr, 0);
+        }
+        else
+        {
+            delete context;
+            result = OC_STACK_ERROR;
+        }
+        return result;
+    }
+
+    OCStackApplicationResult listenCallback2(void* ctx, OCDoHandle /*handle*/,
+        OCClientResponse* clientResponse)
+    {
+        ClientCallbackContext::ListenContext2* context =
+            static_cast<ClientCallbackContext::ListenContext2*>(ctx);
+
+        if (clientResponse->result != OC_STACK_OK)
+        {
+            oclog() << "listenCallback2(): failed to create resource. clientResponse: "
+                    << clientResponse->result
+                    << std::flush;
+
+            return OC_STACK_KEEP_TRANSACTION;
+        }
+
+        if (!clientResponse->payload || clientResponse->payload->type != PAYLOAD_TYPE_DISCOVERY)
+        {
+            oclog() << "listenCallback2(): clientResponse payload was null or the wrong type"
+                << std::flush;
+            return OC_STACK_KEEP_TRANSACTION;
+        }
+
+        auto clientWrapper = context->clientWrapper.lock();
+
+        if (!clientWrapper)
+        {
+            oclog() << "listenCallback2(): failed to get a shared_ptr to the client wrapper"
+                    << std::flush;
+            return OC_STACK_KEEP_TRANSACTION;
+        }
+
+        try
+        {
+            ListenOCContainer container(clientWrapper, clientResponse->devAddr,
+                                    reinterpret_cast<OCDiscoveryPayload*>(clientResponse->payload));
+
+            std::thread exec(context->callback, container.Resources());
+            exec.detach();
+        }
+        catch (std::exception &e)
+        {
+            oclog() << "Exception in listCallback2, ignoring response: "
+                    << e.what() << std::flush;
+        }
+
+
+        return OC_STACK_KEEP_TRANSACTION;
+    }
+
+    OCStackResult InProcClientWrapper::ListenForResource2(
+            const std::string& serviceUrl,
+            const std::string& resourceType,
+            OCConnectivityType connectivityType,
+            FindResListCallback& callback, QualityOfService QoS)
+    {
+        if (!callback)
+        {
+            return OC_STACK_INVALID_PARAM;
+        }
+
+        OCStackResult result;
+        ostringstream resourceUri;
+        resourceUri << serviceUrl << resourceType;
+
+        ClientCallbackContext::ListenContext2* context =
+            new ClientCallbackContext::ListenContext2(callback, shared_from_this());
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(context),
+        cbdata.cb      = listenCallback2;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::ListenContext2*)c;};
+
+        auto cLock = m_csdkLock.lock();
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            result = OCDoResource(nullptr, OC_REST_DISCOVER,
+                                  resourceUri.str().c_str(),
+                                  nullptr, nullptr, connectivityType,
+                                  static_cast<OCQualityOfService>(QoS),
+                                  &cbdata,
+                                  nullptr, 0);
+        }
+        else
+        {
+            delete context;
+            result = OC_STACK_ERROR;
+        }
+        return result;
+    }
+
+#ifdef WITH_MQ
+    OCStackApplicationResult listenMQCallback(void* ctx, OCDoHandle /*handle*/,
+                                              OCClientResponse* clientResponse)
+    {
+        ClientCallbackContext::MQTopicContext* context =
+            static_cast<ClientCallbackContext::MQTopicContext*>(ctx);
+
+        if (!clientResponse || !context)
+        {
+            return OC_STACK_DELETE_TRANSACTION;
+        }
+
+        std::string resourceURI = clientResponse->resourceUri;
+        if (clientResponse->result != OC_STACK_OK)
+        {
+            oclog() << "listenMQCallback(): failed to create resource. clientResponse: "
+                    << clientResponse->result
+                    << std::flush;
+
+            std::thread exec(context->callback, clientResponse->result,
+                             resourceURI, nullptr);
+            exec.detach();
+
+            return OC_STACK_DELETE_TRANSACTION;
+        }
+
+        auto clientWrapper = context->clientWrapper.lock();
+        if (!clientWrapper)
+        {
+            oclog() << "listenMQCallback(): failed to get a shared_ptr to the client wrapper"
+                    << std::flush;
+            return OC_STACK_DELETE_TRANSACTION;
+        }
+
+        try
+        {
+            ListenOCContainer container(clientWrapper, clientResponse->devAddr,
+                                        (OCRepPayload *) clientResponse->payload);
+
+            // loop to ensure valid construction of all resources
+            for (auto resource : container.Resources())
+            {
+                std::thread exec(context->callback, clientResponse->result,
+                                 resourceURI, resource);
+                exec.detach();
+            }
+        }
+        catch (std::exception &e)
+        {
+            oclog() << "Exception in listCallback, ignoring response: "
+                    << e.what() << std::flush;
+        }
+
+        return OC_STACK_DELETE_TRANSACTION;
+    }
+
+    OCStackResult InProcClientWrapper::ListenForMQTopic(const OCDevAddr& devAddr,
+                                                        const std::string& resourceUri,
+                                                        const QueryParamsMap& queryParams,
+                                                        const HeaderOptions& headerOptions,
+                                                        MQTopicCallback& callback,
+                                                        QualityOfService QoS)
+    {
+        oclog() << "ListenForMQTopic()" << std::flush;
+
+        if (!callback)
+        {
+            return OC_STACK_INVALID_PARAM;
+        }
+
+        ClientCallbackContext::MQTopicContext* context =
+            new ClientCallbackContext::MQTopicContext(callback, shared_from_this());
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(context),
+        cbdata.cb      = listenMQCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::MQTopicContext*)c;};
+
+        std::string uri = assembleSetResourceUri(resourceUri, queryParams);
+
+        OCStackResult result = OC_STACK_ERROR;
+        auto cLock = m_csdkLock.lock();
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            OCHeaderOption options[MAX_HEADER_OPTIONS];
+            result = OCDoResource(
+                                  nullptr, OC_REST_GET,
+                                  uri.c_str(),
+                                  &devAddr, nullptr,
+                                  CT_DEFAULT,
+                                  static_cast<OCQualityOfService>(QoS),
+                                  &cbdata,
+                                  assembleHeaderOptions(options, headerOptions),
+                                  headerOptions.size());
+        }
+        else
+        {
+            delete context;
+        }
+
+        return result;
+    }
+#endif
 
     OCStackApplicationResult listenDeviceCallback(void* ctx,
                                                   OCDoHandle /*handle*/,
@@ -265,11 +561,11 @@ namespace OC
 
         ClientCallbackContext::DeviceListenContext* context =
             new ClientCallbackContext::DeviceListenContext(callback, shared_from_this());
-        OCCallbackData cbdata(
-                static_cast<void*>(context),
-                listenDeviceCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::DeviceListenContext*>(c);}
-                );
+        OCCallbackData cbdata;
+
+        cbdata.context = static_cast<void*>(context),
+        cbdata.cb      = listenDeviceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::DeviceListenContext*)c;};
 
         auto cLock = m_csdkLock.lock();
         if (cLock)
@@ -316,6 +612,132 @@ namespace OC
         }
     }
 
+#ifdef WITH_MQ
+    OCStackApplicationResult createMQTopicCallback(void* ctx, OCDoHandle /*handle*/,
+                    OCClientResponse* clientResponse)
+    {
+        ClientCallbackContext::MQTopicContext* context =
+            static_cast<ClientCallbackContext::MQTopicContext*>(ctx);
+        HeaderOptions serverHeaderOptions;
+
+        if (!clientResponse || !context)
+        {
+            return OC_STACK_DELETE_TRANSACTION;
+        }
+
+        std::string createdUri;
+        bool isLocationOption = false;
+        OCStackResult result = clientResponse->result;
+        if (OC_STACK_OK               == result ||
+            OC_STACK_RESOURCE_CREATED == result)
+        {
+            parseServerHeaderOptions(clientResponse, serverHeaderOptions);
+
+            for (auto headerOption : serverHeaderOptions)
+            {
+                if (HeaderOption::LOCATION_PATH_OPTION_ID == headerOption.getOptionID())
+                {
+                    createdUri += "/";
+                    createdUri += headerOption.getOptionData();
+                    if (!isLocationOption)
+                    {
+                        isLocationOption = true;
+                    }
+                }
+            }
+        }
+
+        if (!isLocationOption)
+        {
+            createdUri = std::string(clientResponse->resourceUri);
+        }
+
+        auto clientWrapper = context->clientWrapper.lock();
+
+        if (!clientWrapper)
+        {
+            oclog() << "createMQTopicCallback(): failed to get a shared_ptr to the client wrapper"
+                    << std::flush;
+            return OC_STACK_DELETE_TRANSACTION;
+        }
+
+        try
+        {
+            if (OC_STACK_OK               == result ||
+                OC_STACK_RESOURCE_CREATED == result)
+            {
+                ListenOCContainer container(clientWrapper, clientResponse->devAddr,
+                                            createdUri);
+                for (auto resource : container.Resources())
+                {
+                    std::thread exec(context->callback, result,
+                                     createdUri,
+                                     resource);
+                    exec.detach();
+                }
+            }
+            else
+            {
+                std::thread exec(context->callback, result,
+                                 createdUri,
+                                 nullptr);
+                exec.detach();
+            }
+        }
+        catch (std::exception &e)
+        {
+            oclog() << "Exception in createMQTopicCallback, ignoring response: "
+                    << e.what() << std::flush;
+        }
+        return OC_STACK_DELETE_TRANSACTION;
+    }
+
+    OCStackResult InProcClientWrapper::PutMQTopicRepresentation(
+                const OCDevAddr& devAddr,
+                const std::string& uri,
+                const OCRepresentation& rep,
+                const QueryParamsMap& queryParams, const HeaderOptions& headerOptions,
+                MQTopicCallback& callback, QualityOfService QoS)
+    {
+        if (!callback)
+        {
+            return OC_STACK_INVALID_PARAM;
+        }
+        OCStackResult result;
+        ClientCallbackContext::MQTopicContext* ctx =
+                new ClientCallbackContext::MQTopicContext(callback, shared_from_this());
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = createMQTopicCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::MQTopicContext*)c;};
+
+        std::string url = assembleSetResourceUri(uri, queryParams);
+
+        auto cLock = m_csdkLock.lock();
+
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            OCHeaderOption options[MAX_HEADER_OPTIONS];
+
+            result = OCDoResource(nullptr, OC_REST_PUT,
+                                  url.c_str(), &devAddr,
+                                  assembleSetResourcePayload(rep),
+                                  CT_DEFAULT,
+                                  static_cast<OCQualityOfService>(QoS),
+                                  &cbdata,
+                                  assembleHeaderOptions(options, headerOptions),
+                                  headerOptions.size());
+        }
+        else
+        {
+            delete ctx;
+            result = OC_STACK_ERROR;
+        }
+
+        return result;
+    }
+#endif
     OCStackApplicationResult getResourceCallback(void* ctx,
                                                  OCDoHandle /*handle*/,
         OCClientResponse* clientResponse)
@@ -326,17 +748,15 @@ namespace OC
         OCRepresentation rep;
         HeaderOptions serverHeaderOptions;
         OCStackResult result = clientResponse->result;
-        if (result == OC_STACK_OK)
+
+        parseServerHeaderOptions(clientResponse, serverHeaderOptions);
+        try
         {
-            parseServerHeaderOptions(clientResponse, serverHeaderOptions);
-            try
-            {
-                rep = parseGetSetCallback(clientResponse);
-            }
-            catch(OC::OCException& e)
-            {
-                result = e.code();
-            }
+            rep = parseGetSetCallback(clientResponse);
+        }
+        catch(OC::OCException& e)
+        {
+            result = e.code();
         }
 
         std::thread exec(context->callback, serverHeaderOptions, rep, result);
@@ -348,6 +768,7 @@ namespace OC
         const OCDevAddr& devAddr,
         const std::string& resourceUri,
         const QueryParamsMap& queryParams, const HeaderOptions& headerOptions,
+        OCConnectivityType connectivityType,
         GetCallback& callback, QualityOfService QoS)
     {
         if (!callback)
@@ -357,11 +778,11 @@ namespace OC
         OCStackResult result;
         ClientCallbackContext::GetContext* ctx =
             new ClientCallbackContext::GetContext(callback);
-        OCCallbackData cbdata(
-                static_cast<void*>(ctx),
-                getResourceCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::GetContext*>(c);}
-                );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = getResourceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::GetContext*)c;};
+
 
         std::string uri = assembleSetResourceUri(resourceUri, queryParams);
 
@@ -376,7 +797,7 @@ namespace OC
                                   nullptr, OC_REST_GET,
                                   uri.c_str(),
                                   &devAddr, nullptr,
-                                  CT_DEFAULT,
+                                  connectivityType,
                                   static_cast<OCQualityOfService>(QoS),
                                   &cbdata,
                                   assembleHeaderOptions(options, headerOptions),
@@ -401,20 +822,15 @@ namespace OC
         HeaderOptions serverHeaderOptions;
 
         OCStackResult result = clientResponse->result;
-        if (OC_STACK_OK               == result ||
-            OC_STACK_RESOURCE_CREATED == result ||
-            OC_STACK_RESOURCE_DELETED == result ||
-            OC_STACK_RESOURCE_CHANGED == result)
+
+        parseServerHeaderOptions(clientResponse, serverHeaderOptions);
+        try
         {
-            parseServerHeaderOptions(clientResponse, serverHeaderOptions);
-            try
-            {
-                attrs = parseGetSetCallback(clientResponse);
-            }
-            catch(OC::OCException& e)
-            {
-                result = e.code();
-            }
+            attrs = parseGetSetCallback(clientResponse);
+        }
+        catch(OC::OCException& e)
+        {
+            result = e.code();
         }
 
         std::thread exec(context->callback, serverHeaderOptions, attrs, result);
@@ -425,9 +841,12 @@ namespace OC
     std::string InProcClientWrapper::assembleSetResourceUri(std::string uri,
         const QueryParamsMap& queryParams)
     {
-        if (uri.back() == '/')
+        if (!uri.empty())
         {
-            uri.resize(uri.size()-1);
+            if (uri.back() == '/')
+            {
+                uri.resize(uri.size() - 1);
+            }
         }
 
         ostringstream paramsList;
@@ -436,12 +855,59 @@ namespace OC
             paramsList << '?';
         }
 
-        for(auto& param : queryParams)
+        for (auto& param : queryParams)
         {
             paramsList << param.first <<'='<<param.second<<';';
         }
 
         std::string queryString = paramsList.str();
+
+        if (queryString.empty())
+        {
+            return uri;
+        }
+
+        if (queryString.back() == ';')
+        {
+            queryString.resize(queryString.size() - 1);
+        }
+
+        std::string ret = uri + queryString;
+        return ret;
+    }
+
+    std::string InProcClientWrapper::assembleSetResourceUri(std::string uri,
+        const QueryParamsList& queryParams)
+    {
+        if (!uri.empty())
+        {
+            if (uri.back() == '/')
+            {
+                uri.resize(uri.size() - 1);
+            }
+        }
+
+        ostringstream paramsList;
+        if (queryParams.size() > 0)
+        {
+            paramsList << '?';
+        }
+
+        for (auto& param : queryParams)
+        {
+            for (auto& paramList : param.second)
+            {
+                paramsList << param.first << '=' << paramList << ';';
+            }
+        }
+
+        std::string queryString = paramsList.str();
+
+        if (queryString.empty())
+        {
+            return uri;
+        }
+
         if (queryString.back() == ';')
         {
             queryString.resize(queryString.size() - 1);
@@ -468,6 +934,7 @@ namespace OC
         const std::string& uri,
         const OCRepresentation& rep,
         const QueryParamsMap& queryParams, const HeaderOptions& headerOptions,
+        OCConnectivityType connectivityType,
         PostCallback& callback, QualityOfService QoS)
     {
         if (!callback)
@@ -476,11 +943,11 @@ namespace OC
         }
         OCStackResult result;
         ClientCallbackContext::SetContext* ctx = new ClientCallbackContext::SetContext(callback);
-        OCCallbackData cbdata(
-                static_cast<void*>(ctx),
-                setResourceCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::SetContext*>(c);}
-                );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = setResourceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::SetContext*)c;};
+
 
         std::string url = assembleSetResourceUri(uri, queryParams);
 
@@ -494,7 +961,7 @@ namespace OC
             result = OCDoResource(nullptr, OC_REST_POST,
                                   url.c_str(), &devAddr,
                                   assembleSetResourcePayload(rep),
-                                  CT_DEFAULT,
+                                  connectivityType,
                                   static_cast<OCQualityOfService>(QoS),
                                   &cbdata,
                                   assembleHeaderOptions(options, headerOptions),
@@ -522,11 +989,11 @@ namespace OC
         }
         OCStackResult result;
         ClientCallbackContext::SetContext* ctx = new ClientCallbackContext::SetContext(callback);
-        OCCallbackData cbdata(
-                static_cast<void*>(ctx),
-                setResourceCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::SetContext*>(c);}
-                );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = setResourceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::SetContext*)c;};
+
 
         std::string url = assembleSetResourceUri(uri, queryParams).c_str();
 
@@ -564,10 +1031,8 @@ namespace OC
             static_cast<ClientCallbackContext::DeleteContext*>(ctx);
         HeaderOptions serverHeaderOptions;
 
-        if (clientResponse->result == OC_STACK_OK)
-        {
-            parseServerHeaderOptions(clientResponse, serverHeaderOptions);
-        }
+        parseServerHeaderOptions(clientResponse, serverHeaderOptions);
+
         std::thread exec(context->callback, serverHeaderOptions, clientResponse->result);
         exec.detach();
         return OC_STACK_DELETE_TRANSACTION;
@@ -577,6 +1042,7 @@ namespace OC
         const OCDevAddr& devAddr,
         const std::string& uri,
         const HeaderOptions& headerOptions,
+        OCConnectivityType connectivityType,
         DeleteCallback& callback,
         QualityOfService /*QoS*/)
     {
@@ -587,11 +1053,11 @@ namespace OC
         OCStackResult result;
         ClientCallbackContext::DeleteContext* ctx =
             new ClientCallbackContext::DeleteContext(callback);
-        OCCallbackData cbdata(
-                static_cast<void*>(ctx),
-                deleteResourceCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::DeleteContext*>(c);}
-                );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = deleteResourceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::DeleteContext*)c;};
+
 
         auto cLock = m_csdkLock.lock();
 
@@ -604,7 +1070,7 @@ namespace OC
             result = OCDoResource(nullptr, OC_REST_DELETE,
                                   uri.c_str(), &devAddr,
                                   nullptr,
-                                  CT_DEFAULT,
+                                  connectivityType,
                                   static_cast<OCQualityOfService>(m_cfg.QoS),
                                   &cbdata,
                                   assembleHeaderOptions(options, headerOptions),
@@ -629,21 +1095,24 @@ namespace OC
         HeaderOptions serverHeaderOptions;
         uint32_t sequenceNumber = clientResponse->sequenceNumber;
         OCStackResult result = clientResponse->result;
-        if (clientResponse->result == OC_STACK_OK)
+
+        parseServerHeaderOptions(clientResponse, serverHeaderOptions);
+        try
         {
-            parseServerHeaderOptions(clientResponse, serverHeaderOptions);
-            try
-            {
-                attrs = parseGetSetCallback(clientResponse);
-            }
-            catch(OC::OCException& e)
-            {
-                result = e.code();
-            }
+            attrs = parseGetSetCallback(clientResponse);
         }
+        catch(OC::OCException& e)
+        {
+            result = e.code();
+        }
+
         std::thread exec(context->callback, serverHeaderOptions, attrs,
                     result, sequenceNumber);
         exec.detach();
+        if (sequenceNumber == MAX_SEQUENCE_NUMBER + 1)
+        {
+            return OC_STACK_DELETE_TRANSACTION;
+        }
 
         return OC_STACK_KEEP_TRANSACTION;
     }
@@ -662,11 +1131,11 @@ namespace OC
 
         ClientCallbackContext::ObserveContext* ctx =
             new ClientCallbackContext::ObserveContext(callback);
-        OCCallbackData cbdata(
-                static_cast<void*>(ctx),
-                observeResourceCallback,
-                [](void* c){delete static_cast<ClientCallbackContext::ObserveContext*>(c);}
-                );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = observeResourceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::ObserveContext*)c;};
+
 
         OCMethod method;
         if (observeType == ObserveType::Observe)
@@ -768,12 +1237,11 @@ namespace OC
 
         ClientCallbackContext::SubscribePresenceContext* ctx =
             new ClientCallbackContext::SubscribePresenceContext(presenceHandler);
-        OCCallbackData cbdata(
-                static_cast<void*>(ctx),
-                subscribePresenceCallback,
-                [](void* c)
-                {delete static_cast<ClientCallbackContext::SubscribePresenceContext*>(c);}
-                );
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = subscribePresenceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::SubscribePresenceContext*)c;};
+
 
         auto cLock = m_csdkLock.lock();
 
@@ -815,6 +1283,53 @@ namespace OC
         return result;
     }
 
+#ifdef WITH_CLOUD
+    OCStackResult InProcClientWrapper::SubscribeDevicePresence(OCDoHandle* handle,
+                                                               const std::string& host,
+                                                               const std::vector<std::string>& di,
+                                                               OCConnectivityType connectivityType,
+                                                               ObserveCallback& callback)
+    {
+        if (!callback)
+        {
+            return OC_STACK_INVALID_PARAM;
+        }
+        OCStackResult result;
+
+        ClientCallbackContext::ObserveContext* ctx =
+            new ClientCallbackContext::ObserveContext(callback);
+        OCCallbackData cbdata;
+        cbdata.context = static_cast<void*>(ctx),
+        cbdata.cb      = observeResourceCallback;
+        cbdata.cd      = [](void* c){delete (ClientCallbackContext::ObserveContext*)c;};
+
+        auto cLock = m_csdkLock.lock();
+
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+
+            std::ostringstream os;
+            os << host << OC_RSRVD_DEVICE_PRESENCE_URI;
+            QueryParamsList queryParams({{OC_RSRVD_DEVICE_ID, di}});
+            std::string url = assembleSetResourceUri(os.str(), queryParams);
+
+            result = OCDoResource(handle, OC_REST_OBSERVE,
+                                  url.c_str(), nullptr,
+                                  nullptr, connectivityType,
+                                  OC_LOW_QOS, &cbdata,
+                                  nullptr, 0);
+        }
+        else
+        {
+            delete ctx;
+            result = OC_STACK_ERROR;
+        }
+
+        return result;
+    }
+#endif
+
     OCStackResult InProcClientWrapper::GetDefaultQos(QualityOfService& qos)
     {
         qos = m_cfg.QoS;
@@ -833,10 +1348,11 @@ namespace OC
 
         for (auto it=headerOptions.begin(); it != headerOptions.end(); ++it)
         {
-            options[i] = OCHeaderOption(OC_COAP_ID,
-                    it->getOptionID(),
-                    it->getOptionData().length() + 1,
-                    reinterpret_cast<const uint8_t*>(it->getOptionData().c_str()));
+            options[i] = OCHeaderOption();
+            options[i].protocolID = OC_COAP_ID;
+            options[i].optionID = it->getOptionID();
+            options[i].optionLength = it->getOptionData().length() + 1;
+            strcpy((char*)options[i].optionData, (it->getOptionData().c_str()));
             i++;
         }
 

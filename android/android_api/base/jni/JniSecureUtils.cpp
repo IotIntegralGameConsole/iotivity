@@ -150,45 +150,6 @@ jobject JniSecureUtils::convertUUIDVectorToJavaStrList(JNIEnv *env, UuidList_t &
     return jList;
 }
 
-static void freeValidities(OicSecValidity_t *head)
-{
-    OicSecValidity_t *tmp = head;
-    while(tmp != NULL)
-    {
-        head = head->next;
-        free(tmp->recurrences);
-        free(tmp);
-        tmp = head;
-    }
-}
-
-static void freeResources(OicSecRsrc_t *head)
-{
-    OicSecRsrc_t *tmp = head;
-    while(tmp != NULL)
-    {
-        head = head->next;
-        free(tmp->types);
-        free(tmp->interfaces);
-        free(tmp);
-        tmp = head;
-    }
-}
-
-void JniSecureUtils::FreeACLList(OicSecAcl_t *acl)
-{
-    if (acl)
-    {
-        if (acl->aces)
-        {
-            freeResources(acl->aces->resources);
-            freeValidities(acl->aces->validities);
-            OICFree(acl->aces);
-        }
-        OICFree(acl);
-    }
-}
-
 static OicSecValidity_t* getValiditiesList(JNIEnv *env, jobject validityObject)
 {
     jstring jData;
@@ -204,38 +165,21 @@ static OicSecValidity_t* getValiditiesList(JNIEnv *env, jobject validityObject)
     for (int i = 0 ; i < nr_validities; i++)
     {
         OicSecValidity_t *tmp = (OicSecValidity_t*)OICCalloc(1, sizeof(OicSecValidity_t));
-        if (NULL == tmp)
-        {
-            LOGE("Failed to allocate memory");
-            freeValidities(valHead);
-            return nullptr;
-        }
-
         jobject element = env->GetObjectArrayElement(valList, i);
         if (!element || env->ExceptionCheck())
         {
-            OICFree(tmp);
-            freeValidities(valHead);
             return nullptr;
         }
 
         jData = (jstring)env->CallObjectMethod(element, g_mid_OcOicSecAcl_validity_get_getPeriod);
         if (!jData || env->ExceptionCheck())
         {
-            OICFree(tmp);
-            freeValidities(valHead);
             return nullptr;
         }
         tmp->period = (char*)env->GetStringUTFChars(jData, 0);
 
         jint jrecurrenceLen = (jint) env->CallIntMethod(element,
                 g_mid_OcOicSecAcl_validity_get_recurrenceLen);
-        if (env->ExceptionCheck())
-        {
-            OICFree(tmp);
-            freeValidities(valHead);
-            return nullptr;
-        }
         tmp->recurrenceLen = (int)jrecurrenceLen;
 
         if (jrecurrenceLen > 0)
@@ -249,9 +193,6 @@ static OicSecValidity_t* getValiditiesList(JNIEnv *env, jobject validityObject)
                 jData = (jstring)env->CallObjectMethodA(element, g_mid_OcOicSecAcl_validity_get_recurrences, argv);
                 if (!jData || env->ExceptionCheck())
                 {
-                    OICFree(tmp->recurrences);
-                    OICFree(tmp);
-                    freeValidities(valHead);
                     return nullptr;
                 }
                 tmp->recurrences[i] = (char*)env->GetStringUTFChars(jData, 0);
@@ -289,24 +230,14 @@ static OicSecRsrc_t * getResourcesList(JNIEnv *env, jobject resourceObject)
     for (int i = 0 ; i < nr_resc; i++)
     {
         OicSecRsrc_t *tmp = (OicSecRsrc_t*)OICCalloc(1, sizeof(OicSecRsrc_t));
-        if (NULL == tmp)
-        {
-            LOGE("Failed to allocate memory");
-            freeResources(rescHead);
-            return nullptr;
-        }
         jobject element = env->GetObjectArrayElement(rescList, i);
         if (!element || env->ExceptionCheck())
         {
-            OICFree(tmp);
-            freeResources(rescHead);
             return nullptr;
         }
         jData = (jstring)env->CallObjectMethod(element, g_mid_OcOicSecAcl_resr_get_href);
         if (!jData || env->ExceptionCheck())
         {
-            OICFree(tmp);
-            freeResources(rescHead);
             return nullptr;
         }
         tmp->href = (char*)env->GetStringUTFChars(jData, 0);
@@ -314,29 +245,16 @@ static OicSecRsrc_t * getResourcesList(JNIEnv *env, jobject resourceObject)
         jData = (jstring)env->CallObjectMethod(element, g_mid_OcOicSecAcl_resr_get_rel);
         if (!jData || env->ExceptionCheck())
         {
-            OICFree(tmp);
-            freeResources(rescHead);
             return nullptr;
         }
         tmp->rel = (char*)env->GetStringUTFChars(jData, 0);
 
         jint len = (jint) env->CallIntMethod(element, g_mid_OcOicSecAcl_resr_get_typeLen);
-        if (env->ExceptionCheck())
-        {
-            OICFree(tmp);
-            freeResources(rescHead);
-            return nullptr;
-        }
         tmp->typeLen = (int)len;
         if (len > 0)
         {
             jvalue argv[1];
             tmp->types = (char**)OICCalloc(len, sizeof(char*));
-            if (NULL == tmp->types)
-            {
-                LOGE("Failed to allocate memory");
-                return nullptr;
-            }
 
             for (int i = 0 ; i < len; i++)
             {
@@ -344,9 +262,6 @@ static OicSecRsrc_t * getResourcesList(JNIEnv *env, jobject resourceObject)
                 jData = (jstring)env->CallObjectMethodA(element, g_mid_OcOicSecAcl_resr_get_types, argv);
                 if (!jData || env->ExceptionCheck())
                 {
-                    OICFree(tmp->types);
-                    OICFree(tmp);
-                    freeResources(rescHead);
                     return nullptr;
                 }
                 tmp->types[i] = (char*)env->GetStringUTFChars(jData, 0);
@@ -354,13 +269,6 @@ static OicSecRsrc_t * getResourcesList(JNIEnv *env, jobject resourceObject)
         }
 
         len = (jint) env->CallIntMethod(element, g_mid_OcOicSecAcl_resr_get_interfaceLen);
-        if (env->ExceptionCheck())
-        {
-            OICFree(tmp->types);
-            OICFree(tmp);
-            freeResources(rescHead);
-            return nullptr;
-        }
         tmp->interfaceLen = len;
         if (len > 0)
         {
@@ -373,9 +281,6 @@ static OicSecRsrc_t * getResourcesList(JNIEnv *env, jobject resourceObject)
                 jData = (jstring)env->CallObjectMethodA(element, g_mid_OcOicSecAcl_resr_get_interfaces, argv);
                 if (!jData || env->ExceptionCheck())
                 {
-                    OICFree(tmp->types);
-                    OICFree(tmp);
-                    freeResources(rescHead);
                     return nullptr;
                 }
                 tmp->interfaces[i] = (char*)env->GetStringUTFChars(jData, 0);
@@ -409,10 +314,6 @@ OCStackResult JniSecureUtils::convertJavaACLToOCAcl(JNIEnv *env, jobject in, Oic
     }
 
     char *str = (char*) env->GetStringUTFChars(jData, 0);
-    if (!str)
-    {
-        return OC_STACK_ERROR;
-    }
     if (OC_STACK_OK == ConvertStrToUuid(str, &acl->rownerID))
     {
         env->ReleaseStringUTFChars(jData, str);
@@ -450,11 +351,6 @@ OCStackResult JniSecureUtils::convertJavaACLToOCAcl(JNIEnv *env, jobject in, Oic
         }
 
         str = (char*) env->GetStringUTFChars(jData, 0);
-
-        if (!str)
-        {
-            return OC_STACK_ERROR;
-        }
         if (OC_STACK_OK == ConvertStrToUuid(str, &tmp->subjectuuid))
         {
             env->ReleaseStringUTFChars(jData, str);

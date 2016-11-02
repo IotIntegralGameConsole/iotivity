@@ -24,38 +24,46 @@ package org.iotivity.cloud.rdserver;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 
-import org.iotivity.cloud.base.CoapServer;
-import org.iotivity.cloud.base.ResourceManager;
-import org.iotivity.cloud.rdserver.resources.ResourceDirectoryResource;
-import org.iotivity.cloud.util.Logger;
+import org.iotivity.cloud.base.ServerSystem;
+import org.iotivity.cloud.base.server.CoapServer;
+import org.iotivity.cloud.rdserver.resources.directory.rd.ResourceDirectoryResource;
+import org.iotivity.cloud.rdserver.resources.directory.res.DiscoveryResource;
+import org.iotivity.cloud.rdserver.resources.presence.device.DevicePresenceResource;
+import org.iotivity.cloud.rdserver.resources.presence.resource.ResPresenceResource;
+import org.iotivity.cloud.util.Log;
 
+/**
+ *
+ * This class is in charge of running of resource directory server.
+ *
+ */
 public class ResourceDirectoryServer {
 
     public static void main(String[] args) throws Exception {
+        Log.Init();
 
         System.out.println("-----RD SERVER-----");
 
-        if (args.length != 1) {
-            Logger.e("coap server port required");
+        if (args.length != 2) {
+            Log.e("coap server port and TLS mode required\n" + "ex) 5684 0\n");
             return;
         }
 
-        ResourceManager resourceManager = null;
+        ServerSystem serverSystem = new ServerSystem();
 
-        CoapServer coapServer = null;
+        serverSystem.addResource(new ResourceDirectoryResource());
+        serverSystem.addResource(new DiscoveryResource());
+        serverSystem.addResource(new DevicePresenceResource());
+        serverSystem.addResource(new ResPresenceResource());
 
-        coapServer = new CoapServer();
+        serverSystem.addServer(new CoapServer(
+                new InetSocketAddress(Integer.parseInt(args[0]))));
 
-        resourceManager = new ResourceManager();
+        boolean tlsMode = Integer.parseInt(args[1]) == 1;
 
-        coapServer.addHandler(resourceManager);
+        serverSystem.startSystem(tlsMode);
 
-        resourceManager.registerResource(new ResourceDirectoryResource());
-
-        coapServer
-                .startServer(new InetSocketAddress(Integer.parseInt(args[0])));
-
-        Scanner in = new Scanner(System.in, "UTF-8");
+        Scanner in = new Scanner(System.in);
 
         System.out.println("press 'q' to terminate");
 
@@ -65,7 +73,7 @@ public class ResourceDirectoryServer {
 
         System.out.println("Terminating...");
 
-        coapServer.stopServer();
+        serverSystem.stopSystem();
 
         System.out.println("Terminated");
     }

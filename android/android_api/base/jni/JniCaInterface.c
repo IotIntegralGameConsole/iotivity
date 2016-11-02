@@ -35,6 +35,8 @@
 static jobject g_foundDeviceListenerObject = NULL;
 static jobject g_listenerObject = NULL;
 static JavaVM *g_jvm = NULL;
+static jclass g_jni_cls_enum = NULL;
+static jmethodID g_jni_mid_enum = NULL;
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
@@ -60,12 +62,14 @@ Java_org_iotivity_ca_CaInterface_initialize
     CANativeJNISetContext(env, context);
 }
 
-void CAManagerConnectionStateChangedCB(CATransportAdapter_t adapter,
-                                       const char *remote_address,
+void CAManagerConnectionStateChangedCB(const CAEndpoint_t *info,
                                        bool connected)
 {
-    LOGI("Callback - CAManagerConnectionStateChangedCB : type(%d), address(%s), connected(%d)",
-         adapter, remote_address, connected);
+    if (!info)
+    {
+        LOGE("info is NULL");
+        return;
+    }
 
     if (!g_listenerObject)
     {
@@ -73,8 +77,11 @@ void CAManagerConnectionStateChangedCB(CATransportAdapter_t adapter,
         return;
     }
 
+    LOGI("Callback - CAManagerConnectionStateChangedCB : type(%d), address(%s), connected(%d)",
+         info->adapter, info->addr, connected);
+
     bool isAttached = false;
-    JNIEnv* env;
+    JNIEnv* env = NULL;
     jint res = (*g_jvm)->GetEnv(g_jvm, (void**) &env, JNI_VERSION_1_6);
     if (JNI_OK != res)
     {
@@ -106,33 +113,21 @@ void CAManagerConnectionStateChangedCB(CATransportAdapter_t adapter,
         goto exit_error;
     }
 
-    jstring jni_address = (*env)->NewStringUTF(env, remote_address);
+    jstring jni_address = (*env)->NewStringUTF(env, info->addr);
     if (!jni_address)
     {
         LOGE("jni_address is null");
         goto exit_error;
     }
 
-    jclass jni_cls_enum = (*env)->FindClass(env, "org/iotivity/base/OcConnectivityType");
-    if (!jni_cls_enum)
+    if (g_jni_cls_enum && g_jni_mid_enum)
     {
-        LOGE("could not get jni_cls_enum");
-        goto exit_error;
+        jobject jni_adaptertype = (*env)->CallStaticObjectMethod(env, g_jni_cls_enum,
+                                                                 g_jni_mid_enum, info->adapter);
+        (*env)->CallVoidMethod(env, g_listenerObject, jni_mid_listener,
+                               jni_adaptertype, jni_address,
+                               (jboolean)connected);
     }
-
-    jmethodID jni_mid_enum = (*env)->GetStaticMethodID(env, jni_cls_enum, "getInstance",
-                                                       "(I)Lorg/iotivity/base/OcConnectivityType;");
-    if (!jni_mid_enum)
-    {
-        LOGE("could not get Method ID (getInstance)");
-        goto exit_error;
-    }
-
-    jobject jni_adaptertype = (*env)->CallStaticObjectMethod(env, jni_cls_enum,
-                                                             jni_mid_enum, adapter);
-    (*env)->CallVoidMethod(env, g_listenerObject, jni_mid_listener,
-                           jni_adaptertype, jni_address,
-                           (jboolean)connected);
 
 exit_error:
     if (isAttached)
@@ -155,7 +150,7 @@ void CAManagerAdapterStateChangedCB(CATransportAdapter_t adapter, bool enabled)
     }
 
     bool isAttached = false;
-    JNIEnv* env;
+    JNIEnv* env = NULL;
     jint res = (*g_jvm)->GetEnv(g_jvm, (void**) &env, JNI_VERSION_1_6);
     if (JNI_OK != res)
     {
@@ -186,26 +181,14 @@ void CAManagerAdapterStateChangedCB(CATransportAdapter_t adapter, bool enabled)
         goto exit_error;
     }
 
-    jclass jni_cls_enum = (*env)->FindClass(env, "org/iotivity/base/OcConnectivityType");
-    if (!jni_cls_enum)
+    if (g_jni_cls_enum && g_jni_mid_enum)
     {
-        LOGE("could not get jni_cls_enum");
-        goto exit_error;
+        jobject jni_adaptertype = (*env)->CallStaticObjectMethod(env, g_jni_cls_enum,
+                                                                 g_jni_mid_enum, adapter);
+
+        (*env)->CallVoidMethod(env, g_listenerObject, jni_mid_listener,
+                               jni_adaptertype, (jboolean)enabled);
     }
-
-    jmethodID jni_mid_enum = (*env)->GetStaticMethodID(env, jni_cls_enum, "getInstance",
-                                                       "(I)Lorg/iotivity/base/OcConnectivityType;");
-    if (!jni_mid_enum)
-    {
-        LOGE("could not get Method ID (getInstance)");
-        goto exit_error;
-    }
-
-    jobject jni_adaptertype = (*env)->CallStaticObjectMethod(env, jni_cls_enum,
-                                                             jni_mid_enum, adapter);
-
-    (*env)->CallVoidMethod(env, g_listenerObject, jni_mid_listener,
-                           jni_adaptertype, (jboolean)enabled);
 
 exit_error:
     if (isAttached)
@@ -223,8 +206,25 @@ Java_org_iotivity_ca_CaInterface_caManagerInitialize(JNIEnv *env, jclass clazz,
 
     CAUtilClientInitialize(env, g_jvm, context);
 
-    g_listenerObject = (*env)->NewGlobalRef(env, listener);
+    if (listener)
+    {
+        g_listenerObject = (*env)->NewGlobalRef(env, listener);
+    }
 
+    if (g_listenerObject)
+    {
+        jclass cls = (*env)->FindClass(env, "org/iotivity/base/OcConnectivityType");
+        if (cls)
+        {
+            g_jni_cls_enum = (jclass)(*env)->NewGlobalRef(env, cls);
+        }
+
+        if (g_jni_cls_enum)
+        {
+            g_jni_mid_enum = (*env)->GetStaticMethodID(env, g_jni_cls_enum, "getInstance",
+                                                   "(I)Lorg/iotivity/base/OcConnectivityType;");
+        }
+    }
     CARegisterNetworkMonitorHandler(CAManagerAdapterStateChangedCB,
                                     CAManagerConnectionStateChangedCB);
 }
@@ -241,6 +241,12 @@ Java_org_iotivity_ca_CaInterface_caManagerTerminate(JNIEnv *env, jclass clazz)
         (*env)->DeleteGlobalRef(env, g_listenerObject);
         g_listenerObject = NULL;
     }
+
+    if (g_jni_cls_enum)
+    {
+        (*env)->DeleteGlobalRef(env, g_jni_cls_enum);
+        g_jni_cls_enum = NULL;
+    }
 }
 
 JNIEXPORT void JNICALL
@@ -249,6 +255,11 @@ Java_org_iotivity_ca_CaInterface_caManagerSetAutoConnectionDeviceInfo(JNIEnv *en
                                                                       jstring jaddress)
 {
     LOGI("CaManager_setAutoConnectionDeviceInfo");
+    if (!jaddress)
+    {
+        LOGE("jaddress is null");
+        return;
+    }
 
     const char* address = (*env)->GetStringUTFChars(env, jaddress, NULL);
     if (!address)
@@ -268,6 +279,11 @@ Java_org_iotivity_ca_CaInterface_caManagerUnsetAutoConnectionDeviceInfo(JNIEnv *
                                                                         jstring jaddress)
 {
     LOGI("CaManager_unsetAutoConnectionDeviceInfo");
+    if (!jaddress)
+    {
+        LOGE("jaddress is null");
+        return;
+    }
 
     const char* address = (*env)->GetStringUTFChars(env, jaddress, NULL);
     if (!address)
@@ -329,3 +345,29 @@ Java_org_iotivity_ca_CaInterface_caBtPairingCreateBond(JNIEnv *env, jclass clazz
     (void)clazz;
     CAUtilCreateBond(env, device);
 }
+
+JNIEXPORT void JNICALL
+Java_org_iotivity_ca_CaInterface_setLeScanIntervalTimeImpl(JNIEnv *env, jclass clazz,
+                                                           jint intervalTime, jint workignCount)
+{
+    LOGI("setLeScanIntervalTimeImpl");
+    (void)env;
+    (void)clazz;
+    CAUtilSetLEScanInterval(intervalTime, workignCount);
+}
+
+JNIEXPORT jint JNICALL Java_org_iotivity_ca_CaInterface_setCipherSuiteImpl
+  (JNIEnv *env, jclass clazz, jint cipherSuite, jint adapter)
+{
+    LOGI("setCipherSuiteImpl");
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+    (void)env;
+    (void)clazz;
+    CAResult_t ret = CASelectCipherSuite(cipherSuite, (CATransportAdapter_t) adapter);
+    return ret;
+#else
+    LOGE("Method not supported");
+    return -1;
+#endif //  __WITH_DTLS__ || __WITH_TLS__
+}
+

@@ -1,23 +1,23 @@
 /*
- * //******************************************************************
- * //
- * // Copyright 2015 Intel Corporation.
- * //
- * //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
- * //
- * // Licensed under the Apache License, Version 2.0 (the "License");
- * // you may not use this file except in compliance with the License.
- * // You may obtain a copy of the License at
- * //
- * //      http://www.apache.org/licenses/LICENSE-2.0
- * //
- * // Unless required by applicable law or agreed to in writing, software
- * // distributed under the License is distributed on an "AS IS" BASIS,
- * // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * // See the License for the specific language governing permissions and
- * // limitations under the License.
- * //
- * //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ *******************************************************************
+ *
+ * Copyright 2015 Intel Corporation.
+ *
+ *-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
  */
 
 package org.iotivity.base;
@@ -84,6 +84,11 @@ public class SmokeTest extends InstrumentationTestCase {
                             Log.i(TAG, " " + connectivityType);
                         }
                         signal.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -156,6 +161,11 @@ public class SmokeTest extends InstrumentationTestCase {
                         } catch (InterruptedException e) {
                             assertTrue(false);
                         }
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -262,6 +272,11 @@ public class SmokeTest extends InstrumentationTestCase {
                             assertTrue(false);
                         }
                         signal1.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -429,6 +444,11 @@ public class SmokeTest extends InstrumentationTestCase {
                             assertTrue(false);
                         }
                         signal1.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -603,6 +623,11 @@ public class SmokeTest extends InstrumentationTestCase {
                         }
                         signal1.countDown();
                     }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
+                    }
                 };
 
         try {
@@ -730,6 +755,11 @@ public class SmokeTest extends InstrumentationTestCase {
                             assertTrue(false);
                         }
                         signal1.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -894,6 +924,11 @@ public class SmokeTest extends InstrumentationTestCase {
                             assertTrue(false);
                         }
                         signal1.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -1094,12 +1129,22 @@ public class SmokeTest extends InstrumentationTestCase {
             public void onResourceFound(OcResource resource) {
                 signal1.countDown();
             }
+
+            @Override
+            public void onFindResourceFailed(Throwable ex, String uri) {
+                Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
+            }
         };
 
         OcPlatform.OnResourceFoundListener resourceFoundListener2 = new OcPlatform.OnResourceFoundListener() {
             @Override
             public void onResourceFound(OcResource resource) {
                 signal2.countDown();
+            }
+
+            @Override
+            public void onFindResourceFailed(Throwable ex, String uri) {
+                Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
             }
         };
 
@@ -1108,12 +1153,22 @@ public class SmokeTest extends InstrumentationTestCase {
             public void onResourceFound(OcResource resource) {
                 signal3.countDown();
             }
+
+            @Override
+            public void onFindResourceFailed(Throwable ex, String uri) {
+                Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
+            }
         };
 
         OcPlatform.OnResourceFoundListener resourceFoundListener4 = new OcPlatform.OnResourceFoundListener() {
             @Override
             public void onResourceFound(OcResource resource) {
                 signal4.countDown();
+            }
+
+            @Override
+            public void onFindResourceFailed(Throwable ex, String uri) {
+                Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
             }
         };
 
@@ -1122,12 +1177,22 @@ public class SmokeTest extends InstrumentationTestCase {
             public void onResourceFound(OcResource resource) {
                 signal5.countDown();
             }
+
+            @Override
+            public void onFindResourceFailed(Throwable ex, String uri) {
+                Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
+            }
         };
 
         OcPlatform.OnResourceFoundListener resourceFoundListener6 = new OcPlatform.OnResourceFoundListener() {
             @Override
             public void onResourceFound(OcResource resource) {
                 signal6.countDown();
+            }
+
+            @Override
+            public void onFindResourceFailed(Throwable ex, String uri) {
+                Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
             }
         };
 
@@ -1270,7 +1335,12 @@ public class SmokeTest extends InstrumentationTestCase {
                         headerOptionList.add(new OcHeaderOption(2885, "OptionData1"));
                         headerOptionList.add(new OcHeaderOption(2886, "OptionData2"));
 
-                        resource.setHeaderOptions(headerOptionList);
+                        try {
+                            resource.setHeaderOptions(headerOptionList);
+                        } catch (OcException e) {
+                            Log.e(TAG, "onResourceFound, error in setHeaderOptions -- " + e.getMessage());
+                        }
+
                         resource.unsetHeaderOptions();
 
                         OcResourceIdentifier resourceIdentifier = resource.getUniqueIdentifier();
@@ -1278,6 +1348,11 @@ public class SmokeTest extends InstrumentationTestCase {
                         assertTrue(resourceIdentifier.equals(resourceIdentifier2));
 
                         signal.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -1358,6 +1433,11 @@ public class SmokeTest extends InstrumentationTestCase {
                             assertTrue(false);
                         }
                         signal.countDown();
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
 
@@ -1556,6 +1636,11 @@ public class SmokeTest extends InstrumentationTestCase {
                                 assertTrue(false);
                             }
                         }
+                    }
+
+                    @Override
+                    public void onFindResourceFailed(Throwable ex, String uri) {
+                        Log.i(TAG, "Find Resource Failed for Uri: " + uri + " Error: " + ex.getMessage());
                     }
                 };
         try {

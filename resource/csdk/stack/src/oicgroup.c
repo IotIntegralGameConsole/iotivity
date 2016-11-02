@@ -20,6 +20,8 @@
 
 #define _POSIX_C_SOURCE 200112L
 
+#include "iotivity_config.h"
+
 #include <string.h>
 
 #include "oicgroup.h"
@@ -31,10 +33,6 @@
 #include "occollection.h"
 #include "logger.h"
 #include "timer.h"
-
-#ifndef WITH_ARDUINO
-#include <pthread.h>
-#endif
 
 #define TAG "OIC_RI_GROUP"
 
@@ -71,8 +69,45 @@
         pointer = NULL; \
     }
 
-#ifndef WITH_ARDUINO
-pthread_mutex_t lock;
+// Mutex implementation macros
+#if defined(HAVE_PTHREAD_H)
+
+ #include <pthread.h>
+ pthread_mutex_t g_scheduledResourceLock;
+ #define MUTEX_LOCK(ARG_NAME)       { pthread_mutex_lock(ARG_NAME); }
+ #define MUTEX_UNLOCK(ARG_NAME)     { pthread_mutex_unlock(ARG_NAME); }
+ #define MUTEX_INITIALIZE(ARG_NAME) { }
+ #define MUTEX_TERMINATE(ARG_NAME)  { }
+
+#elif defined(HAVE_WINDOWS_H)
+
+ #include <windows.h>
+ CRITICAL_SECTION g_scheduledResourceLock;
+ bool g_initializedScheduledResourceLock = false;
+ #define MUTEX_LOCK(ARG_NAME)       { EnterCriticalSection(ARG_NAME); }
+ #define MUTEX_UNLOCK(ARG_NAME)     { LeaveCriticalSection(ARG_NAME); }
+ #define MUTEX_INITIALIZE(ARG_NAME) { assert(!g_initializedScheduledResourceLock); \
+                                      InitializeCriticalSection(ARG_NAME); \
+                                      g_initializedScheduledResourceLock = true; \
+                                    }
+ #define MUTEX_TERMINATE(ARG_NAME)  { if (g_initializedScheduledResourceLock) \
+                                      { \
+                                          DeleteCriticalSection(ARG_NAME); \
+                                          g_initializedScheduledResourceLock = false; \
+                                      } \
+                                    }
+
+#elif defined(WITH_ARDUINO)
+
+ #define MUTEX_LOCK(ARG_NAME)       { }
+ #define MUTEX_UNLOCK(ARG_NAME)     { }
+ #define MUTEX_INITIALIZE(ARG_NAME) { }
+ #define MUTEX_TERMINATE(ARG_NAME)  { }
+
+#else
+
+ ERROR Need mutex implementation on this platform
+
 #endif
 
 enum ACTION_TYPE
@@ -93,16 +128,14 @@ typedef struct scheduledresourceinfo
     struct scheduledresourceinfo* next;
 } ScheduledResourceInfo;
 
-ScheduledResourceInfo *scheduleResourceList = NULL;
+ScheduledResourceInfo *g_scheduleResourceList = NULL;
 
 void AddScheduledResource(ScheduledResourceInfo **head,
         ScheduledResourceInfo* add)
 {
     OIC_LOG(INFO, TAG, "AddScheduledResource Entering...");
 
-#ifndef WITH_ARDUINO
-    pthread_mutex_lock(&lock);
-#endif
+    MUTEX_LOCK(&g_scheduledResourceLock);
     ScheduledResourceInfo *tmp = NULL;
 
     if (*head != NULL)
@@ -119,25 +152,21 @@ void AddScheduledResource(ScheduledResourceInfo **head,
     {
         *head = add;
     }
-#ifndef WITH_ARDUINO
-    pthread_mutex_unlock(&lock);
-#endif
+    MUTEX_UNLOCK(&g_scheduledResourceLock);
 }
 
 ScheduledResourceInfo* GetScheduledResource(ScheduledResourceInfo *head)
 {
     OIC_LOG(INFO, TAG, "GetScheduledResource Entering...");
 
-#ifndef WITH_ARDUINO
-    pthread_mutex_lock(&lock);
-#endif
+    MUTEX_LOCK(&g_scheduledResourceLock);
 
     time_t t_now;
 
     ScheduledResourceInfo *tmp = NULL;
     tmp = head;
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO)
     time(&t_now);
 #else
     t_now = now();
@@ -148,11 +177,7 @@ ScheduledResourceInfo* GetScheduledResource(ScheduledResourceInfo *head)
         while (tmp)
         {
             time_t diffTm = 0;
-#ifndef WITH_ARDUINO
             diffTm = timespec_diff(tmp->time, t_now);
-#else
-            diffTm = timespec_diff(tmp->time, t_now);
-#endif
 
             if (diffTm <= (time_t) 0)
             {
@@ -165,9 +190,9 @@ ScheduledResourceInfo* GetScheduledResource(ScheduledResourceInfo *head)
     }
 
     exit:
-#ifndef WITH_ARDUINO
-    pthread_mutex_unlock(&lock);
-#endif
+
+    MUTEX_UNLOCK(&g_scheduledResourceLock);
+
     if (tmp == NULL)
     {
         OIC_LOG(INFO, TAG, "Cannot Find Call Info.");
@@ -179,9 +204,8 @@ ScheduledResourceInfo* GetScheduledResourceByActionSetName(ScheduledResourceInfo
 {
     OIC_LOG(INFO, TAG, "GetScheduledResourceByActionSetName Entering...");
 
-#ifndef WITH_ARDUINO
-    pthread_mutex_lock(&lock);
-#endif
+    MUTEX_LOCK(&g_scheduledResourceLock);
+
     ScheduledResourceInfo *tmp = NULL;
     tmp = head;
 
@@ -199,9 +223,9 @@ ScheduledResourceInfo* GetScheduledResourceByActionSetName(ScheduledResourceInfo
     }
 
 exit:
-#ifndef WITH_ARDUINO
-    pthread_mutex_unlock(&lock);
-#endif
+
+    MUTEX_UNLOCK(&g_scheduledResourceLock);
+
     if (tmp == NULL)
     {
         OIC_LOG(INFO, TAG, "Cannot Find Call Info.");
@@ -212,17 +236,17 @@ exit:
 void RemoveScheduledResource(ScheduledResourceInfo **head,
         ScheduledResourceInfo* del)
 {
-#ifndef WITH_ARDUINO
-    pthread_mutex_lock(&lock);
-#endif
+
+    MUTEX_LOCK(&g_scheduledResourceLock);
+
     OIC_LOG(INFO, TAG, "RemoveScheduledResource Entering...");
     ScheduledResourceInfo *tmp = NULL;
 
     if (del == NULL)
     {
-#ifndef WITH_ARDUINO
-    pthread_mutex_unlock(&lock);
-#endif
+
+        MUTEX_UNLOCK(&g_scheduledResourceLock);
+
         return;
     }
 
@@ -244,9 +268,8 @@ void RemoveScheduledResource(ScheduledResourceInfo **head,
     }
 
     OCFREE(del)
-#ifndef WITH_ARDUINO
-    pthread_mutex_unlock(&lock);
-#endif
+
+    MUTEX_UNLOCK(&g_scheduledResourceLock);
 }
 
 typedef struct aggregatehandleinfo
@@ -427,11 +450,13 @@ void DeleteAction(OCAction** action)
 
 void DeleteActionSet(OCActionSet** actionset)
 {
+    OCAction* pointer = NULL;
+    OCAction* pDel = NULL;
+
     if(*actionset == NULL)
         return;
 
-    OCAction* pointer = (*actionset)->head;
-    OCAction* pDel = NULL;
+    pointer = (*actionset)->head;
 
     while (pointer)
     {
@@ -650,7 +675,7 @@ OCStackResult BuildActionSetFromString(OCActionSet **set, char* actiondesc)
     // yyyy-mm-dd hh:mm:ss d
     iterToken = (char *) strtok_r(NULL, ACTION_DELIMITER, &iterTokenPtr);
     VARIFY_PARAM_NULL(iterToken, result, exit)
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO)
     if( 2 != sscanf(iterToken, "%ld %u", &(*set)->timesteps, &(*set)->type) )
     {
         // If the return value should be 2, the number of items in the argument. Otherwise, it fails.
@@ -1074,7 +1099,7 @@ OCStackResult DoAction(OCResource* resource, OCActionSet* actionset,
 void DoScheduledGroupAction()
 {
     OIC_LOG(INFO, TAG, "DoScheduledGroupAction Entering...");
-    ScheduledResourceInfo* info = GetScheduledResource(scheduleResourceList);
+    ScheduledResourceInfo* info = GetScheduledResource(g_scheduleResourceList);
 
     if (info == NULL)
     {
@@ -1096,13 +1121,13 @@ void DoScheduledGroupAction()
         OIC_LOG(INFO, TAG, "Target ActionSet is NULL");
         goto exit;
     }
-#ifndef WITH_ARDUINO
-    pthread_mutex_lock(&lock);
-#endif
+
+    MUTEX_LOCK(&g_scheduledResourceLock);
+
     DoAction(info->resource, info->actionset, info->ehRequest);
-#ifndef WITH_ARDUINO
-    pthread_mutex_unlock(&lock);
-#endif
+
+    MUTEX_UNLOCK(&g_scheduledResourceLock);
+
 
     if (info->actionset->type == RECURSIVE)
     {
@@ -1117,9 +1142,7 @@ void DoScheduledGroupAction()
 
             if (info->actionset->timesteps > 0)
             {
-#ifndef WITH_ARDUINO
-                pthread_mutex_lock(&lock);
-#endif
+                MUTEX_LOCK(&g_scheduledResourceLock);
                 schedule->resource = info->resource;
                 schedule->actionset = info->actionset;
                 schedule->ehRequest = info->ehRequest;
@@ -1128,11 +1151,9 @@ void DoScheduledGroupAction()
                         &schedule->timer_id,
                         &DoScheduledGroupAction);
 
-                OIC_LOG(INFO, TAG, "Reregisteration.");
-#ifndef WITH_ARDUINO
-                pthread_mutex_unlock(&lock);
-#endif
-                AddScheduledResource(&scheduleResourceList, schedule);
+                OIC_LOG(INFO, TAG, "Reregistration.");
+                MUTEX_UNLOCK(&g_scheduledResourceLock);
+                AddScheduledResource(&g_scheduleResourceList, schedule);
             }
             else
             {
@@ -1141,7 +1162,7 @@ void DoScheduledGroupAction()
         }
     }
 
-    RemoveScheduledResource(&scheduleResourceList, info);
+    RemoveScheduledResource(&g_scheduleResourceList, info);
 
     exit:
 
@@ -1329,30 +1350,22 @@ OCStackResult BuildCollectionGroupActionCBORResponse(
                             OIC_LOG(INFO, TAG, "Building New Call Info.");
                             memset(schedule, 0,
                                     sizeof(ScheduledResourceInfo));
-#ifndef WITH_ARDUINO
-                            pthread_mutex_lock(&lock);
-#endif
+                            MUTEX_LOCK(&g_scheduledResourceLock);
                             schedule->resource = resource;
                             schedule->actionset = actionset;
                             schedule->ehRequest =
                                     (OCServerRequest*) ehRequest->requestHandle;
-#ifndef WITH_ARDUINO
-                            pthread_mutex_unlock(&lock);
-#endif
+                            MUTEX_UNLOCK(&g_scheduledResourceLock);
                             if (delay > 0)
                             {
                                 OIC_LOG_V(INFO, TAG, "delay_time is %ld seconds.",
                                         actionset->timesteps);
-#ifndef WITH_ARDUINO
-                                pthread_mutex_lock(&lock);
-#endif
+                                MUTEX_LOCK(&g_scheduledResourceLock);
                                 schedule->time = registerTimer(delay,
                                         &schedule->timer_id,
                                         &DoScheduledGroupAction);
-#ifndef WITH_ARDUINO
-                                pthread_mutex_unlock(&lock);
-#endif
-                                AddScheduledResource(&scheduleResourceList,
+                                MUTEX_UNLOCK(&g_scheduledResourceLock);
+                                AddScheduledResource(&g_scheduleResourceList,
                                         schedule);
                                 stackRet = OC_STACK_OK;
                             }
@@ -1368,13 +1381,15 @@ OCStackResult BuildCollectionGroupActionCBORResponse(
         else if (strcmp(doWhat, "CancelAction") == 0)
         {
             ScheduledResourceInfo *info =
-                    GetScheduledResourceByActionSetName(scheduleResourceList, details);
+                    GetScheduledResourceByActionSetName(g_scheduleResourceList, details);
 
             if(info != NULL)
             {
+                MUTEX_LOCK(&g_scheduledResourceLock);
                 unregisterTimer(info->timer_id);
+                MUTEX_UNLOCK(&g_scheduledResourceLock);
 
-                RemoveScheduledResource(&scheduleResourceList, info);
+                RemoveScheduledResource(&g_scheduleResourceList, info);
                 stackRet = OC_STACK_OK;
             }
             else
@@ -1442,4 +1457,19 @@ exit:
     OCFREE(details)
 
     return stackRet;
+}
+
+OCStackResult InitializeScheduleResourceList()
+{
+    MUTEX_INITIALIZE(&g_scheduledResourceLock);
+
+    g_scheduleResourceList = NULL;
+    return OC_STACK_OK;
+}
+
+void TerminateScheduleResourceList()
+{
+    assert(g_scheduleResourceList == NULL);
+
+    MUTEX_TERMINATE(&g_scheduledResourceLock);
 }

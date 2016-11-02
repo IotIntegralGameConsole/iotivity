@@ -95,7 +95,6 @@ OCStackResult SendUnicastSecurePortDiscovery(PEContext_t *context,
  * ::OC_STACK_ERROR, If unable to successfully send unicast ACL request due to error.
  *
  */
-
 OCStackResult SendAclReq(PEContext_t *context,
                          OCDevAddr *devAddr,
                          OCConnectivityType connType,

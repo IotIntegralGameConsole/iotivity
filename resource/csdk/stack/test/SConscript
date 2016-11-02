@@ -24,8 +24,6 @@ import os.path
 # SConscript file for Local PKI google tests
 gtest_env = SConscript('#extlibs/gtest/SConscript')
 stacktest_env = gtest_env.Clone()
-
-src_dir = stacktest_env.get('SRC_DIR')
 target_os = stacktest_env.get('TARGET_OS')
 
 ######################################################################
@@ -39,32 +37,31 @@ stacktest_env.PrependUnique(CPPPATH = [
 		'../../stack/include',
 		'../../stack/include/internal',
 		'../../connectivity/api',
+		'../../connectivity/inc/pkix',
 		'../../connectivity/external/inc',
 		'../../extlibs/cjson',
 		'../../../oc_logger/include',
 		])
-if target_os not in ['windows']:
-	stacktest_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall', '-pthread'])
+
 stacktest_env.AppendUnique(LIBPATH = [stacktest_env.get('BUILD_DIR')])
 stacktest_env.PrependUnique(LIBS = ['octbstack',
                                     'ocsrm',
                                     'connectivity_abstraction',
-                                    'coap',
-                                    'gtest',
-                                    'gtest_main'])
-
+                                    'coap'])
 if target_os != 'darwin':
     stacktest_env.PrependUnique(LIBS = ['oc_logger'])
 
 if stacktest_env.get('SECURED') == '1':
-    stacktest_env.AppendUnique(LIBS = ['tinydtls'])
+	stacktest_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509','mbedcrypto'])
 
 if stacktest_env.get('LOGGING'):
 	stacktest_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
 
-if target_os not in ['msys_nt', 'windows']:
+if target_os in ['msys_nt', 'windows']:
+	stacktest_env.AppendUnique(LINKFLAGS = ['/subsystem:CONSOLE'])
+	stacktest_env.AppendUnique(LIBS = ['ws2_32', 'iphlpapi', 'kernel32'])
+else:
 	stacktest_env.PrependUnique(LIBS = ['m'])
-	stacktest_env.PrependUnique(LIBS = ['pthread'])
 
 ######################################################################
 # Source files and Targets
@@ -77,7 +74,9 @@ Alias("test", [stacktests, cbortests])
 
 stacktest_env.AppendTarget('test')
 if stacktest_env.get('TEST') == '1':
-	if target_os in ['linux']:
+	if target_os in ['windows']:
+		stacktest_env.AppendENVPath('PATH', [os.path.join(stacktest_env.get('BUILD_DIR'), 'resource', 'csdk')])
+	if target_os in ['linux', 'windows']:
                 from tools.scons.RunTest import *
                 run_test(stacktest_env,
                          'resource_csdk_stack_test.memcheck',

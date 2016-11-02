@@ -3,7 +3,7 @@
 %{!?VERBOSE: %define VERBOSE 1}
 
 Name: com-oic-ri-sample
-Version:    1.1.1
+Version:    1.2.0
 Release:    0
 Summary: Tizen adapter interfacesample application
 URL: http://slp-source.sec.samsung.net
@@ -12,6 +12,7 @@ License: Apache-2.0
 Group: Applications/OICSample
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: pkgconfig(uuid)
 BuildRequires: boost-devel
 BuildRequires: boost-thread
 BuildRequires: boost-system
@@ -31,7 +32,7 @@ OIC RIsample application
 %build
 
 scons TARGET_OS=tizen -c
-scons VERBOSE=%{VERBOSE} TARGET_OS=tizen TARGET_TRANSPORT=%{TARGET_TRANSPORT} SECURED=%{SECURED} RELEASE=%{RELEASE} ROUTING=%{ROUTING}
+scons TARGET_OS=tizen TARGET_TRANSPORT=%{TARGET_TRANSPORT} SECURED=%{SECURED} RELEASE=%{RELEASE} ROUTING=%{ROUTING} WITH_TCP=%{WITH_TCP} WITH_PROXY=%{WITH_PROXY} WITH_MQ=%{WITH_MQ}
 
 %install
 

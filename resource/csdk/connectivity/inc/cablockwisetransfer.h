@@ -28,12 +28,18 @@
 
 #include <stdint.h>
 
-#include "coap.h"
+#include <coap/coap.h>
 #include "cathreadpool.h"
 #include "camutex.h"
 #include "uarraylist.h"
 #include "cacommon.h"
 #include "caprotocolmessage.h"
+#include "camessagehandler.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /**
  * Callback to send block data.
@@ -109,11 +115,6 @@ typedef enum
     CA_BLOCK_TOO_LARGE,
     CA_BLOCK_RECEIVED_ALREADY
 } CABlockState_t;
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 /**
  * Initializes the block-wise transfer context.
@@ -253,7 +254,7 @@ CAResult_t CASetNextBlockOption2(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
  * @return ::CASTATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CANegotiateBlockSize(CABlockData_t *currData, coap_block_t *block,
-                                coap_pdu_t *pdu, uint16_t blockType);
+                                const coap_pdu_t *pdu, uint16_t blockType);
 
 /**
  * Update the block option in block-wise transfer list.
@@ -550,12 +551,20 @@ CABlockData_t *CACreateNewBlockData(const CAData_t *sendData);
 CAResult_t CARemoveBlockDataFromList(const CABlockDataID_t *blockID);
 
 /**
- * Check if data exist in block-wise transfer list.
- * @param[in]   blockID     ID set of CABlockData.
- * @return true or false.
+ * Remove all block data in block-wise transfer list.
+ * @return ::CASTATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-bool CAIsBlockDataInList(const CABlockDataID_t *blockID);
+CAResult_t CARemoveAllBlockDataFromList();
 
+/**
+ * Find the block data with seed info and remove it from block-wise transfer list.
+ * @param[in]   token         token of the message.
+ * @param[in]   tokenLength   token length of the message.
+ * @param[in]   portNumber    port.
+ * @return ::CASTATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
+ */
+CAResult_t CARemoveBlockDataFromListWithSeed(const CAToken_t token, uint8_t tokenLength,
+                                             uint16_t portNumber);
 
 #ifdef __cplusplus
 } /* extern "C" */

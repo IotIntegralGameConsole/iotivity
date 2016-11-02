@@ -26,8 +26,18 @@ export LOGGING=$5
 echo $6
 export ROUTING=$6
 
+echo $7
+export WITH_TCP=$7
+
+echo $8
+export WITH_PROXY=$8
+
+echo $9
+export WITH_MQ=$9
+
 echo $TARGET_TRANSPORT
 echo $BUILD_SAMPLE
+echo $WITH_MQ
 
 rm -rf $name-$version
 
@@ -42,14 +52,18 @@ mkdir ./tmp/extlibs/
 mkdir ./tmp/packaging
 cp -LR ./extlibs/tinycbor $sourcedir/tmp/extlibs
 rm -rf $sourcedir/tmp/extlibs/tinycbor/tinycbor/.git
+cp -Rf ./extlibs/mbedtls $sourcedir/tmp/extlibs
 cp -R ./extlibs/cjson $sourcedir/tmp/extlibs
 cp -R ./extlibs/tinydtls $sourcedir/tmp/extlibs
 cp -R ./extlibs/timer $sourcedir/tmp/extlibs
 cp -R ./extlibs/rapidxml $sourcedir/tmp/extlibs
+cp -R ./extlibs/libcoap $sourcedir/tmp/extlibs
 cp -LR ./extlibs/sqlite3 $sourcedir/tmp/extlibs
 cp -R ./resource/csdk/stack/samples/tizen/build/packaging/*.spec $sourcedir/tmp/packaging
 cp -R ./resource $sourcedir/tmp/
 cp -R ./build_common/external_libs.scons $sourcedir/tmp/
+mkdir -p $sourcedir/tmp/build_common/
+cp -a ./build_common/*.scons $sourcedir/tmp/build_common/
 
 # copy dependency RPMs and conf files for tizen build
 cp ./tools/tizen/*.rpm $sourcedir/tmp
@@ -76,6 +90,13 @@ cd $sourcedir/tmp
 
 echo `pwd`
 
+if [ -d ./extlibs/mbedtls/mbedtls ];then
+    cd ./extlibs/mbedtls/mbedtls
+    git reset --hard ad249f509fd62a3bbea7ccd1fef605dbd482a7bd ; git apply --whitespace=fix ../ocf.patch
+    cd -
+    rm -rf ./extlibs/mbedtls/mbedtls/.git*
+fi
+
 whoami
 # Initialize Git repository
 if [ ! -d .git ]; then
@@ -87,7 +108,7 @@ if [ ! -d .git ]; then
 fi
 
 echo "Calling core gbs build command"
-gbscommand="gbs build -A armv7l -B ~/GBS-ROOT-RI-OIC --include-all --repository ./ --define 'TARGET_TRANSPORT $1' --define 'SECURED $2' --define 'RELEASE $4' --define 'LOGGING $5' --define 'ROUTING $6'"
+gbscommand="gbs build -A armv7l -B ~/GBS-ROOT-RI-OIC --include-all --repository ./ --define 'TARGET_TRANSPORT $1' --define 'SECURED $2' --define 'RELEASE $4' --define 'LOGGING $5' --define 'ROUTING $6' --define 'WITH_TCP $7' --define 'WITH_PROXY $8' --define 'WITH_MQ $9'"
 echo $gbscommand
 if eval $gbscommand; then
    echo "Core build is successful"
@@ -110,7 +131,7 @@ if echo $BUILD_SAMPLE|grep -qi '^ON$'; then
       git commit -m "Initial commit"
    fi
    echo "Calling sample gbs build command"
-   gbscommand="gbs build -A armv7l -B ~/GBS-ROOT-RI-OIC --include-all --repository ./ --define 'TARGET_TRANSPORT $1' --define 'SECURED $2' --define 'RELEASE $4' --define 'LOGGING $5' --define 'ROUTING $6'"
+   gbscommand="gbs build -A armv7l -B ~/GBS-ROOT-RI-OIC --include-all --repository ./ --define 'TARGET_TRANSPORT $1' --define 'SECURED $2' --define 'RELEASE $4' --define 'LOGGING $5' --define 'ROUTING $6' --define 'WITH_TCP $7' --define 'WITH_PROXY $8' --define 'WITH_MQ $9'"
    echo $gbscommand
    if eval $gbscommand; then
       echo "Sample build is successful"

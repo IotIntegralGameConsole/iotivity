@@ -121,6 +121,45 @@ namespace OC
         return result;
     }
 
+    OCStackResult OCSecure::discoverSingleDevice(unsigned short timeout,
+            const OicUuid_t* deviceID,
+            std::shared_ptr<OCSecureResource> &foundDevice)
+    {
+        OCStackResult result;
+        OCProvisionDev_t *pDev = nullptr;
+        auto csdkLock = OCPlatform_impl::Instance().csdkLock();
+        auto cLock = csdkLock.lock();
+
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            result = OCDiscoverSingleDevice(timeout, deviceID, &pDev);
+            if (result == OC_STACK_OK)
+            {
+                if (pDev)
+                {
+                    foundDevice.reset(new OCSecureResource(csdkLock, pDev));
+                }
+                else
+                {
+                    oclog() <<"Not found Secure resource!";
+                    foundDevice.reset();
+                }
+            }
+            else
+            {
+                oclog() <<"Secure resource discovery failed!";
+            }
+        }
+        else
+        {
+            oclog() <<"Mutex not found";
+            result = OC_STACK_ERROR;
+        }
+
+        return result;
+    }
+
     OCStackResult OCSecure::setOwnerTransferCallbackData(OicSecOxm_t oxm,
             OTMCallbackData_t* callbackData, InputPinCallback inputPin)
     {
@@ -229,6 +268,77 @@ namespace OC
 
         return result;
     }
+
+    OCStackResult OCSecure::removeDeviceWithUuid(unsigned short waitTimeForOwnedDeviceDiscovery,
+            std::string uuid,
+            ResultCallBack resultCallback)
+    {
+        if (!resultCallback)
+        {
+            oclog() << "Result calback can't be null";
+            return OC_STACK_INVALID_CALLBACK;
+        }
+
+        OCStackResult result;
+        auto cLock = OCPlatform_impl::Instance().csdkLock().lock();
+
+        if (cLock)
+        {
+            ProvisionContext* context = new ProvisionContext(resultCallback);
+
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+
+            OicUuid_t targetDev;
+            result = ConvertStrToUuid(uuid.c_str(), &targetDev);
+            if(OC_STACK_OK == result)
+            {
+                result = OCRemoveDeviceWithUuid(static_cast<void*>(context), waitTimeForOwnedDeviceDiscovery,
+                        &targetDev, &OCSecureResource::callbackWrapper);
+            }
+            else
+            {
+                oclog() <<"Can not convert struuid to uuid";
+            }
+        }
+        else
+        {
+            oclog() <<"Mutex not found";
+            result = OC_STACK_ERROR;
+        }
+        return result;
+    }
+
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+    OCStackResult OCSecure::saveTrustCertChain(uint8_t *trustCertChain, size_t chainSize,
+                                        OicEncodingType_t encodingType, uint16_t *credId)
+    {
+        if (!trustCertChain)
+        {
+            oclog() <<"trustCertChain can't be null";
+            return OC_STACK_INVALID_PARAM;
+        }
+        if (!credId)
+        {
+            oclog() <<"cred ID can not be null";
+            return OC_STACK_INVALID_PARAM;
+        }
+
+        OCStackResult result;
+        auto cLock = OCPlatform_impl::Instance().csdkLock().lock();
+
+        if (cLock)
+        {
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            result = OCSaveTrustCertChain(trustCertChain, chainSize, encodingType, credId );
+        }
+        else
+        {
+            oclog() <<"Mutex not found";
+            result = OC_STACK_ERROR;
+        }
+        return result;
+    }
+#endif // __WITH_DTLS__ || __WITH_TLS__
 
     void OCSecureResource::callbackWrapper(void* ctx, int nOfRes, OCProvisionResult_t *arr, bool hasError)
     {
@@ -458,45 +568,6 @@ namespace OC
         return result;
     }
 
-    OCStackResult OCSecureResource::removeDeviceWithUuid(unsigned short waitTimeForOwnedDeviceDiscovery,
-            std::string uuid,
-            ResultCallBack resultCallback)
-    {
-        if (!resultCallback)
-        {
-            oclog() << "Result calback can't be null";
-            return OC_STACK_INVALID_CALLBACK;
-        }
-
-        OCStackResult result;
-        auto cLock = m_csdkLock.lock();
-
-        if (cLock)
-        {
-            ProvisionContext* context = new ProvisionContext(resultCallback);
-
-            std::lock_guard<std::recursive_mutex> lock(*cLock);
-
-            OicUuid_t targetDev;
-            result = ConvertStrToUuid(uuid.c_str(), &targetDev);
-            if(OC_STACK_OK == result)
-            {
-                result = OCRemoveDeviceWithUuid(static_cast<void*>(context), waitTimeForOwnedDeviceDiscovery,
-                        &targetDev, &OCSecureResource::callbackWrapper);
-            }
-            else
-            {
-                oclog() <<"Can not convert struuid to uuid";
-            }
-        }
-        else
-        {
-            oclog() <<"Mutex not found";
-            result = OC_STACK_ERROR;
-        }
-        return result;
-    }
-
     OCStackResult OCSecureResource::getLinkedDevices(UuidList_t &uuidList)
     {
         OCStackResult result;
@@ -560,6 +631,42 @@ namespace OC
         }
         return result;
     }
+
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+    OCStackResult OCSecureResource::provisionTrustCertChain(OicSecCredType_t type, uint16_t credId,
+                    ResultCallBack resultCallback)
+    {
+        if (SIGNED_ASYMMETRIC_KEY != type)
+        {
+            oclog() <<"Invalid key type";
+            return OC_STACK_INVALID_PARAM;
+        }
+        if (!resultCallback)
+        {
+            oclog() <<"result callback can not be null";
+            return OC_STACK_INVALID_CALLBACK;
+        }
+
+        OCStackResult result;
+        auto cLock = m_csdkLock.lock();
+
+        if (cLock)
+        {
+            ProvisionContext* context = new ProvisionContext(resultCallback);
+
+            std::lock_guard<std::recursive_mutex> lock(*cLock);
+            result = OCProvisionTrustCertChain(static_cast<void*>(context),
+                    type, credId, devPtr,
+                    &OCSecureResource::callbackWrapper);
+        }
+        else
+        {
+            oclog() <<"Mutex not found";
+            result = OC_STACK_ERROR;
+        }
+        return result;
+    }
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
     std::string OCSecureResource::getDeviceID()
     {

@@ -18,13 +18,24 @@
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+#include "iotivity_config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+/** @todo stop-gap for naming issue. Windows.h does not like us to use ERROR */
+#ifdef ERROR
+#undef ERROR
+#endif
+#endif
 #include <iostream>
 #include <sstream>
+#include <getopt.h>
 #include "ocstack.h"
 #include "logger.h"
 #include "occlientbasicops.h"
@@ -38,6 +49,7 @@ static int UnicastDiscovery = 0;
 static int TestCase = 0;
 static int ConnType = 0;
 static int DevOwner = 0;
+static int WithTcp = 0;
 
 static char DISCOVERY_QUERY[] = "%s/oic/res";
 OCConnectivityType discoveryReqConnType = CT_ADAPTER_IP;
@@ -94,6 +106,8 @@ static void PrintUsage()
     OIC_LOG(INFO, TAG, "-c 1 : IP Connectivity Type");
     OIC_LOG(INFO, TAG, "-d 0 : Client as Non Device Owner");
     OIC_LOG(INFO, TAG, "-d 1 : Client as Device Owner");
+    OIC_LOG(INFO, TAG, "-p 0 : Use UDP protocol");
+    OIC_LOG(INFO, TAG, "-p 1 : Use TCP protocol");
 }
 
 OCStackResult InvokeOCDoResource(std::ostringstream &query,
@@ -208,9 +222,13 @@ OCStackApplicationResult discoveryReqCB(void*, OCDoHandle,
 
 int InitPutRequest(OCQualityOfService qos)
 {
-    OIC_LOG_V(INFO, TAG, "\n\nExecuting %s", __func__);
+    OIC_LOG_V(INFO, TAG, "Executing %s", __func__);
     std::ostringstream query;
     query << coapServerResource;
+    if(WithTcp)
+    {
+        endpoint.adapter = OC_ADAPTER_TCP;
+    }
     endpoint.flags = (OCTransportFlags)(endpoint.flags|OC_SECURE);
     return (InvokeOCDoResource(query, OC_REST_PUT, &endpoint,
             ((qos == OC_HIGH_QOS) ? OC_HIGH_QOS: OC_LOW_QOS), putReqCB, NULL, 0));
@@ -219,7 +237,8 @@ int InitPutRequest(OCQualityOfService qos)
 int InitPostRequest(OCQualityOfService qos)
 {
     OCStackResult result;
-    OIC_LOG_V(INFO, TAG, "\n\nExecuting %s", __func__);
+
+    OIC_LOG_V(INFO, TAG, "Executing %s", __func__);
     std::ostringstream query;
     query << coapServerResource;
     endpoint.flags = (OCTransportFlags)(endpoint.flags|OC_SECURE);
@@ -251,9 +270,13 @@ int InitPostRequest(OCQualityOfService qos)
 
 int InitGetRequest(OCQualityOfService qos)
 {
-    OIC_LOG_V(INFO, TAG, "\n\nExecuting %s", __func__);
+    OIC_LOG_V(INFO, TAG, "Executing %s", __func__);
     std::ostringstream query;
     query << coapServerResource;
+    if(WithTcp)
+    {
+        endpoint.adapter = OC_ADAPTER_TCP;
+    }
     endpoint.flags = (OCTransportFlags)(endpoint.flags|OC_SECURE);
 
     return (InvokeOCDoResource(query, OC_REST_GET, &endpoint,
@@ -321,7 +344,7 @@ int main(int argc, char* argv[])
     struct timespec timeout;
     OCPersistentStorage ps;
 
-    while ((opt = getopt(argc, argv, "u:t:c:d:")) != -1)
+    while ((opt = getopt(argc, argv, "u:t:c:d:p:")) != -1)
     {
         switch(opt)
         {
@@ -336,6 +359,16 @@ int main(int argc, char* argv[])
                 break;
             case 'd':
                 DevOwner = atoi(optarg);
+                break;
+            case 'p':
+            {
+                WithTcp = atoi(optarg);
+                if(WithTcp > 1)
+                {
+                    PrintUsage();
+                    return -1;
+                }
+            }
                 break;
             default:
                 PrintUsage();
@@ -431,8 +464,18 @@ int parseClientResponse(OCClientResponse * clientResponse)
         }
         if (res->secure)
         {
-            OIC_LOG_V(INFO,TAG,"SECUREPORT: %d",res->port);
-            endpoint.port = res->port;
+            if(WithTcp)
+            {
+#ifdef TCP_ADAPTER
+                OIC_LOG_V(INFO,TAG,"SECUREPORT tcp: %d",res->tcpPort);
+                endpoint.port = res->tcpPort;
+#endif
+            }
+            else
+            {
+                OIC_LOG_V(INFO,TAG,"SECUREPORT udp: %d",res->port);
+                endpoint.port = res->port;
+            }
             coapSecureResource = 1;
         }
 

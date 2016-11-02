@@ -83,10 +83,16 @@ public class CoapEncoder extends MessageToByteEncoder<CoapMessage> {
             byteBuf.writeByte(
                     (14 & 0x0F) << 4 | (coapMessage.getTokenLength() & 0x0F));
             byteBuf.writeShort(((int) length - 269) & 0xFFFF);
-        } else if (length < Integer.MAX_VALUE * 2) {
+        } else if (length < 4294967294L) {
             byteBuf.writeByte(
                     (15 & 0x0F) << 4 | (coapMessage.getTokenLength() & 0x0F));
-            byteBuf.writeLong((length - 65805) & 0xFFFFFFFF);
+            byte[] size = new byte[4];
+            long payload = length - 65805;
+            for (int i = 3; i > -1; i--) {
+                size[i] = (byte) (payload & 0xFF);
+                payload >>= 8;
+            }
+            byteBuf.writeBytes(size);
         } else {
             throw new IllegalArgumentException(
                     "Length must be less than 4GB " + length);

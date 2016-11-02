@@ -24,11 +24,18 @@ package org.iotivity.cloud.accountserver;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 
-import org.iotivity.cloud.accountserver.resources.AccountResource;
-import org.iotivity.cloud.accountserver.resources.AuthResource;
-import org.iotivity.cloud.base.CoapServer;
-import org.iotivity.cloud.base.ResourceManager;
-import org.iotivity.cloud.util.Logger;
+import org.iotivity.cloud.accountserver.resources.account.AccountResource;
+import org.iotivity.cloud.accountserver.resources.account.session.SessionResource;
+import org.iotivity.cloud.accountserver.resources.account.tokenrefresh.TokenRefreshResource;
+import org.iotivity.cloud.accountserver.resources.acl.group.GroupResource;
+import org.iotivity.cloud.accountserver.resources.acl.id.AclResource;
+import org.iotivity.cloud.accountserver.resources.acl.verify.AclVerifyResource;
+import org.iotivity.cloud.accountserver.resources.acl.invite.InviteResource;
+import org.iotivity.cloud.accountserver.resources.credprov.cert.CertificateResource;
+import org.iotivity.cloud.accountserver.resources.credprov.crl.CrlResource;
+import org.iotivity.cloud.base.ServerSystem;
+import org.iotivity.cloud.base.server.CoapServer;
+import org.iotivity.cloud.util.Log;
 
 /**
  *
@@ -38,28 +45,43 @@ import org.iotivity.cloud.util.Logger;
 public class AccountServer {
 
     public static void main(String[] args) throws Exception {
+        Log.Init();
 
         System.out.println("-----Account SERVER-----");
 
-        if (args.length != 1) {
-            Logger.e("coap server port required");
+        if (args.length != 2) {
+            Log.e("coap server port and TLS mode required\n" + "ex) 5685 0\n");
             return;
         }
 
-        ResourceManager resourceManager = null;
+        ServerSystem serverSystem = new ServerSystem();
 
-        CoapServer coapServer = null;
+        serverSystem.addResource(new AccountResource());
 
-        coapServer = new CoapServer();
+        serverSystem.addResource(new SessionResource());
 
-        resourceManager = new ResourceManager();
-        coapServer.addHandler(resourceManager);
+        serverSystem.addResource(new TokenRefreshResource());
 
-        resourceManager.registerResource(new AuthResource());
-        resourceManager.registerResource(new AccountResource());
+        serverSystem.addResource(new GroupResource());
 
-        coapServer
-                .startServer(new InetSocketAddress(Integer.parseInt(args[0])));
+        serverSystem.addResource(new AclResource());
+
+        serverSystem.addResource(new AclVerifyResource());
+
+        serverSystem.addResource(new CertificateResource());
+
+        serverSystem.addResource(new CrlResource());
+
+        serverSystem.addResource(new AclResource());
+
+        serverSystem.addResource(new InviteResource());
+
+        serverSystem.addServer(new CoapServer(
+                new InetSocketAddress(Integer.parseInt(args[0]))));
+
+        boolean tlsMode = Integer.parseInt(args[1]) == 1;
+
+        serverSystem.startSystem(tlsMode);
 
         Scanner in = new Scanner(System.in, "UTF-8");
 
@@ -71,7 +93,7 @@ public class AccountServer {
 
         System.out.println("Terminating...");
 
-        coapServer.stopServer();
+        serverSystem.stopSystem();
 
         System.out.println("Terminated");
     }

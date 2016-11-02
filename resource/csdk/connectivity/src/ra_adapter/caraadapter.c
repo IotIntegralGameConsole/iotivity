@@ -231,16 +231,16 @@ static char *CARAGetSIDFromPDU(coap_pdu_t *pdu)
 
     VERIFY_NON_NULL_RET(pdu, RA_ADAPTER_TAG, "Invalid parameter!", NULL);
 
-    if (pdu->hdr->coap_hdr_udp_t.token_length * 2 > MAX_IBB_SESSION_ID_LENGTH)
+    if (pdu->hdr->token_length * 2 > MAX_IBB_SESSION_ID_LENGTH)
     {
         OIC_LOG(ERROR, RA_ADAPTER_TAG, "Token length more than expected!");
         return NULL;
     }
 
     char hex[3] = {0};
-    for (int i = 0; i < pdu->hdr->coap_hdr_udp_t.token_length; i++)
+    for (int i = 0; i < pdu->hdr->token_length; i++)
     {
-        snprintf(hex, 3, "%02x", pdu->hdr->coap_hdr_udp_t.token[i]);
+        snprintf(hex, 3, "%02x", pdu->hdr->token[i]);
         OICStrcat(s_sid, sizeof(s_sid), hex);
     }
 
@@ -493,8 +493,10 @@ CAResult_t CAStopRA()
 }
 
 int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                                  uint32_t dataLength)
+                            uint32_t dataLength, CADataType_t dataType)
 {
+    SET_BUT_NOT_USED(dataType);
+
     if (!remoteEndpoint || !data)
     {
         OIC_LOG(ERROR, RA_ADAPTER_TAG, "Invalid parameter!");
@@ -563,12 +565,14 @@ CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
 }
 
 int32_t CASendRAMulticastData(const CAEndpoint_t *endpoint,
-                    const void *data, uint32_t dataLength)
+                              const void *data, uint32_t dataLength,
+                              CADataType_t dataType)
 {
     OIC_LOG(INFO, RA_ADAPTER_TAG, "RA adapter does not support sending multicast data");
     SET_BUT_NOT_USED(endpoint);
     SET_BUT_NOT_USED(data);
     SET_BUT_NOT_USED(dataLength);
+    SET_BUT_NOT_USED(dataType);
     return 0;
 }
 
@@ -879,8 +883,9 @@ CAResult_t CAStopRA()
 }
 
 int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                                  uint32_t dataLength)
+                            uint32_t dataLength, CADataType_t dataType)
 {
+    (void)dataType;
     if (!remoteEndpoint || !data)
     {
         OIC_LOG(ERROR, RA_ADAPTER_TAG, "Invalid parameter!");
@@ -947,7 +952,8 @@ CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
 }
 
 int32_t CASendRAMulticastData(const CAEndpoint_t *endpoint,
-                    const void *data, uint32_t dataLength)
+                              const void *data, uint32_t dataLength,
+                              CADataType_t dataType)
 {
     OIC_LOG(INFO, RA_ADAPTER_TAG, "RA adapter does not support sending multicast data");
     return 0;

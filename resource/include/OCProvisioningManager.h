@@ -144,6 +144,22 @@ namespace OC
                     DeviceList_t &list);
 
             /**
+             * API is responsible for discovery of devices in specified endpoint/deviceID.
+             * And this function will only return the specified device's response.
+             *
+             * @param timeout Timeout in seconds, time until which function will listen to
+             *                    responses from server before returning the specified device.
+             * @param deviceID  deviceID of target device
+             * @param foundDevice OCSecureResource object of found device.
+             * @return ::OC_STACK_OK in case of success and other value otherwise.\n
+             *         ::OC_STACK_INVALID_PARAM when deviceID is NULL or ppFoundDevice is not
+             *                                  initailized.
+             */
+            static OCStackResult discoverSingleDevice(unsigned short timeout,
+                    const OicUuid_t* deviceID,
+                    std::shared_ptr<OCSecureResource> &foundDevice);
+
+            /**
              * API for registering Ownership transfer methods for a particular transfer Type.
              *
              * @param oxm Ownership transfer method.
@@ -177,6 +193,35 @@ namespace OC
              * @return ::OC_STACK_OK in case of success and other value otherwise.
              */
             static OCStackResult setDisplayPinCB(GeneratePinCallback displayPin);
+
+            /**
+             * API to remove device credential and ACL from all devices in subnet.
+             *
+             * @param resultCallback Callback provided by API user, callback will be called when
+             *            credential revocation is finished.
+             * @param uuid Device uuid to be revoked.
+             * @param waitTimeForOwnedDeviceDiscovery Maximum wait time for owned device
+             *            discovery in seconds.
+             * @return  ::OC_STACK_OK in case of success and other value otherwise.
+             */
+            static OCStackResult removeDeviceWithUuid(unsigned short waitTimeForOwnedDeviceDiscovery,
+                    std::string uuid,
+                    ResultCallBack resultCallback);
+
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+            /**
+             * API to save Trust certificate chain into Cred of SVR.
+             *
+             * @param[in] trustCertChain Trust certificate chain to be saved in Cred of SVR.
+             * @param[in] chainSize Size of trust certificate chain to be saved in Cred of SVR
+             * @param[in] encodingType Encoding type of trust certificate chain to be saved in Cred of SVR
+             * @param[out] credId CredId of saved trust certificate chain in Cred of SVR.
+             * @return  OC_STACK_OK in case of success and other value otherwise.
+             */
+            static OCStackResult saveTrustCertChain(uint8_t *trustCertChain, size_t chainSize,
+                                        OicEncodingType_t encodingType, uint16_t *credId);
+#endif // __WITH_DTLS__ || __WITH_TLS__
+
     };
 
     /**
@@ -268,20 +313,6 @@ namespace OC
                     ResultCallBack resultCallback);
 
             /**
-             * API to remove device credential and ACL from all devices in subnet.
-             *
-             * @param resultCallback Callback provided by API user, callback will be called when
-             *            credential revocation is finished.
-             * @param uuid Device uuid to be revoked.
-             * @param waitTimeForOwnedDeviceDiscovery Maximum wait time for owned device
-             *            discovery in seconds.
-             * @return  ::OC_STACK_OK in case of success and other value otherwise.
-             */
-            OCStackResult removeDeviceWithUuid(unsigned short waitTimeForOwnedDeviceDiscovery,
-                    std::string uuid,
-                    ResultCallBack resultCallback);
-
-            /**
              * API to provision DirectPairing to devices.
              *
              * @param pconf pointer to PCONF (Pairing Configuration).
@@ -291,6 +322,21 @@ namespace OC
              */
             OCStackResult provisionDirectPairing(const OicSecPconf_t *pconf,
                     ResultCallBack resultCallback);
+
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+            /**
+             * API to provision cert.
+             *
+             * @param type type of cred.
+             * @param credId id of cert.
+             * @param resultCallback Callback will be called when provisioning request
+             *                           receives a response from resource server.
+             * @return  ::OC_STACK_OK in case of success and other value otherwise.
+             */
+            OCStackResult provisionTrustCertChain(OicSecCredType_t type, uint16_t credId,
+                    ResultCallBack resultCallback);
+
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
             /**
              * This method is used to get linked devices' IDs.
@@ -330,13 +376,14 @@ namespace OC
              */
             bool getOwnedStatus();
 
-        private:
+
             /**
              * Common callback wrapper, which will be called from OC-APIs.
              */
             static void callbackWrapper(void* ctx, int nOfRes,
                     OCProvisionResult_t *arr, bool hasError);
 
+        private:
             void validateSecureResource();
     };
 

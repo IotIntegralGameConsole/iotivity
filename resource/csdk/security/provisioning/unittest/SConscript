@@ -30,6 +30,14 @@ target_os = sptest_env.get('TARGET_OS')
 ######################################################################
 # Build flags
 ######################################################################
+with_upstream_libcoap = sptest_env.get('WITH_UPSTREAM_LIBCOAP')
+if with_upstream_libcoap == '1':
+	# For bring up purposes only, we manually copy the forked version to where the unforked version is downloaded.
+	sptest_env.AppendUnique(CPPPATH = ['#extlibs/libcoap/libcoap/include'])
+else:
+	# For bring up purposes only, the forked version will live here.
+	sptest_env.AppendUnique(CPPPATH = ['../../../connectivity/lib/libcoap-4.1.1/include'])
+
 sptest_env.PrependUnique(CPPPATH = [
 		'../include',
 		'../../include',
@@ -47,8 +55,8 @@ sptest_env.PrependUnique(CPPPATH = [
 		'../../../../../extlibs/cjson',
 		'../../../../../extlibs/base64',
 		'../../../connectivity/inc',
+		'../../../connectivity/inc/pkix',
 		'../../../connectivity/common/inc',
-		'../../../connectivity/lib/libcoap-4.1.1',
 		'../../../connectivity/api',
 		'../../../../../extlibs/tinydtls'
 		])
@@ -56,48 +64,55 @@ sptest_env.AppendUnique(LIBPATH = [sptest_env.get('BUILD_DIR')])
 sptest_env.PrependUnique(LIBS = [   'ocpmapi',
                                     'oc',
                                     'ocsrm',
-                                    'octbstack',
                                     'oc_logger',
                                     'connectivity_abstraction',
-                                    'coap',
-                                    'gtest',
-                                    'gtest_main'])
+                                    'coap'])
 
 if sptest_env.get('SECURED') == '1':
+    sptest_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509','mbedcrypto'])
     sptest_env.AppendUnique(LIBS = ['tinydtls'])
-
-if sptest_env.get('DTLS_WITH_X509') == '1':
-	sptest_env.AppendUnique(LIBS = ['CKManager'])
-	sptest_env.AppendUnique(LIBS = ['asn1'])
 
 if not sptest_env.get('RELEASE'):
 	sptest_env.AppendUnique(CPPDEFINES = ['TB_LOG'])
 
-if target_os not in ['msys_nt', 'windows']:
-	sptest_env.AppendUnique(CXXFLAGS = ['-std=c++0x', '-Wall', '-pthread'])
-	sptest_env.AppendUnique(LIBS = ['dl', 'pthread'])
+if sptest_env.get('MULTIPLE_OWNER') == '1':
+	sptest_env.AppendUnique(CPPDEFINES=['_ENABLE_MULTIPLE_OWNER_'])
+
+if target_os in ['msys_nt', 'windows']:
+    sptest_env.AppendUnique(LINKFLAGS = ['/subsystem:CONSOLE'])
+    sptest_env.AppendUnique(LIBS = ['ws2_32',
+                                    'advapi32',
+                                    'bcrypt',
+                                    'octbstack_static',
+                                    'iphlpapi'])
+else:
+	sptest_env.AppendUnique(LIBS = ['octbstack'])
 
 ######################################################################
 # Source files and Targets
 ######################################################################
-unittest = sptest_env.Program('unittest', ['pmutilitytest.cpp',
-                                           'secureresourceprovider.cpp',
-                                           'provisioningdatabasemanager.cpp',
-                                           'ocprovisioningmanager.cpp', 'otmunittest.cpp', 
-                                           'credentialgeneratortest.cpp' ])
+unittest_src = ['pmutilitytest.cpp',
+                'secureresourceprovider.cpp',
+                'provisioningdatabasemanager.cpp',
+                'ocprovisioningmanager.cpp',
+                'credentialgeneratortest.cpp',
+                ]
 
-sample_server1 = sptest_env.Program('sample_server1', ['sampleserver1.cpp'])
-sample_server2 = sptest_env.Program('sample_server2', ['sampleserver2.cpp'])
+if target_os not in ['windows']:
+    unittest_src += [ 'otmunittest.cpp' ]
 
-provisioning_unittest_src_dir = src_dir + '/resource/csdk/security/provisioning/unittest/'
-provisioning_unittest_build_dir = sptest_env.get('BUILD_DIR') +'/resource/csdk/security/provisioning/unittest/'
+unittest = sptest_env.Program('unittest', unittest_src)
 
-Alias("test", [unittest, sample_server1, sample_server2])
+if target_os not in ['windows']:
+    sample_server1 = sptest_env.Program('sample_server1', ['sampleserver1.cpp'])
+    sample_server2 = sptest_env.Program('sample_server2', ['sampleserver2.cpp'])
+    Alias("test", [sample_server1, sample_server2])
 
+Alias("test", [unittest])
 
 sptest_env.AppendTarget('test')
 if sptest_env.get('TEST') == '1':
-	if target_os in ['linux']:
+	if target_os in ['linux', 'windows']:
 		out_dir = sptest_env.get('BUILD_DIR')
 		result_dir = os.path.join(sptest_env.get('BUILD_DIR'), 'test_out') + os.sep
 		if not os.path.isdir(result_dir):

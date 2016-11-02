@@ -20,16 +20,23 @@
 
 // OCClient.cpp : Defines the entry point for the console application.
 //
+#include "iotivity_config.h"
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+#include <Windows.h>
+#endif
 #include <string>
 #include <map>
 #include <cstdlib>
-#include <pthread.h>
 #include <mutex>
 #include <condition_variable>
 #include "OCPlatform.h"
 #include "OCApi.h"
-
-#define maxSequenceNumber 0xFFFFFF
 
 using namespace OC;
 
@@ -39,6 +46,7 @@ typedef std::map<OCResourceIdentifier, std::shared_ptr<OCResource>> DiscoveredRe
 DiscoveredResourceMap discoveredResources;
 std::shared_ptr<OCResource> curResource;
 static ObserveType OBSERVE_TYPE_TO_USE = ObserveType::Observe;
+static OCConnectivityType TRANSPORT_TYPE_TO_USE = OCConnectivityType::CT_ADAPTER_IP;
 std::mutex curResourceLock;
 
 class Light
@@ -67,7 +75,7 @@ void onObserve(const HeaderOptions /*headerOptions*/, const OCRepresentation& re
 {
     try
     {
-        if(eCode == OC_STACK_OK && sequenceNumber != maxSequenceNumber + 1)
+        if(eCode == OC_STACK_OK && sequenceNumber <= MAX_SEQUENCE_NUMBER)
         {
             if(sequenceNumber == OC_OBSERVE_REGISTER)
             {
@@ -99,7 +107,9 @@ void onObserve(const HeaderOptions /*headerOptions*/, const OCRepresentation& re
         {
             if(eCode == OC_STACK_OK)
             {
-                std::cout << "Observe registration failed or de-registration action failed/succeeded" << std::endl;
+                std::cout << "No observe option header is returned in the response." << std::endl;
+                std::cout << "For a registration request, it means the registration failed"
+                        << std::endl;
             }
             else
             {
@@ -328,12 +338,65 @@ void getLightRepresentation(std::shared_ptr<OCResource> resource)
     }
 }
 
+void receivedPlatformInfo(const OCRepresentation& rep)
+{
+    std::cout << "\nPlatform Information received ---->\n";
+    std::string value;
+    std::string values[] =
+    {
+        "pi",   "Platform ID                    ",
+        "mnmn", "Manufacturer name              ",
+        "mnml", "Manufacturer url               ",
+        "mnmo", "Manufacturer Model No          ",
+        "mndt", "Manufactured Date              ",
+        "mnpv", "Manufacturer Platform Version  ",
+        "mnos", "Manufacturer OS version        ",
+        "mnhw", "Manufacturer hardware version  ",
+        "mnfv", "Manufacturer firmware version  ",
+        "mnsl", "Manufacturer support url       ",
+        "st",   "Manufacturer system time       "
+    };
+
+    for (unsigned int i = 0; i < sizeof(values) / sizeof(values[0]) ; i += 2)
+    {
+        if(rep.getValue(values[i], value))
+        {
+            std::cout << values[i + 1] << " : "<< value << std::endl;
+        }
+    }
+}
+
+void receivedDeviceInfo(const OCRepresentation& rep)
+{
+    std::cout << "\nDevice Information received ---->\n";
+    std::string value;
+    std::string values[] =
+    { 
+        "di",  "Device ID        ",
+        "n",   "Device name      ",
+        "lcv", "Spec version url ",
+        "dmv", "Data Model Model ", 
+    };
+
+    for (unsigned int i = 0; i < sizeof(values) / sizeof(values[0]); i += 2)
+    {
+        if (rep.getValue(values[i], value))
+        {
+            std::cout << values[i + 1] << " : " << value << std::endl;
+        }
+    }
+}
+
 // Callback to found resources
 void foundResource(std::shared_ptr<OCResource> resource)
 {
     std::cout << "In foundResource\n";
     std::string resourceURI;
     std::string hostAddress;
+
+    std::string platformDiscoveryURI = "/oic/p";
+    std::string deviceDiscoveryURI   = "/oic/d";
+
     try
     {
         {
@@ -368,6 +431,36 @@ void foundResource(std::shared_ptr<OCResource> resource)
             hostAddress = resource->host();
             std::cout << "\tHost address of the resource: " << hostAddress << std::endl;
 
+            OCStackResult ret;
+
+            std::cout << "Querying for platform information... " << std::endl;
+
+            ret = OCPlatform::getPlatformInfo("", platformDiscoveryURI, CT_ADAPTER_IP,
+                    &receivedPlatformInfo);
+
+            if (ret == OC_STACK_OK)
+            {
+                std::cout << "Get platform information is done." << std::endl;
+            }
+            else
+            {
+                std::cout << "Get platform information failed." << std::endl;
+            }
+
+            std::cout << "Querying for device information... " << std::endl;
+
+            ret = OCPlatform::getDeviceInfo(resource->host(), deviceDiscoveryURI,
+                        resource->connectivityType(), &receivedDeviceInfo);
+
+            if (ret == OC_STACK_OK)
+            {
+                std::cout << "Getting device information is done." << std::endl;
+            }
+            else
+            {
+                std::cout << "Getting device information failed." << std::endl;
+            }
+
             // Get the resource types
             std::cout << "\tList of resource types: " << std::endl;
             for(auto &resourceTypes : resource->getResourceTypes())
@@ -384,9 +477,15 @@ void foundResource(std::shared_ptr<OCResource> resource)
 
             if(resourceURI == "/a/light")
             {
-                curResource = resource;
-                // Call a local function which will internally invoke get API on the resource pointer
-                getLightRepresentation(resource);
+                if (resource->connectivityType() & TRANSPORT_TYPE_TO_USE)
+                {
+                    curResource = resource;
+                    // Get the resource host address
+                    std::cout << "\tAddress of selected resource: " << resource->host() << std::endl;
+
+                    // Call a local function which will internally invoke get API on the resource pointer
+                    getLightRepresentation(resource);
+                }
             }
         }
         else
@@ -406,9 +505,11 @@ void printUsage()
 {
     std::cout << std::endl;
     std::cout << "---------------------------------------------------------------------\n";
-    std::cout << "Usage : simpleclient <ObserveType>" << std::endl;
+    std::cout << "Usage : simpleclient <ObserveType> <TransportType>" << std::endl;
     std::cout << "   ObserveType : 1 - Observe" << std::endl;
     std::cout << "   ObserveType : 2 - ObserveAll" << std::endl;
+    std::cout << "   TransportType : 1 - IP" << std::endl;
+    std::cout << "   TransportType : 2 - TCP" << std::endl;
     std::cout << "---------------------------------------------------------------------\n\n";
 }
 
@@ -431,6 +532,25 @@ void checkObserverValue(int value)
     }
 }
 
+void checkTransportValue(int value)
+{
+    if (1 == value)
+    {
+        TRANSPORT_TYPE_TO_USE = OCConnectivityType::CT_ADAPTER_IP;
+        std::cout << "<===Setting TransportType to IP===>\n\n";
+    }
+    else if (2 == value)
+    {
+        TRANSPORT_TYPE_TO_USE = OCConnectivityType::CT_ADAPTER_TCP;
+        std::cout << "<===Setting TransportType to TCP===>\n\n";
+    }
+    else
+    {
+        std::cout << "<===Invalid TransportType selected."
+                  <<" Setting TransportType to IP===>\n\n";
+    }
+}
+
 static FILE* client_open(const char* /*path*/, const char *mode)
 {
     return fopen(SVR_DB_FILE_NAME, mode);
@@ -450,6 +570,11 @@ int main(int argc, char* argv[]) {
         else if (argc == 2)
         {
             checkObserverValue(std::stoi(argv[1]));
+        }
+        else if (argc == 3)
+        {
+            checkObserverValue(std::stoi(argv[1]));
+            checkTransportValue(std::stoi(argv[2]));
         }
         else
         {

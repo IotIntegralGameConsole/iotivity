@@ -22,24 +22,25 @@
 package org.iotivity.cloud.ciserver.resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.iotivity.cloud.base.Resource;
-import org.iotivity.cloud.base.SessionManager;
-import org.iotivity.cloud.base.protocols.coap.CoapRequest;
-import org.iotivity.cloud.base.protocols.coap.CoapResponse;
-import org.iotivity.cloud.base.protocols.coap.enums.CoapStatus;
+import org.iotivity.cloud.base.device.Device;
+import org.iotivity.cloud.base.exception.ServerException;
+import org.iotivity.cloud.base.exception.ServerException.BadRequestException;
+import org.iotivity.cloud.base.protocols.IRequest;
+import org.iotivity.cloud.base.protocols.IResponse;
+import org.iotivity.cloud.base.protocols.MessageBuilder;
+import org.iotivity.cloud.base.protocols.enums.ContentFormat;
+import org.iotivity.cloud.base.protocols.enums.ResponseStatus;
+import org.iotivity.cloud.base.resource.Resource;
 import org.iotivity.cloud.ciserver.Constants;
 import org.iotivity.cloud.util.Cbor;
-import org.iotivity.cloud.util.Logger;
-
-import io.netty.channel.ChannelHandlerContext;
 
 /**
  *
@@ -48,166 +49,104 @@ import io.netty.channel.ChannelHandlerContext;
  *
  */
 public class KeepAliveResource extends Resource {
+    private int[]                         mIntervals      = null;
+    private Timer                         mTimer          = new Timer();
+    private Cbor<HashMap<String, Object>> mCbor           = new Cbor<>();
+    private HashMap<Device, Long>         mConnectionPool = new HashMap<>();
 
-    private int[]                                intervals;
-    private HashMap<ChannelHandlerContext, Long> connectPool;
-    private Timer                                timer;
-    private Cbor<HashMap<String, Integer>>       cbor;
-    private SessionManager                       sessionManager = null;
-
-    public void setIntervals(int[] intervals) {
-        this.intervals = intervals;
+    public KeepAliveResource(int[] intervals) {
+        super(Arrays.asList(Constants.PREFIX_OIC, Constants.KEEP_ALIVE_URI));
+        mIntervals = intervals;
     }
 
-    public int[] getIntervals() {
-        return this.intervals;
+    @Override
+    public void onDefaultRequestReceived(Device srcDevice, IRequest request)
+            throws ServerException {
+
+        IResponse response = null;
+
+        switch (request.getMethod()) {
+            case GET:
+                response = handleGetPingConfig(request);
+                break;
+
+            case PUT:
+                response = handlePutPingConfig(srcDevice, request);
+                break;
+
+            default:
+                throw new BadRequestException(
+                        request.getMethod() + " request type is not support");
+        }
+
+        srcDevice.sendResponse(response);
     }
 
-    public KeepAliveResource(SessionManager sessionManager, int[] intervals) {
-        setUri(Constants.KEEP_ALIVE_URI);
-        setIntervals(intervals);
-        this.sessionManager = sessionManager;
-        connectPool = new HashMap<ChannelHandlerContext, Long>();
-        timer = new Timer();
-        cbor = new Cbor<HashMap<String, Integer>>();
-    }
-
-    public void startSessionChecker() {
-        timer.schedule(new KeepAliveTask(), 30000, 60000);
+    public void startSessionChecker(int startTime, int intervalTime) {
+        mTimer.schedule(new KeepAliveTask(), startTime, intervalTime);
     }
 
     public void stopSessionChecker() {
-        timer.cancel();
-    }
-
-    /**
-     * API for receiving message(message to keepalive resource)
-     *
-     * @param ctx
-     *            ChannelHandlerContext of request message
-     * @param request
-     *            CoAP request message
-     */
-    @Override
-    public void onRequestReceived(ChannelHandlerContext ctx,
-            CoapRequest request) {
-
-        CoapResponse response = null;
-
-        switch (request.getRequestMethod()) {
-            // First message to KeepAlive from resource
-            case GET:
-                if (intervals != null) {
-                    response = makePingConfigMessage(request);
-                    connectPool.put(ctx, System.currentTimeMillis()
-                            + (intervals[0] * (long) 60000));
-                }
-                break;
-            // interval Message to KeepAlive After receiving GET Message
-            case PUT:
-                HashMap<String, Integer> payloadData = null;
-                payloadData = cbor.parsePayloadFromCbor(request.getPayload(),
-                        HashMap.class);
-
-                Logger.d("Receive payloadData : " + payloadData);
-                if (payloadData != null) {
-                    if (payloadData.containsKey("in")) {
-                        Logger.d("interval : " + payloadData.get("in"));
-
-                        connectPool.put(ctx, System.currentTimeMillis()
-                                + (payloadData.get("in") * (long) 60000));
-                    }
-                }
-                response = makeResponse(request);
-                break;
-
-            case POST:
-                break;
-
-            case DELETE:
-                break;
-        }
-
-        ctx.writeAndFlush(response);
-    }
-
-    /**
-     * API for making response to Resource
-     *
-     * @param request
-     *            ChannelHandlerContext of request message
-     */
-    private CoapResponse makeResponse(CoapRequest request) {
-        CoapResponse response = new CoapResponse(CoapStatus.VALID);
-        response.setToken(request.getToken());
-
-        return response;
+        mTimer.cancel();
     }
 
     /**
      * API for making interval and first response to Resource
-     *
+     * 
      * @param request
      *            ChannelHandlerContext of request message
      */
-    private CoapResponse makePingConfigMessage(CoapRequest request) {
-        CoapResponse response = new CoapResponse(CoapStatus.CONTENT);
-        response.setToken(request.getToken());
+    private IResponse handleGetPingConfig(IRequest request) {
 
-        HashMap<String, int[]> payloadData = new HashMap<String, int[]>();
-        payloadData.put("inarray", intervals);
+        HashMap<String, int[]> payloadData = new HashMap<>();
+        payloadData.put(Constants.REQ_PING_ARRAY, mIntervals);
 
-        byte[] cborData = cbor.encodingPayloadToCbor(payloadData);
+        return MessageBuilder.createResponse(request, ResponseStatus.CONTENT,
+                ContentFormat.APPLICATION_CBOR,
+                mCbor.encodingPayloadToCbor(payloadData));
+    }
 
-        response.setPayload(cborData);
+    private IResponse handlePutPingConfig(Device srcDevice, IRequest request) {
 
-        Logger.d("Send payloadData : " + payloadData);
+        HashMap<String, Object> payloadData = mCbor
+                .parsePayloadFromCbor(request.getPayload(), HashMap.class);
 
-        return response;
+        checkPayloadException(Constants.REQ_PING, payloadData);
+
+        Long pingTime = Integer.valueOf(
+                payloadData.get(Constants.REQ_PING).toString()) * (long) 60000;
+        Long connectionTime = System.currentTimeMillis() + pingTime;
+        mConnectionPool.put(srcDevice, connectionTime);
+
+        return MessageBuilder.createResponse(request, ResponseStatus.VALID);
     }
 
     /**
      * API for managing session
      */
-    public class KeepAliveTask extends TimerTask {
+    private class KeepAliveTask extends TimerTask {
 
         @Override
         public void run() {
-            Map<ChannelHandlerContext, Long> map = Collections
-                    .synchronizedMap(connectPool);
-            Set<ChannelHandlerContext> keySet = map.keySet();
-            ArrayList<ChannelHandlerContext> deleteList = new ArrayList<ChannelHandlerContext>();
-            Iterator<ChannelHandlerContext> iterator = null;
+            Map<Device, Long> map = Collections
+                    .synchronizedMap(mConnectionPool);
+
+            List<Device> deleteList = new ArrayList<>();
+
             synchronized (map) {
-                iterator = keySet.iterator();
                 Long currentTime = System.currentTimeMillis();
-                // check interval
-                while (iterator.hasNext()) {
-                    ChannelHandlerContext key = iterator.next();
-                    if (map.containsKey(key)) {
-                        if (map.get(key) != null) {
-                            Long lifeTime = (Long) map.get(key);
-                            if (lifeTime != null) {
-                                Logger.d("KeepAliveTask Operating : "
-                                        + key.channel().toString() + ", Time : "
-                                        + (lifeTime - currentTime));
-                                if (lifeTime < currentTime) {
-                                    deleteList.add(key);
-                                }
-                            }
-                        }
+                for (Device device : map.keySet()) {
+                    Long lifeTime = (Long) map.get(device);
+                    if (lifeTime != null && lifeTime < currentTime) {
+                        deleteList.add(device);
                     }
                 }
-
             }
-            iterator = deleteList.iterator();
-            // remove session
-            while (iterator.hasNext()) {
-                ChannelHandlerContext key = iterator.next();
-                Logger.d("KeepAliveTask Remove");
-                connectPool.remove(key);
-                sessionManager.removeSessionByChannel(key);
-                key.close();
+
+            for (Device device : deleteList) {
+                mConnectionPool.remove(device);
+                device.getCtx().fireChannelInactive();
+                device.getCtx().close();
             }
         }
     }

@@ -26,9 +26,9 @@ TINYCBOR_SOURCES = \
 	src/cborencoder.c \
 	src/cborencoder_close_container_checked.c \
 	src/cborparser.c \
+	src/cborparser_dup_string.c \
 	src/cborpretty.c \
 	src/cbortojson.c \
-	$(if $(open_memstream-pass),,src/open_memstream.c) \
 #
 CBORDUMP_SOURCES = tools/cbordump/cbordump.c
 
@@ -71,6 +71,17 @@ endif
 
 -include .config
 
+# if open_memstream is unavailable on the system, try to implement our own
+# version using funopen or fopencookie
+ifeq ($(open_memstream-pass),)
+  ifeq ($(funopen-pass)$(fopencookie-pass),)
+    CFLAGS += -DWITHOUT_OPEN_MEMSTREAM
+    $(warning warning: funopen and fopencookie unavailable, open_memstream can not be implemented and conversion to JSON will not work properly!)
+  else
+    TINYCBOR_SOURCES += src/open_memstream.c
+  endif
+endif
+
 # json2cbor depends on an external library (cJSON)
 ifneq ($(cjson-pass)$(system-cjson-pass),)
   JSON2CBOR_SOURCES = tools/json2cbor/json2cbor.c
@@ -92,7 +103,7 @@ silentcheck: | lib/libtinycbor.a
 	TESTARGS=-silent $(MAKE) -f $(MAKEFILE) -s check
 configure: .config
 .config: Makefile.configure
-	$(MAKE) -f $(SRCDIR)Makefile.configure OUT='>&10' configure 10> $@
+	$(MAKE) -f $(SRCDIR)Makefile.configure OUT='>&9' configure 9> $@
 
 lib bin:
 	$(MKDIR) $@
@@ -122,15 +133,17 @@ $(PACKAGE).tar.gz: | .git
 $(PACKAGE).zip: | .git
 	GIT_DIR=$(SRCDIR).git $(GIT_ARCHIVE) --format=zip -o "$(PACKAGE).zip" HEAD
 
-$(DESTDIR)%/:
-	$(INSTALL) -d $@
-$(DESTDIR)$(libdir)/%: lib/% | $(DESTDIR)$(libdir)/
+$(DESTDIR)$(libdir)/%: lib/%
+	$(INSTALL) -d $(@D)
 	$(INSTALL_DATA) $< $@
-$(DESTDIR)$(bindir)/%: bin/% | $(DESTDIR)$(bindir)/
+$(DESTDIR)$(bindir)/%: bin/%
+	$(INSTALL) -d $(@D)
 	$(INSTALL_PROGRAM) $< $@
-$(DESTDIR)$(pkgconfigdir)/%: % | $(DESTDIR)$(pkgconfigdir)/
+$(DESTDIR)$(pkgconfigdir)/%: %
+	$(INSTALL) -d $(@D)
 	$(INSTALL_DATA) $< $@
-$(DESTDIR)$(includedir)/tinycbor/%: src/% | $(DESTDIR)$(includedir)/tinycbor/
+$(DESTDIR)$(includedir)/tinycbor/%: src/%
+	$(INSTALL) -d $(@D)
 	$(INSTALL_DATA) $< $@
 
 install-strip:
@@ -154,12 +167,15 @@ clean: mostlyclean
 distclean: clean
 	test -e tests/Makefile && $(MAKE) -C tests distclean || :
 
+docs:
+	cd $(SRCDIR)src && VERSION=$(VERSION) doxygen $(SRCDIR)/../Doxyfile
+
 dist: $(PACKAGE).tar.gz $(PACKAGE).zip
 distcheck: .git
-	-$(RM) -r $$TMPDIR/tinycbor-distcheck
-	GIT_DIR=$(SRCDIR).git git archive --prefix=tinycbor-distcheck/ --format=tar HEAD | tar -xf - -C $$TMPDIR
-	cd $$TMPDIR/tinycbor-distcheck && $(MAKE) silentcheck
-	$(RM) -r $$TMPDIR/tinycbor-distcheck
+	-$(RM) -r $${TMPDIR-/tmp}/tinycbor-distcheck
+	GIT_DIR=$(SRCDIR).git git archive --prefix=tinycbor-distcheck/ --format=tar HEAD | tar -xf - -C $${TMPDIR-/tmp}
+	cd $${TMPDIR-/tmp}/tinycbor-distcheck && $(MAKE) silentcheck
+	$(RM) -r $${TMPDIR-/tmp}/tinycbor-distcheck
 
 release: .git
 	$(MAKE) -f $(MAKEFILE) distcheck
@@ -182,7 +198,7 @@ release: .git
 
 .PHONY: all check silentcheck configure install uninstall
 .PHONY: mostlyclean clean distclean
-.PHONY: dist distcheck release
+.PHONY: docs dist distcheck release
 .SECONDARY:
 
 cflags := $(CPPFLAGS) -I$(SRCDIR)src

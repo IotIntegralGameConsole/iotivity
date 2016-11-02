@@ -70,7 +70,7 @@ static ca_mutex g_bleConnectionStateChangedCbMutex = NULL;
 *
 * @param result         [IN] Result of the query done to the platform.
 * @param adapter_state  [IN] State of the LE adapter.
-* @param user_data      [IN] Any user_data passed by the caller when querying for the state changed cb.
+* @param user_data      [IN] User data passed by the caller when querying for the state changed cb.
 *
 * @return  None.
 */
@@ -83,7 +83,7 @@ void CALEAdapterStateChangedCb(int result, bt_adapter_state_e adapter_state,
 * @param result         [IN] Result of the query done to the platform.
 * @param connected      [IN] State of connection.
 * @param remoteAddress  [IN] LE address of the device to be notified.
-* @param user_data      [IN] Any user_data passed by the caller when querying for the state changed cb.
+* @param user_data      [IN] User data passed by the caller when querying for the state changed cb.
 *
 * @return  None.
 */
@@ -114,6 +114,7 @@ CAResult_t CAInitializeLENetworkMonitor()
             return CA_STATUS_FAILED;
         }
     }
+
     OIC_LOG(DEBUG, TAG, "OUT");
 
     return CA_STATUS_OK;
@@ -128,6 +129,7 @@ void CATerminateLENetworkMonitor()
 
     ca_mutex_free(g_bleConnectionStateChangedCbMutex);
     g_bleConnectionStateChangedCbMutex = NULL;
+
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
@@ -147,19 +149,6 @@ CAResult_t CAStartLEAdapter()
     {
         OIC_LOG(ERROR, TAG, "bt_initialize failed");
         return CA_STATUS_FAILED;
-    }
-    bt_adapter_state_e adapterState = BT_ADAPTER_DISABLED;
-    //Get Bluetooth adapter state
-    ret = bt_adapter_get_state(&adapterState);
-
-    if (BT_ERROR_NONE != ret && BT_ADAPTER_ENABLED == adapterState)
-    {
-        ret = bt_adapter_set_visibility(BT_ADAPTER_VISIBILITY_MODE_GENERAL_DISCOVERABLE, 0);
-        if (BT_ERROR_NONE != ret)
-        {
-            OIC_LOG(ERROR, TAG, "bt_adapter_set_visibility failed");
-            return CA_STATUS_FAILED;
-        }
     }
 
     ret = bt_adapter_set_state_changed_cb(CALEAdapterStateChangedCb, NULL);

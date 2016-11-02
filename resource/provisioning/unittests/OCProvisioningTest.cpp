@@ -24,6 +24,7 @@
 #include <OCPlatform_impl.h>
 #include <oxmjustworks.h>
 #include <oxmrandompin.h>
+#include <srmutility.h>
 #include <OCProvisioningManager.h>
 #include <gtest/gtest.h>
 
@@ -49,6 +50,24 @@ namespace OCProvisioningTest
     {
         std::string dbPath("./dbPath");
         EXPECT_EQ(OC_STACK_OK, OCSecure::provisionInit(dbPath));
+    }
+
+    TEST(DiscoveryTest, SecureResource)
+    {
+        std::shared_ptr< OC::OCSecureResource > secureResource;
+        OicUuid_t uuid;
+        ConvertStrToUuid("11111111-1111-1111-1111-111111111111", &uuid);
+
+        EXPECT_EQ(OC_STACK_OK, OCSecure::discoverSingleDevice(TIMEOUT, &uuid, secureResource));
+    }
+
+    TEST(DiscoveryTest, SecureResourceZeroTimeout)
+    {
+        std::shared_ptr< OC::OCSecureResource > secureResource;
+        OicUuid_t uuid;
+        ConvertStrToUuid("11111111-1111-1111-1111-111111111111", &uuid);
+
+        EXPECT_EQ(OC_STACK_INVALID_PARAM, OCSecure::discoverSingleDevice(0, &uuid, secureResource));
     }
 
     TEST(DiscoveryTest, UnownedDevices)

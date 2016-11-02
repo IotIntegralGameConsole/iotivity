@@ -120,14 +120,22 @@ CAResult_t CAManagerStartAutoConnection(JNIEnv *env, jstring remote_le_address)
     VERIFY_NON_NULL(remote_le_address, TAG, "remote_le_address is null");
 
     OIC_LOG(DEBUG, TAG, "IN - CAManagerStartAutoConnection");
+    ca_mutex_lock(g_connectRetryMutex);
 
-    if (true == CAManagerGetAutoConnectionFlag(env, remote_le_address))
+    bool isAutoConnecting = false;
+    if (CA_STATUS_OK != CAManagerGetAutoConnectingFlag(env, remote_le_address, &isAutoConnecting))
     {
-        OIC_LOG(INFO, TAG, "auto connecting.");
+        OIC_LOG(DEBUG, TAG, "CAManagerIsAutoConnecting has failed");
+        ca_mutex_unlock(g_connectRetryMutex);
         return CA_STATUS_FAILED;
     }
 
-    ca_mutex_lock(g_connectRetryMutex);
+    if (isAutoConnecting)
+    {
+        OIC_LOG(INFO, TAG, "connection has been already in progress or completed");
+        ca_mutex_unlock(g_connectRetryMutex);
+        return CA_STATUS_FAILED;
+    }
 
     CAResult_t res = CA_STATUS_OK;
     for (size_t retry_cnt = 0 ; retry_cnt < MAX_RETRY_COUNT ; retry_cnt++)
@@ -141,8 +149,8 @@ CAResult_t CAManagerStartAutoConnection(JNIEnv *env, jstring remote_le_address)
                       MAX_RETRY_COUNT - retry_cnt - 1);
             if (ca_cond_wait_for(g_connectRetryCond, g_connectRetryMutex, TIMEOUT) == 0)
             {
-                OIC_LOG(INFO, TAG, "request to connect gatt was canceled");
                 ca_mutex_unlock(g_connectRetryMutex);
+                OIC_LOG(INFO, TAG, "request to connect gatt was canceled");
                 return CA_STATUS_OK;
             }
             // time out. retry connection
@@ -187,7 +195,7 @@ CAResult_t CAManagerConnectGatt(JNIEnv *env, jstring remote_le_address)
     }
 
     // set flag auto connection is requested.
-    CAManagerSetAutoConnectionFlag(env, remote_le_address, true);
+    CAManagerSetAutoConnectingFlag(env, remote_le_address, true);
 
     OIC_LOG(DEBUG, TAG, "OUT - CAManagerConnectGatt");
     return CA_STATUS_OK;

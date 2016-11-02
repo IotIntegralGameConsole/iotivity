@@ -59,7 +59,6 @@ void CAEDRTerminateNetworkMonitor()
 
     g_edrNetworkChangeCallback = NULL;
 
-
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "OUT");
 }
 
@@ -73,14 +72,14 @@ CAResult_t CAEDRStartNetworkMonitor()
     {
         OIC_LOG_V(ERROR, EDR_ADAPTER_TAG, "Bluetooth initialization failed!, error num [%x]",
                   ret);
-        return;
+        return CA_STATUS_FAILED;
     }
 
     ret = bt_adapter_set_state_changed_cb(CAEDRAdapterStateChangeCallback, NULL);
     if(BT_ERROR_NONE != ret)
     {
        OIC_LOG(ERROR, EDR_ADAPTER_TAG, "bt_adapter_set_state_changed_cb failed");
-       return;
+       return CA_STATUS_FAILED;
     }
 
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "OUT");
@@ -152,8 +151,6 @@ CAResult_t CAEDRGetInterfaceInformation(CAEndpoint_t **info)
 CAResult_t CAEDRGetAdapterEnableState(bool *state)
 {
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "IN");
-
-    // Input validation
     VERIFY_NON_NULL(state, EDR_ADAPTER_TAG, "state holder is NULL!");
 
     bt_adapter_state_e adapterState;

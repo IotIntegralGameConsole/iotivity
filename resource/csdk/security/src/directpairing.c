@@ -20,12 +20,19 @@
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200112L
 #endif
-#ifndef WITH_ARDUINO
+#include "iotivity_config.h"
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#ifdef HAVE_TIME_H
 #include <time.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
 
 #include "ocstack.h"
 #include "oic_malloc.h"
@@ -239,12 +246,22 @@ bool DPGenerateQuery(bool isSecure,
 
     static char QPREFIX_COAP[] =  "coap://";
     static char QPREFIX_COAPS[] = "coaps://";
+    static char QPREFIX_COAP_TCP[] =  "coap+tcp://";
+    static char QPREFIX_COAPS_TCP[] = "coaps+tcp://";
 
     int snRet = 0;
     char* prefix = (isSecure == true) ? QPREFIX_COAPS : QPREFIX_COAP;
 
     switch(connType & CT_MASK_ADAPTER)
     {
+// @todo: Remove this ifdef. On Arduino, CT_ADAPTER_TCP resolves to the same value
+// as CT_ADAPTER_IP, resulting in a compiler error.
+#ifdef WITH_TCP
+#ifndef WITH_ARDUINO
+        case CT_ADAPTER_TCP:
+            prefix = (isSecure == true) ? QPREFIX_COAPS_TCP : QPREFIX_COAP_TCP;
+#endif
+#endif
         case CT_ADAPTER_IP:
             switch(connType & CT_MASK_FLAGS & ~CT_FLAG_SECURE)
             {
@@ -352,7 +369,7 @@ static OCStackApplicationResult DirectPairingFinalizeHandler(void *ctx, OCDoHand
                 return OC_STACK_DELETE_TRANSACTION;
             }
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
             res = SavePairingPSK((OCDevAddr*)&endpoint, &peer->deviceID, &ptDeviceID, false);
             if(OC_STACK_OK != res)
             {
@@ -362,18 +379,18 @@ static OCStackApplicationResult DirectPairingFinalizeHandler(void *ctx, OCDoHand
             }
 
             //  close temporary sesion
-            CAResult_t caResult = CACloseDtlsSession((const CAEndpoint_t*)&endpoint);
+            CAResult_t caResult = CAcloseSslSession((const CAEndpoint_t*)&endpoint);
             if(CA_STATUS_OK != caResult)
             {
                 OIC_LOG(INFO, TAG, "Fail to close temporary dtls session");
             }
 
-            caResult = CASelectCipherSuite(TLS_NULL_WITH_NULL_NULL);
+            caResult = CASelectCipherSuite(TLS_NULL_WITH_NULL_NULL, CA_ADAPTER_IP);
             if(CA_STATUS_OK != caResult)
             {
                 OIC_LOG(ERROR, TAG, "Failed to select TLS_NULL_WITH_NULL_NULL");
             }
-#endif // __WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
             OIC_LOG(INFO, TAG, "Direct-Papring was successfully completed.");
 
@@ -540,9 +557,9 @@ void DirectPairingDTLSHandshakeCB(const CAEndpoint_t *endpoint, const CAErrorInf
                 resultCallback(g_dp_proceed_ctx->userCtx, peer, OC_STACK_AUTHENTICATION_FAILURE);
             }
 
-#ifdef __WITH_DTLS__
-            CARegisterDTLSHandshakeCallback(NULL);
-#endif // __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
+            CAregisterSslHandshakeCallback(NULL);
+#endif // __WITH_DTLS__ or __WITH_TLS__
             res = RemoveCredential(&peer->deviceID);
             if(OC_STACK_RESOURCE_DELETED != res)
             {
@@ -593,7 +610,7 @@ static OCStackApplicationResult DirectPairingHandler(void *ctx, OCDoHandle UNUSE
             // result
             OIC_LOG(INFO, TAG, "DirectPairingHandler : success POST request to /oic/sec/dpairing");
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
             // Add temporary psk
             res = AddTmpPskWithPIN(&dpairData->peer->deviceID,
                            SYMMETRIC_PAIR_WISE_KEY,
@@ -608,12 +625,12 @@ static OCStackApplicationResult DirectPairingHandler(void *ctx, OCDoHandle UNUSE
             caresult = CAEnableAnonECDHCipherSuite(false);
             VERIFY_SUCCESS(TAG, CA_STATUS_OK == caresult, ERROR);
 
-            caresult = CASelectCipherSuite(TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256);
+            caresult = CASelectCipherSuite(TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA_256, CA_ADAPTER_IP);
             VERIFY_SUCCESS(TAG, CA_STATUS_OK == caresult, ERROR);
 
             //Register proceeding peer info. & DTLS event handler to catch the dtls event while handshake
             g_dp_proceed_ctx = dpairData;
-            res = CARegisterDTLSHandshakeCallback(DirectPairingDTLSHandshakeCB);
+            res = CAregisterSslHandshakeCallback(DirectPairingDTLSHandshakeCB);
             VERIFY_SUCCESS(TAG, CA_STATUS_OK == caresult, ERROR);
 
             // initiate dtls
@@ -627,7 +644,7 @@ static OCStackApplicationResult DirectPairingHandler(void *ctx, OCDoHandle UNUSE
             caresult = CAInitiateHandshake(endpoint);
             OICFree(endpoint);
             VERIFY_SUCCESS(TAG, CA_STATUS_OK == caresult, ERROR);
-#endif // __WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
             res = OC_STACK_OK;
         }
@@ -642,9 +659,9 @@ static OCStackApplicationResult DirectPairingHandler(void *ctx, OCDoHandle UNUSE
         OIC_LOG(ERROR, TAG, "DirectPairingHandler received Null clientResponse");
     }
 
-#ifdef __WITH_DTLS__
+#if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
 exit:
-#endif // __WITH_DTLS__
+#endif // __WITH_DTLS__ or __WITH_TLS__
 
     if (OC_STACK_OK != res)
     {
@@ -953,9 +970,6 @@ OCStackResult DPDeviceDiscovery(unsigned short waittime)
     }
 
     OCStackResult ret;
-    struct timespec startTime = {.tv_sec=0, .tv_nsec=0};
-    struct timespec currTime  = {.tv_sec=0, .tv_nsec=0};
-    struct timespec timeout;
 
     const char DP_DISCOVERY_QUERY[] = "/oic/sec/pconf";
 
@@ -976,12 +990,16 @@ OCStackResult DPDeviceDiscovery(unsigned short waittime)
     }
 
     // wait..
-    timeout.tv_sec  = 0;
-    timeout.tv_nsec = 100000000L;
 
     int clock_res = -1;
+#if defined(_MSC_VER)
+    time_t startTime = NULL;
+    clock_res = (time(&startTime) == -1);
+#else
+    struct timespec startTime = {.tv_sec=0, .tv_nsec=0};
 #if defined(__ANDROID__) || _POSIX_TIMERS > 0
     clock_res = clock_gettime(CLOCK_MONOTONIC, &startTime);
+#endif
 #endif
     if (0 != clock_res)
     {
@@ -995,8 +1013,14 @@ OCStackResult DPDeviceDiscovery(unsigned short waittime)
 
     while (1)
     {
+#if defined(_MSC_VER)
+        time_t currTime = NULL;
+        clock_res = (time(&currTime) == -1);
+#else
+        struct timespec currTime  = {.tv_sec=0, .tv_nsec=0};
 #if defined(__ANDROID__) || _POSIX_TIMERS > 0
         clock_res = clock_gettime(CLOCK_MONOTONIC, &currTime);
+#endif
 #endif
         if (0 != clock_res)
         {
@@ -1004,19 +1028,24 @@ OCStackResult DPDeviceDiscovery(unsigned short waittime)
             ret = OC_STACK_ERROR;
             break;
         }
+#if defined(_MSC_VER)
+        long elapsed = currTime - startTime;
+#else
         long elapsed = (currTime.tv_sec - startTime.tv_sec);
+#endif
         if (elapsed > waittime)
         {
             break;
         }
         else
         {
+            struct timespec timeout = {.tv_sec=0, .tv_nsec=100000000L};
             OCProcess();
             nanosleep(&timeout, NULL);
         }
     }
 
-    //Waiting for each response.
+    // Waiting for each response.
     ret = OCCancel(handle, OC_LOW_QOS, NULL, 0);
     if (OC_STACK_OK != ret)
     {
