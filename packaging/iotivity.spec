@@ -31,6 +31,7 @@ Requires(post): /sbin/ldconfig
 %{!?TARGET_TRANSPORT: %define TARGET_TRANSPORT IP}
 %{!?LOGGING: %define LOGGING True}
 %{!?ROUTING: %define ROUTING GW}
+%{!?SECURED: %define SECURED 1}
 %{!?ES_TARGET_ENROLLEE: %define ES_TARGET_ENROLLEE tizen}
 %{!?ES_ROLE: %define ES_ROLE enrollee}
 %{!?ES_SOFTAP_MODE: %define ES_SOFTAP_MODE MEDIATOR_SOFTAP}
@@ -114,7 +115,7 @@ cp %{SOURCE1001} ./%{name}-test.manifest
 scons %{JOB} --prefix=%{_prefix} \
 	VERBOSE=%{VERBOSE} \
 	TARGET_OS=tizen TARGET_ARCH=%{RPM_ARCH} TARGET_TRANSPORT=%{TARGET_TRANSPORT} \
-	RELEASE=%{RELEASE} SECURED=1 LOGGING=%{LOGGING} ROUTING=%{ROUTING} \
+	RELEASE=%{RELEASE} SECURED=%{SECURED} LOGGING=%{LOGGING} ROUTING=%{ROUTING} \
 	ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} ES_ROLE=%{ES_ROLE} ES_SOFTAP_MODE=%{ES_SOFTAP_MODE} \
 	LIB_INSTALL_DIR=%{_libdir} WITH_TCP=true
 
@@ -124,7 +125,7 @@ rm -rf %{buildroot}
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
 scons install --install-sandbox=%{buildroot} --prefix=%{_prefix} \
 	TARGET_OS=tizen TARGET_ARCH=%{RPM_ARCH} TARGET_TRANSPORT=%{TARGET_TRANSPORT} \
-	RELEASE=%{RELEASE} SECURED=1 LOGGING=%{LOGGING} ROUTING=%{ROUTING} \
+	RELEASE=%{RELEASE} SECURED=%{SECURED} LOGGING=%{LOGGING} ROUTING=%{ROUTING} \
 	ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} ES_ROLE=%{ES_ROLE} ES_SOFTAP_MODE=%{ES_SOFTAP_MODE} \
 	LIB_INSTALL_DIR=%{_libdir} WITH_TCP=true
 
@@ -159,6 +160,7 @@ cp out/tizen/*/%{build_mode}/resource/examples/simpleserverHQ %{ex_install_dir}
 cp out/tizen/*/%{build_mode}/resource/examples/threadingsample %{ex_install_dir}
 cp out/tizen/*/%{build_mode}/resource/examples/oic_svr_db_server.dat %{ex_install_dir}
 cp out/tizen/*/%{build_mode}/resource/examples/oic_svr_db_client.dat %{ex_install_dir}
+%if 0%{SECURED} == 1
 mkdir -p %{ex_install_dir}/provisioning
 cp out/tizen/*/%{build_mode}/resource/csdk/security/provisioning/sample/provisioningclient %{ex_install_dir}/provisioning/
 cp out/tizen/*/%{build_mode}/resource/csdk/security/provisioning/sample/oic_svr_db_client.dat %{ex_install_dir}/provisioning/
@@ -166,6 +168,7 @@ cp out/tizen/*/%{build_mode}/resource/csdk/security/provisioning/sample/samplese
 cp out/tizen/*/%{build_mode}/resource/csdk/security/provisioning/sample/oic_svr_db_server_justworks.dat %{ex_install_dir}/provisioning/
 cp out/tizen/*/%{build_mode}/resource/csdk/security/provisioning/sample/sampleserver_randompin %{ex_install_dir}/provisioning/
 cp out/tizen/*/%{build_mode}/resource/csdk/security/provisioning/sample/oic_svr_db_server_randompin.dat %{ex_install_dir}/provisioning/
+%endif
 
 cp ./resource/csdk/security/include/pinoxmcommon.h %{buildroot}%{_includedir}
 cp ./resource/csdk/security/include/securevirtualresourcetypes.h %{buildroot}%{_includedir}
@@ -203,8 +206,10 @@ cp service/easy-setup/enrollee/inc/*.h %{buildroot}%{_includedir}
 %{_libdir}/liboc_logger_core.so
 %{_libdir}/liboctbstack.so
 %{_libdir}/libconnectivity_abstraction.so
+%if 0%{SECURED} == 1
 %{_libdir}/libocpmapi.so
 %{_libdir}/libocprovision.so
+%endif
 %if 0%{?tizen_version_major} < 3
 %{_datadir}/license/%{name}
 %else
