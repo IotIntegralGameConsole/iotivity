@@ -47,4 +47,10 @@ void NSDeleteRemoteServerAddress(char *serverAddress);
 bool NSIsRemoteServerAddress(char *serverAddress);
 #endif
 
+#if (defined WITH_CLOUD && defined RD_CLIENT)
+void NSSetRemoteServerAddress(char *serverAddress);
+void NSDeleteRemoteServerAddress(char *serverAddress);
+bool NSIsRemoteServerAddress(char *serverAddress);
+#endif
+
 #endif /* _NS_PROVIDER_SYSTEM__H_ */
