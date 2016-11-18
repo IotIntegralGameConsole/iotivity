@@ -73,6 +73,7 @@ def build_linux_unsecured(flag, extra_option_str):
     print ("*********** Build for linux ************")
     build_options = {
                         'RELEASE':flag,
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -82,7 +83,6 @@ def build_linux_secured_with_tcp(flag, extra_option_str):
                         'RELEASE':flag,
                         'WITH_TCP': 1,
                         'WITH_CLOUD':1,
-                        'SECURED':1,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -92,6 +92,7 @@ def build_linux_unsecured_with_tcp(flag, extra_option_str):
                         'RELEASE':flag,
                         'WITH_TCP': 1,
                         'TARGET_TRANSPORT': 'IP',
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -100,6 +101,7 @@ def build_linux_unsecured_with_rm(flag, extra_option_str):
     build_options = {
                         'ROUTING':'GW',
                         'RELEASE':flag,
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -107,7 +109,6 @@ def build_linux_secured(flag, extra_option_str):
     print ("*********** Build for linux with Security *************")
     build_options = {
                         'RELEASE':flag,
-                        'SECURED':1,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -117,6 +118,7 @@ def build_linux_unsecured_with_ra(flag, extra_option_str):
                         'RELEASE':flag,
                         'WITH_RA':1,
                         'WITH_RA_IBB':1,
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -126,7 +128,6 @@ def build_linux_secured_with_ra(flag, extra_option_str):
                         'RELEASE':flag,
                         'WITH_RA':1,
                         'WITH_RA_IBB':1,
-                        'SECURED':1,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -135,6 +136,7 @@ def build_linux_unsecured_with_rd(flag, extra_option_str):
     build_options = {
                         'RELEASE':flag,
                         'RD_MODE':'all',
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -143,7 +145,6 @@ def build_linux_secured_with_rd(flag, extra_option_str):
     build_options = {
                         'RELEASE':flag,
                         'RD_MODE':'all',
-                        'SECURED':1,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -152,6 +153,7 @@ def build_linux_unsecured_with_mq(flag, extra_option_str):
     build_options = {
                         'RELEASE':flag,
                         'WITH_MQ':'PUB,SUB,BROKER',
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -160,6 +162,7 @@ def build_linux_unsecured_with_tcp(flag, extra_option_str):
     build_options = {
                         'RELEASE':flag,
                         'WITH_TCP':'1',
+                        'SECURED':0,
                     }
     call_scons(build_options, extra_option_str)
 
@@ -364,7 +367,7 @@ def build_tizen(flag, extra_option_str):
     print ("Running : " + cmd_line)
     subprocess.Popen([cmd_line], shell=True).wait()
 
-    print ("*********** Build for Tizen octbstack lib and sample *************")
+    print ("*********** Build for Tizen octbstack lib and sample with security *************")
     extra_option_str = "-f resource/csdk/stack/samples/tizen/build/SConscript " + extra_option_str
     build_options = {
                         'TARGET_OS':'tizen',
@@ -374,12 +377,11 @@ def build_tizen(flag, extra_option_str):
                     }
     call_scons(build_options, extra_option_str)
 
-    print ("*********** Build for Tizen octbstack lib and sample with Security*************")
-    build_options['SECURED'] = 1
+    print ("*********** Build for Tizen octbstack lib and sample *************")
+    build_options['SECURED'] = 0
     call_scons(build_options, extra_option_str)
 
     print ("*********** Build for Tizen octbstack lib and sample with Routing Manager*************")
-    del build_options['SECURED']
     build_options['ROUTING'] = 'GW'
     call_scons(build_options, extra_option_str)
 
@@ -428,7 +430,6 @@ def build_windows(flag, extra_option_str):
                         'RELEASE':flag,
                         'WITH_RA':0,
                         'TARGET_TRANSPORT':'IP',
-                        'SECURED':1,
                         'WITH_TCP':0,
                         'BUILD_SAMPLE':'ON',
                         'LOGGING':'off',
@@ -447,7 +448,6 @@ def build_msys(flag, extra_option_str):
                         'RELEASE':flag,
                         'WITH_RA':0,
                         'TARGET_TRANSPORT':'IP',
-                        'SECURED':1,
                         'WITH_TCP':0,
                         'BUILD_SAMPLE':'ON',
                         'LOGGING':'off',
@@ -475,6 +475,7 @@ def unit_tests():
     build_options = {
                         'TEST':1,
                         'RELEASE':'false',
+                        'SECURED':0,
                     }
     extra_option_str = ""
     call_scons(build_options, extra_option_str)
