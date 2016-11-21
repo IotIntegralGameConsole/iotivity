@@ -1,3 +1,9 @@
+iotivity (0.0.20161121-0~rzr20161121) trusty; urgency=medium
+
+  * WIP: snapshot package for iotivity
+
+ -- Philippe Coval <rzr@gna.org>  Mon, 21 Nov 2016 14:52:33 +0100
+
 iotivity (0.0.0-0) trusty; urgency=medium
 
   * WIP: http://rzr.online.fr/q/snapshot#iotivity
