@@ -1,3 +1,9 @@
+iotivity (0.0.0-0) trusty; urgency=medium
+
+  * WIP: http://rzr.online.fr/q/snapshot#iotivity
+
+ -- Philippe Coval <rzr@gna.org>  Mon, 21 Nov 2016 14:52:31 +0100
+
 iotivity (0.0.0-0) unstable; urgency=low
 
   * Initial release (Closes: #824155)
