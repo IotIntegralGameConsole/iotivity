@@ -204,10 +204,8 @@ public class Topic {
         HashMap<String, Object> message = mCbor.parsePayloadFromCbor(payload,
                 HashMap.class);
 
-        if (message == null
-                || message.containsKey(Constants.MQ_MESSAGE) == false) {
-            throw new PreconditionFailedException(
-                    "message field is not included");
+        if (message == null || message.isEmpty()) {
+            throw new PreconditionFailedException("message is not included");
         }
 
         if (mKafkaProducerOperator.publishMessage(payload) == false) {
