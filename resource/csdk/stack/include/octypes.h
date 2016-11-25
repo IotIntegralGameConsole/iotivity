@@ -43,6 +43,7 @@ extern "C" {
 #define WITH_PRESENCE
 
 #include "ocpresence.h"
+#include "ocrandom.h"
 //-----------------------------------------------------------------------------
 // Defines
 //-----------------------------------------------------------------------------
@@ -703,6 +704,9 @@ typedef struct
 
     /** destination GatewayID:ClientId.*/
     char                    routeData[MAX_ADDR_STR_SIZE];
+
+    /** destination DeviceID.*/
+    char                    deviceId[UUID_STRING_SIZE];
 
 } OCDevAddr;
 
