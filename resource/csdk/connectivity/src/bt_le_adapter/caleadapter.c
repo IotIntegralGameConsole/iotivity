@@ -1254,6 +1254,9 @@ static void CALEServerSendDataThread(void *threadData)
     else
     {
         OIC_LOG(DEBUG, CALEADAPTER_TAG, "Server Sending Multicast data");
+#if defined(__TIZEN__)
+        // @todo
+        // tizen ble should also disabled when Tizen 3.0 is updated.
         result = CAUpdateCharacteristicsToAllGattClients(dataSegment, length);
         if (CA_STATUS_OK != result)
         {
@@ -1347,6 +1350,9 @@ static void CALEServerSendDataThread(void *threadData)
             OIC_LOG_V(DEBUG, CALEADAPTER_TAG,
                       "Server Sent data length [%zu]", remainingLen + CA_BLE_HEADER_SIZE);
         }
+#else
+        OIC_LOG(DEBUG, CALEADAPTER_TAG, "BLE Multicast is not supported");
+#endif
     }
 
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "OUT - CALEServerSendDataThread");
@@ -1577,6 +1583,9 @@ static void CALEClientSendDataThread(void *threadData)
     }
     else
     {
+#if defined(__TIZEN__)
+        // @todo
+        // tizen ble should also disabled when Tizen 3.0 is updated.
         //Sending Mulitcast Data
         // Send the first segment with the header.
         OIC_LOG(DEBUG, CALEADAPTER_TAG, "Sending Multicast Data");
@@ -1673,6 +1682,9 @@ static void CALEClientSendDataThread(void *threadData)
             OIC_LOG_V(DEBUG, CALEADAPTER_TAG,
                       "Client Sent Data length  is [%zu]", remainingLen + CA_BLE_HEADER_SIZE);
         }
+#else
+        OIC_LOG(DEBUG, CALEADAPTER_TAG, "BLE Multicast is not supported");
+#endif
     }
 
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "OUT - CABLEClientSendDataThread");
