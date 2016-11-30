@@ -345,12 +345,14 @@ exit:
 
 static OCStackResult BuildDevicePlatformPayload(const OCResource *resourcePtr, OCRepPayload** payload, bool addDeviceId)
 {
+    OCRepPayload *tempPayload = OCRepPayloadCreate();
+
     if (!resourcePtr)
     {
+        OCRepPayloadDestroy(tempPayload);
         return OC_STACK_INVALID_PARAM;
     }
 
-    OCRepPayload *tempPayload = OCRepPayloadCreate();
     if (!tempPayload)
     {
         return OC_STACK_NO_MEMORY;
