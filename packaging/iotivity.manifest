@@ -1,1 +1,5 @@
-../tools/tizen/iotivity.manifest
+<manifest>
+	<request>
+		<domain name="_" />
+	</request>
+</manifest>
