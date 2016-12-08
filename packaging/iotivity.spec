@@ -60,14 +60,6 @@ Source1002: %{name}-test.manifest
 
 %define ex_install_dir %{buildroot}%{_bindir}
 
-%if ! 0%{?license:0}
-%define license %doc
-%endif
-
-%if ! 0%{?manifest:0}
-%define manifest %doc
-%endif
-
 # Default values to be eventually overiden BEFORE or as gbs params:
 %{!?ES_TARGET_ENROLLEE: %define ES_TARGET_ENROLLEE tizen}
 %{!?LOGGING: %define LOGGING 1}
@@ -172,6 +164,7 @@ cp %{SOURCE1002} .
 %else
 cp %{SOURCE1001} ./%{name}-test.manifest
 %endif
+
 
 %build
 scons %{JOB} --prefix=%{_prefix} \
