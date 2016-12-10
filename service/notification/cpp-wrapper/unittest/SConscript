@@ -97,11 +97,10 @@ notification_provider_wrapper_test = notification_provider_wrapper_test_env.Prog
 Alias("notification_provider_wrapper_test", notification_provider_wrapper_test)
 env.AppendTarget('notification_provider_wrapper_test')
 
+# TODO: fix this test on linux (at least) and remove commented lines
 if env.get('TEST') == '1':
-    if env.get('SECURED') != '1':
-# TODO: fix this test on linux and remove this comment line
-        if target_os in []:
-            from tools.scons.RunTest import *
+        if target_os in ['linux'] and env.get('SECURED') != '1':
+            from tools.scons.RunTest import run_test
             run_test(notification_consumer_wrapper_test_env,
                      '',
 #                    'service_notification_cpp-wrapper_unittest_notification_consumer_wrapper_test.memcheck',
