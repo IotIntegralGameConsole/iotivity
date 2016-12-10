@@ -88,7 +88,7 @@ env.AppendTarget('easysetup_enrollee_test')
 
 # TODO: Fix this test and remove following commented lines
 if env.get('TEST') == '1':
-    if target_os in ['linux'] and env.get('SECURED') != '1':
+    if target_os in ['linux']:
         run_test(easysetup_enrollee_test_env,
 #               'service_easy-setup_enrollee_unittests_easysetup_enrollee_test.memcheck',
                  '',
