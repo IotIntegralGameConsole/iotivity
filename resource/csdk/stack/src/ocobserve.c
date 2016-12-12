@@ -317,7 +317,6 @@ OCStackResult SendListObserverNotification (OCResource * resource,
                             numSentNotification++;
 
                             OICFree(ehResponse.payload);
-                            FindAndDeleteServerRequest(request);
                         }
                         else
                         {
@@ -677,4 +676,3 @@ GetObserveHeaderOption (uint32_t * observationOption,
     }
     return OC_STACK_OK;
 }
-
