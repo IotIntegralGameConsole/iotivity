@@ -56,7 +56,7 @@ public:
             default:
                 ThrowOcException(OC_STACK_INVALID_PARAM, "Unexpected service type");
                 return OC::ServiceType::OutOfProc;
-        };
+        }
     }
 
     static OC::ModeType getModeType(JNIEnv *env, int type)
@@ -74,7 +74,7 @@ public:
             default:
                 ThrowOcException(OC_STACK_INVALID_PARAM, "Unexpected mode type");
                 return OC::ModeType::Both;
-        };
+        }
     }
 
     static OC::QualityOfService getQOS(JNIEnv *env, int type)
@@ -92,7 +92,7 @@ public:
             default:
                 ThrowOcException(OC_STACK_INVALID_PARAM, "Unexpected quality of service");
                 return OC::QualityOfService::NaQos;
-        };
+        }
     }
 
     static OC::ObserveType getObserveType(JNIEnv *env, int type)
@@ -106,7 +106,7 @@ public:
             default:
                 ThrowOcException(OC_STACK_INVALID_PARAM, "Unexpected observe type");
                 return OC::ObserveType::ObserveAll;
-        };
+        }
     }
 #ifdef WITH_CLOUD
     static OC::AclGroupType getAclGroupType(JNIEnv *env, int type)
@@ -144,7 +144,7 @@ public:
             default:
                 ThrowOcException(OC_STACK_INVALID_PARAM, "Unexpected OCEntityHandlerResult");
                 return OCEntityHandlerResult::OC_EH_ERROR;
-        };
+        }
     }
 
     static std::string stackResultToStr(const int result)
