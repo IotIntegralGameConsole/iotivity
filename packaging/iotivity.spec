@@ -27,6 +27,10 @@ Source1002: %{name}-test.manifest
 %define TARGET_TRANSPORT IP
 %endif
 
+%if "%{TARGET_OS}" == "tizen"
+%define TARGET_TRANSPORT IP
+%endif
+
 %define JOB "-j4"
 %if 0%{?speedpython}
 %define JOB %{?_smp_mflags}
