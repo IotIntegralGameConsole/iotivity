@@ -182,7 +182,7 @@ void NSHandleSubscription(OCEntityHandlerRequest *entityHandlerRequest, NSResour
         }
 
         bool currPolicy = NSGetPolicy();
-        NSAskAcceptanceToUser(entityHandlerRequest);
+        NSAskAcceptanceToUser(NSCopyOCEntityHandlerRequest(entityHandlerRequest));
 
         if (currPolicy == NS_POLICY_PROVIDER)
         {
@@ -193,6 +193,8 @@ void NSHandleSubscription(OCEntityHandlerRequest *entityHandlerRequest, NSResour
             NS_LOG(DEBUG, "NSGetSubscriptionAccepter == NS_ACCEPTER_CONSUMER");
             NSSendConsumerSubResponse(NSCopyOCEntityHandlerRequest(entityHandlerRequest));
         }
+
+        NSFreeOCEntityHandlerRequest(entityHandlerRequest);
     }
     else if (resourceType == NS_RESOURCE_SYNC)
     {
