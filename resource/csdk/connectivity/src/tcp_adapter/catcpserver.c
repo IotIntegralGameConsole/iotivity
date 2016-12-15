@@ -319,6 +319,7 @@ static void CAAcceptConnection(CATransportFlags_t flag, CASocket_t *sock)
         svritem->sep.endpoint.flags = flag;
         svritem->sep.endpoint.adapter = CA_ADAPTER_TCP;
         svritem->state = CONNECTED;
+        svritem->isClient = false;
         CAConvertAddrToName((struct sockaddr_storage *)&clientaddr, clientlen,
                             svritem->sep.endpoint.addr, &svritem->sep.endpoint.port);
 
@@ -339,7 +340,7 @@ static void CAAcceptConnection(CATransportFlags_t flag, CASocket_t *sock)
         // pass the connection information to CA Common Layer.
         if (g_connectionCallback)
         {
-            g_connectionCallback(&(svritem->sep.endpoint), true);
+            g_connectionCallback(&(svritem->sep.endpoint), true, svritem->isClient);
         }
     }
 }
@@ -1104,6 +1105,7 @@ CASocketFd_t CAConnectTCPSession(const CAEndpoint_t *endpoint)
     svritem->sep.endpoint.flags = endpoint->flags;
     svritem->sep.endpoint.ifindex = endpoint->ifindex;
     svritem->state = CONNECTING;
+    svritem->isClient = true;
 
     // #2. add TCP connection info to list
     ca_mutex_lock(g_mutexObjectList);
@@ -1131,7 +1133,7 @@ CASocketFd_t CAConnectTCPSession(const CAEndpoint_t *endpoint)
     // #4. pass the connection information to CA Common Layer.
     if (g_connectionCallback)
     {
-        g_connectionCallback(&(svritem->sep.endpoint), true);
+        g_connectionCallback(&(svritem->sep.endpoint), true, svritem->isClient);
     }
 
     return svritem->fd;
@@ -1158,7 +1160,7 @@ CAResult_t CADisconnectTCPSession(size_t index)
         // pass the connection information to CA Common Layer.
         if (g_connectionCallback && DISCONNECTED == removedData->state)
         {
-            g_connectionCallback(&(removedData->sep.endpoint), false);
+            g_connectionCallback(&(removedData->sep.endpoint), false, removedData->isClient);
         }
     }
     OICFree(removedData->data);
