@@ -267,7 +267,6 @@ static void CASelectReturned(fd_set *readFds)
             return;
         }
         OIC_LOG_V(DEBUG, TAG, "Received new connection event with [%s]", buf);
-        FD_CLR(caglobals.tcp.connectionFds[0], readFds);
         return;
     }
     else
@@ -282,10 +281,6 @@ static void CASelectReturned(fd_set *readFds)
                 if (FD_ISSET(svritem->fd, readFds))
                 {
                     CAReceiveMessage(svritem->fd);
-                    if (-1 != svritem->fd)
-                    {
-                        FD_CLR(svritem->fd, readFds);
-                    }
                 }
             }
         }
