@@ -708,8 +708,8 @@ typedef struct
     /** destination GatewayID:ClientId.*/
     char                    routeData[MAX_ADDR_STR_SIZE];
 
-    /** destination DeviceID.*/
-    char                    deviceId[MAX_IDENTITY_SIZE];
+    /** device ID of remote.*/
+    char                    remoteId[MAX_IDENTITY_SIZE];
 
 } OCDevAddr;
 
