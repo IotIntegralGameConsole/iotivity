@@ -42,7 +42,7 @@ public class  OcCloudProvisioning {
    /**
     * API to construct the CloudProvisioning
     *
-    * @param ip address of the cloud server
+    * @param ipAddr address of the cloud server
     * @param port port of the cloud server
     */
     public OcCloudProvisioning(String ip, int port) {
