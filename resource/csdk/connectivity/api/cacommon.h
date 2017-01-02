@@ -106,7 +106,7 @@ extern "C"
 /**
  *Maximum length of the remoteEndpoint identity.
  */
-#define CA_MAX_ENDPOINT_IDENTITY_LEN  UUID_STRING_SIZE
+#define CA_MAX_ENDPOINT_IDENTITY_LEN   (32)
 
 /**
  * option types - the highest option number 63.

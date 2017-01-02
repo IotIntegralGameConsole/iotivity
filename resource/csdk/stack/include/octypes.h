@@ -337,6 +337,9 @@ extern "C" {
 /** Blocks of MAC address */
 #define MAC_ADDR_BLOCKS (6)
 
+/** Max identity size. */
+#define MAX_IDENTITY_SIZE (37)
+
 /** Universal unique identity size. */
 #define UUID_IDENTITY_SIZE (128/8)
 
@@ -681,7 +684,7 @@ typedef struct
     uint16_t id_length;
 
     /** Array of end point identity.*/
-    unsigned char id[UUID_STRING_SIZE];
+    unsigned char id[MAX_IDENTITY_SIZE];
 } OCIdentity;
 
 /**
