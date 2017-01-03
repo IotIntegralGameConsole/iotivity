@@ -31,7 +31,7 @@
 #include <net/if.h>
 #include <errno.h>
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>

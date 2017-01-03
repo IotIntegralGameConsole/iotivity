@@ -13,7 +13,7 @@ src_dir = os.path.join(os.curdir, 'bt_edr_adapter')
 
 # Source files to build common for all platforms
 common_files = []
-if target_os != 'arduino':
+if target_os not in ['arduino', 'esp8266']:
 	common_files = [ os.path.join(src_dir, 'caedradapter.c') ]
 
 # Get list of target-specific source file base names, i.e. no parent

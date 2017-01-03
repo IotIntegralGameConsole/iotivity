@@ -26,14 +26,14 @@ To enable logging for Android, TB_LOG should be defined in the ./jni/Android.mk 
 LOCAL_CFLAGS := -DTB_LOG
 
 //-------------------------------------------------
-// Arduino
+// Arduino || ESP8266
 //-------------------------------------------------
-To enable the logger for Arduino, TB_LOG should be defined in
-Properties|C/C++ Build|Settings|Tool Settings|AVR Compiler|Symbols
+To enable the logger for Arduino/ESP8266, TB_LOG should be defined in
+Properties|C/C++ Build|Settings|Tool Settings|avr-C/xtensa-lx106-elf-gcc Compiler|Symbols
 and
-Properties|C/C++ Build|Settings|Tool Settings|AVR C++ Compiler|Symbols
+Properties|C/C++ Build|Settings|Tool Settings|avr-C++/xtensa-lx106-elf-g++ Compiler|Symbols
 
-Note: when building for Arduino, force the compiler to use avr-g++ to build logger.c.  Or rename logger.c to logger.cpp.
+Note: when building for Arduino/ESP8266, force the compiler to use avr-g++/xtensa-lx106-elf-g++ to build logger.c.  Or rename logger.c to logger.cpp.
 
 Note: when building for Arduino, several warnings are generated when trying to place strings in
 PROGMEM

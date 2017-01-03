@@ -22,7 +22,11 @@
 #include "caadapterutils.h"
 
 #include <string.h>
+#ifdef ESP8266
+#include <c_types.h>
+#else
 #include <ctype.h>
+#endif
 #include "oic_string.h"
 #include "oic_malloc.h"
 #include <errno.h>
@@ -65,7 +69,7 @@ static jobject g_Context = NULL;
 static jobject g_Activity = NULL;
 #endif
 
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 CAResult_t CAParseIPv4AddressInternal(const char *ipAddrStr, uint8_t *ipAddr,
                                    size_t ipAddrLen, uint16_t *port)
 {
@@ -130,7 +134,7 @@ CAResult_t CAParseIPv4AddressInternal(const char *ipAddrStr, uint8_t *ipAddr,
     return CA_STATUS_FAILED;
 }
 
-#else // not with_arduino
+#else // not with_arduino and not with_esp8266
 /*
  * These two conversion functions return void because errors can't happen
  * (because of NI_NUMERIC), and there's nothing to do if they do happen.
@@ -223,7 +227,7 @@ void CAConvertNameToAddr(const char *host, uint16_t port, struct sockaddr_storag
     }
     freeaddrinfo(addrs);
 }
-#endif // WITH_ARDUINO
+#endif // WITH_ARDUINO || WITH_ESP8266
 
 #ifdef __ANDROID__
 void CANativeJNISetContext(JNIEnv *env, jobject context)

@@ -53,7 +53,7 @@
 #define TIMEOUT_USED   1
 #define TIMEOUT_UNUSED  2
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 pthread_t thread_id = 0; // 0: initial thread id (meaningless)
 #endif
 
@@ -85,7 +85,7 @@ void timespec_add(time_t * to, const time_t seconds)
     }
 }
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 
 long int getSeconds(struct tm* tp)
 {
@@ -276,7 +276,7 @@ int initThread()
 
     return 0;
 }
-#else   // WITH_ARDUINO
+#else   // WITH_ARDUINO || WITH_ESP8266
 time_t timeToSecondsFromNow(tmElements_t *t_then)
 {
     time_t t, then;

@@ -30,11 +30,19 @@
 extern "C" {
 #endif
 
-#ifdef ARDUINO
-// MEGA has 16 input pins whereas Due has only 12 input pins
-#define ANALOG_IN (10)
+//This may not be needed for ESP8266 port. Not on master, KE DEc. 22, 2016
+#if !defined(ARDUINO) && !defined(ESP8266)
+#include <time.h>
 #endif
 
+#ifdef ARDUINO
+#define ANALOG_IN (10)
+#else
+#ifdef ESP8266
+//esp8266 has a single ADC channel available to users at A0 pin
+#define ANALOG_IN (A0)
+#endif
+#endif
  /* Number of bytes in a UUID. */
 #define UUID_SIZE (16)
 

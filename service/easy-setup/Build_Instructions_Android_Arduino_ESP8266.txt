@@ -105,7 +105,7 @@ Arduino Build:
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Steps to build and deploy Easysetup Mediator in Arduino platform
 1) Compilation using Scons for Arduino Due
-    a) Set up Arduino first before building. Refer to "connectivity\build\arduino\Arduino_Setup_README.txt" file for help.
+    a) Set up Arduino first before building. Refer to "connectivity/build/arduino/Arduino_Setup_README.txt" file for help.
     b) Go to "iotivity/" folder.
     c) Prerequisite exports for Arduino
          export ARDUINO_HOME=<ARDUINO_HOME_DIR>
@@ -136,6 +136,38 @@ Steps to build and deploy Easysetup Mediator in Arduino platform
 
             To change the port number, please modify  "port" variable in __upload() function in: "/build/arduino/SConscript".
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ESP8266 Build:
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Steps to build and deploy Easysetup Mediator in ESP8266 platform
+1) Compilation using Scons for Generic ESP8266 Module
+    a) Set up ESP8266 first before building. Refer to "connectivity/build/esp8266/ESP8266_Setup_README.txt" file for help.
+    b) Go to "iotivity/" folder.
+    c) Prerequisite exports for ESP8266
+        export ESP8268_HOME=<ESP8266_HOME_DIR>
+    e) scons service TARGET_OS=esp8266 BOARD=generic TARGET_ARCH=esp8266 SHIELD=WIFI
+        - With debug or logging
+            8scons service TARGET_OS=esp8266 BOARD=generic TARGET_ARCH=esp8266 SHIELD=WIFI RELEASE=0
+        - With installation to ESP8266
+            scons service TARGET_OS=espg266 BOARD=generic TARGET_ARCH=esp8266 SHIELD=WIFI RELEASE=0 UPLOAD=truen
+
+       Possible values for <transport> is only: IP
+        -> IP :
+        $ scons service TARGET_OS=esp8266 BOARD=generic TARGET_ARCH=esp8266 SHIELD=WIFI RELEASE=0
+
+        Note :- Only single transport can be built at a time for ESP8266
+    f) The above command will build sample. The "enrollee.hex" can be found at "out/esp8266/esp8266/release/service/easy-setup/sampleapp/enrollee/esp8266"
+    g) After building sample, script will try to install on "/dev/ttyACM0" port in 'sudo' mode.
+        To skip installation, set command line argument 'UPLOAD=false' or without UPLOAD option
+    h) To set WIFI Shield Name, include the option DEVICE_NAME during scons build.
+        -> $ scons service TARGET_OS=esp8266 BOARD=generic TARGET_ARCH=esp8266 SHIELD=WIFI RELEASE=0 DEVICE_NAME=OIC
+
+            Specified Device name length MUST be less than 10 characters. RBL Library has this limitation.
+            By Default DEVICE_NAME=OIC-DEVICE, if device name option is not specified
+
+            To change the port number, please modify  "port" variable in __upload() function in: "/build/esp8266/SConscript".
+
+note: Because ESP8266 module only support one architecture, one transport layer, and one board at the moment, you can simply remove these variables from the building command then
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Folder structure:
@@ -149,6 +181,7 @@ iotivity/
         │    └── inc
         │    └── src
         │    └── arduino/wifi
+	│    └── esp8266/wifi
         │    └── linux/wifi
         │    └── tizen/wifi
         │    └── SConscript
@@ -169,8 +202,9 @@ iotivity/
         │    └──mediator/android
         │    └──mediator/linux
         │    └──enrollee/arduino
+        │    └──enrollee/esp8266
         │    └──enrollee/linux
         │    └──enrollee/tizen
         │    └──enrollee/tizen-sdb
         │
-        └── Build_Instructions_Android_Arduino.txt - You are reading this.
+        └── Build_Instructions_Android_Arduino_ESP8266.txt - You are reading this.

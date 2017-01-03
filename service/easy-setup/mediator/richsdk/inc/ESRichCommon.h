@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include <string>
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 #include <memory>
 #include <vector>
 #endif
@@ -41,7 +41,7 @@
 using namespace OC;
 using namespace std;
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 namespace OIC
 {
     namespace Service
@@ -1063,6 +1063,6 @@ namespace OIC
 
     }
 }
-#endif //WITH_ARDUINO
+#endif //WITH_ARDUINO || WITH_ESP8266
 
 #endif //ES_COMMON_RICH_H_

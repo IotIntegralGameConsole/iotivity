@@ -25,7 +25,7 @@
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#ifdef HAVE_ARDUINO_TIME_H
+#if defined(HAVE_ARDUINO_TIME_H) || defined(HAVE_ESP8266_TIME_H)
 #include <Time.h>
 #endif
 
@@ -36,7 +36,7 @@ extern "C"
 
 #include <math.h>
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 #define SECS_PER_MIN  (60L)
 #define SECS_PER_HOUR (SECS_PER_MIN * 60L)
 #define SECS_PER_DAY  (SECS_PER_HOUR * 24L)
@@ -50,7 +50,7 @@ time_t timespec_diff(const time_t after, const time_t before);
 void timespec_add(time_t * to, const time_t seconds);
 void checkTimeout();
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 long int getSeconds(struct tm* tp);
 long int getRelativeIntervalOfWeek(struct tm* tp);
 long int getSecondsFromAbsTime(struct tm* tp);

@@ -27,8 +27,7 @@
 #define UTLIST_VERSION 1.9.1
 
 /*
- * This file contains macros to manipulate singly and doubly-linked lists.
- *
+ * This file contains macros to manipulate singly and doubly-linked lists.- *
  * 1. LL_ macros:  singly-linked lists.
  * 2. DL_ macros:  doubly-linked lists.
  * 3. CDL_ macros: circular doubly-linked lists.

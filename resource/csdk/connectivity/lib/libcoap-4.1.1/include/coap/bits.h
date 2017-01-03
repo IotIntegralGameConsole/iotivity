@@ -18,6 +18,9 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#ifdef WITH_ESP8266
+#include <stddef.h> /* size_t is defined here */
+#endif
 #include <stdint.h>
 
 /**

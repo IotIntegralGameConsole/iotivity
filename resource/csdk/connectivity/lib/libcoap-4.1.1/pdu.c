@@ -28,7 +28,7 @@
 #include "include/coap/option.h"
 #include "include/coap/encode.h"
 
-#ifdef WITH_ARDUINO
+#if  defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 #include "util.h"
 #endif
 
@@ -154,7 +154,7 @@ coap_pdu_init2(unsigned char type, unsigned char code, unsigned short id,
 #endif
 
     /* size must be large enough for hdr */
-#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(_WIN32)
+#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(WITH_ESP8266) || defined(_WIN32)
     pdu = (coap_pdu_t *) coap_malloc(sizeof(coap_pdu_t) + size);
 #endif
 #ifdef WITH_CONTIKI
@@ -251,9 +251,9 @@ coap_new_pdu2(coap_transport_t transport, unsigned int size)
 
 void coap_delete_pdu(coap_pdu_t *pdu)
 {
-#if defined(WITH_POSIX) || defined(WITH_ARDUINO)
+#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(WITH_ESP8266)
     coap_free( pdu );
-#endif
+#endif /* WITH_POSIX || WITH_ARDUINO || WITH_ESP8266 */
 #ifdef WITH_LWIP
     if (pdu != NULL) /* accepting double free as the other implementation accept that too */
         pbuf_free(pdu->pbuf);

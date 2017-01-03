@@ -10,7 +10,7 @@ project_version = '1.2.1'
 
 # Map of host os and allowed target os (host: allowed target os)
 host_target_map = {
-		'linux': ['linux', 'android', 'arduino', 'yocto', 'tizen'],
+		'linux': ['linux', 'android', 'arduino', 'esp8266', 'yocto', 'tizen'],
 		'windows': ['windows', 'android', 'arduino'],
 		'darwin': ['darwin', 'ios', 'android', 'arduino'],
 		'msys_nt' :['msys_nt'],
@@ -26,6 +26,7 @@ os_arch_map = {
 		'darwin': ['i386', 'x86_64'],
 		'ios': ['i386', 'x86_64', 'armv7', 'armv7s', 'arm64'],
 		'arduino': ['avr', 'arm'],
+		'esp8266': ['esp8266'],
 		'yocto': ['i586', 'i686', 'x86_64', 'arm', 'aarch64', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
 		}
 
@@ -77,7 +78,7 @@ else:
 	logging_default = (release_mode == False)
 
 # targets that do not support the DTLS build (SECURED=1 build option)
-targets_without_dtls_support = ['arduino'];
+targets_without_dtls_support = ['arduino', 'esp8266'];
 if ARGUMENTS.get('SECURED') == '1' and target_os in targets_without_dtls_support:
 	print "\nError: DTLS not supported on target os: %s MUST build with SECURED=0\n" % (target_os)
 	Exit(1)
@@ -85,7 +86,7 @@ if ARGUMENTS.get('SECURED') == '1' and target_os in targets_without_dtls_support
 ######################################################################
 # Common build options (release, target os, target arch)
 ######################################################################
-targets_disallow_multitransport = ['arduino']
+targets_disallow_multitransport = ['arduino', 'esp8266']
 
 help_vars = Variables()
 help_vars.Add(BoolVariable('VERBOSE', 'Show compilation', False))
@@ -117,10 +118,10 @@ help_vars.Add(EnumVariable('MULTIPLE_OWNER', 'Enable multiple owner', '0', allow
 help_vars.Add(EnumVariable('EXC_PROV_SUPPORT', 'Except OCPMAPI library(libocpmapi.so)', '0', allowed_values=('0', '1')))
 help_vars.Add(EnumVariable('TEST', 'Run unit tests', '0', allowed_values=('0', '1')))
 help_vars.Add(BoolVariable('LOGGING', 'Enable stack logging', logging_default))
-help_vars.Add(BoolVariable('UPLOAD', 'Upload binary ? (For Arduino)', require_upload))
+help_vars.Add(BoolVariable('UPLOAD', 'Upload binary ? (For Arduino and ESP8266)', require_upload))
 help_vars.Add(EnumVariable('ROUTING', 'Enable routing', 'EP', allowed_values=('GW', 'EP')))
 help_vars.Add(EnumVariable('BUILD_SAMPLE', 'Build with sample', 'ON', allowed_values=('ON', 'OFF')))
-help_vars.AddVariables(('DEVICE_NAME', 'Network display name for device (For Arduino)', device_name, None, None),)
+help_vars.AddVariables(('DEVICE_NAME', 'Network display name for device (For Arduino and ESP8266)', device_name, None, None),)
 help_vars.Add(PathVariable('ANDROID_NDK', 'Android NDK path', None, PathVariable.PathAccept))
 help_vars.Add(PathVariable('ANDROID_HOME', 'Android SDK path', None, PathVariable.PathAccept))
 help_vars.Add(PathVariable('ANDROID_GRADLE', 'Gradle binary file', None, PathVariable.PathIsFile))
@@ -137,7 +138,7 @@ AddOption('--prefix',
 ######################################################################
 # Platform(build target) specific options: SDK/NDK & toolchain
 ######################################################################
-targets_support_cc = ['linux', 'arduino', 'tizen']
+targets_support_cc = ['linux', 'arduino', 'esp8266', 'tizen']
 
 if target_os in targets_support_cc:
 	# Set cross compile toolchain
@@ -146,7 +147,7 @@ if target_os in targets_support_cc:
 			'Toolchain path (Generally only be required for cross-compiling)',
 			os.environ.get('TC_PATH')))
 
-if target_os in ['android', 'arduino']: # Android/Arduino always uses GNU compiler regardless of the host
+if target_os in ['android', 'arduino', 'esp8266']: # Android/Arduino always uses GNU compiler regardless of the host
 	env = Environment(variables = help_vars,
 			tools = ['gnulink', 'gcc', 'g++', 'ar', 'as', 'textfile']
 			)

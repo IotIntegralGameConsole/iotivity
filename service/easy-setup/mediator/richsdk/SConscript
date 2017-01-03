@@ -35,17 +35,22 @@ else:
 if env.get('LOGGING'):
     env.AppendUnique(CPPDEFINES = ['TB_LOG'])
 
-# Easysetup provides reference implemenation of Arduino Enrollee.
+# Easysetup provides reference implemenation of Arduino or ESP8266 Enrollee.
 # Mediator applications developed on different platforms will be default defining the
-# flag 'REMOTE_ARDUINO_ENROLEE'. If the target Enrollee is not Arduino, the below commented
+# flag 'REMOTE_ARDUINO_ENROLEE' or 'REMOTE_ESP8266_ENROLEE'. If the target Enrollee is not Arduino or ESP8266, the below commented
 # modifications must be enabled instead (and the existing define must be commented).
 #
-##### The following lines must be uncommented, if target Enrollee is not Arduino
+#
+##### The following lines must be uncommented, if target Enrollee is not Arduino or ESP8266
 target_enrollee = env.get('ES_TARGET_ENROLLEE')
 if target_enrollee == 'arduino':
 	print "REMOTE_ARDUINO_ENROLEE flag is defined."
 	print "The Mediator application will be working only with Arduino Enrollee."
 	env.AppendUnique(CPPDEFINES = ['REMOTE_ARDUINO_ENROLEE'])
+elif target_enrollee == 'esp8266':
+	print "REMOTE_ESP8266_ENROLEE flag is defined."
+	print "The Mediator application will be working only with ESP8266 Enrollee."
+	env.AppendUnique(CPPDEFINES = ['REMOTE_ESP8266_ENROLEE'])
 
 # Add third party libraries
 lib_env = env.Clone()

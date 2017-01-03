@@ -1112,7 +1112,7 @@ uint64_t RTMGetCurrentTime()
     clock_gettime(CLOCK_MONOTONIC, &getTs);
 
     currentTime = getTs.tv_sec;
-#elif defined __ARDUINO__
+#elif defined __ARDUINO__ || defined __ESP8266__
     currentTime = millis() / 1000;
 #else
 #if _POSIX_TIMERS > 0

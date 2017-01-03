@@ -43,7 +43,7 @@ catest_env.PrependUnique(LIBS = ['octbstack',
                                     'connectivity_abstraction',
                                     'coap'])
 
-if target_os not in ['arduino', 'darwin', 'ios', 'msys_nt', 'windows']:
+if target_os not in ['arduino', 'esp8266', 'darwin', 'ios', 'msys_nt', 'windows']:
 	catest_env.AppendUnique(LIBS=['rt'])
 
 if catest_env.get('SECURED') == '1':
@@ -76,7 +76,7 @@ tests_src = [
 ]
 
 if (('IP' in target_transport) or ('ALL' in target_transport)):
-	if target_os != 'arduino':
+	if target_os != ['arduino', 'esp8266']:
 		tests_src = tests_src + ['cablocktransfertest.cpp']
 
 if catest_env.get('SECURED') == '1' and catest_env.get('WITH_TCP') == True:

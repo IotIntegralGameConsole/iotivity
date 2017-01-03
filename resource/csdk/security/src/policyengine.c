@@ -412,7 +412,7 @@ static void CopyParamsToContext(PEContext_t     *context,
  */
 static bool IsAccessWithinValidTime(const OicSecAce_t *ace)
 {
-#ifndef WITH_ARDUINO //Period & Recurrence not supported on Arduino due
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266) //Period & Recurrence not supported on Arduino due
     //lack of absolute time
     if (NULL== ace || NULL == ace->validities)
     {
@@ -564,7 +564,11 @@ SRMAccessResponse_t CheckPermission(PEContext_t     *context,
     {
         if (AWAITING_REQUEST == context->state)
         {
+#ifdef WITH_ESP8266
+            SetPolicyEngineState(context, ESP_BUSY);  //Make redeclaration conflict with the BUSY from esp8266/tools/sdk/include
+#else
             SetPolicyEngineState(context, BUSY);
+#endif
             CopyParamsToContext(context, subjectId, resource, requestedPermission);
         }
 

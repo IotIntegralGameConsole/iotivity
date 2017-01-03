@@ -44,7 +44,7 @@
 #include <ws2tcpip.h>
 #endif
 
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 #define DEV_ADDR_SIZE_MAX (16)
 #endif
 
@@ -144,7 +144,7 @@ _coap_is_mcast_impl(const coap_address_t *a)
 }
 #endif /* WITH_POSIX */
 
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 typedef struct coap_address_t
 {
     uint32_t     size;                    /**< length of the address stored in addr field. */
@@ -181,7 +181,7 @@ _coap_is_mcast_impl(const coap_address_t *a)
     return 0;
 }
 
-#endif /* WITH_ARDUINO */
+#endif /* WITH_ARDUINO || WITH_ESP8266*/
 
 /**
  * Resets the given coap_address_t object @p addr to its default

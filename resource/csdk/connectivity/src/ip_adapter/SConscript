@@ -15,7 +15,7 @@ src_dir = './ip_adapter/'
 
 # Source files to build common for all platforms
 common_files = None
-if target_os == 'arduino':
+if target_os in ['esp8266','arduino']:
     common_files = [ os.path.join(src_dir,
                                   'caipadapter.c') ]
 else:

@@ -88,10 +88,10 @@ if 'SERVER' in rd_mode:
 
 if 'CLIENT' in rd_mode:
     rd_src += [RD_SRC_DIR + 'rd_client.c',]
-    if target_os not in ['arduino','darwin','ios', 'windows', 'winrt']:
+    if target_os not in ['arduino', 'esp8266', 'darwin','ios', 'windows', 'winrt']:
         rd_src += [ RD_SRC_DIR + 'RDClient.cpp',]
 
-if target_os not in ['arduino', 'darwin', 'ios', 'windows', 'winrt']:
+if target_os not in ['arduino', 'esp8266', 'darwin', 'ios', 'windows', 'winrt']:
     rdsdk_shared = rd_env.SharedLibrary('resource_directory', rd_src)
     rdsdk_static = rd_env.StaticLibrary('resource_directory', rd_src)
     rdsdk = Flatten([rdsdk_static, rdsdk_shared])

@@ -39,7 +39,7 @@ env.AppendUnique(CPPPATH = [ os.path.join(root_dir, 'inc'),
                              os.path.join(root_dir, 'common', 'inc'),
                              os.path.join(root_dir, 'util', 'inc') ])
 
-if ca_os not in ['arduino', 'windows']:
+if ca_os not in ['arduino', 'esp8266', 'windows']:
 	env.AppendUnique(CPPDEFINES = ['WITH_POSIX'])
 
 if ca_os not in ['darwin', 'ios', 'windows']:
@@ -100,7 +100,19 @@ elif env.get('ROUTING') == 'EP':
 if env.get('WITH_PROXY'):
 	env.AppendUnique(CPPDEFINES = ['WITH_CHPROXY'])
 
-if ca_os == 'arduino':
+if ca_os == 'esp8266':
+	env.AppendUnique(CPPDEFINES = ['SINGLE_THREAD'])
+	env.AppendUnique(CPPDEFINES = ['WITH_ESP8266'])
+	print "setting WITH_ESP8266"
+	ca_common_src = [
+		'caconnectivitymanager.c',
+		'cainterfacecontroller.c',
+		'camessagehandler.c',
+		'canetworkconfigurator.c',
+		'caprotocolmessage.c',
+		'caretransmission.c',
+		]	
+elif ca_os == 'arduino':
 	env.AppendUnique(CPPDEFINES = ['SINGLE_THREAD'])
 	env.AppendUnique(CPPDEFINES = ['WITH_ARDUINO'])
 	print "setting WITH_ARDUINO"
@@ -161,7 +173,7 @@ if 'ALL' in ca_transport:
 
 if 'IP' in ca_transport:
 	env.SConscript(os.path.join(ca_path, 'ip_adapter/SConscript'))
-	if ca_os == 'arduino':
+	if ca_os in ['arduino', 'esp8266']:
 		if with_tcp == True:
 			transports = [ 'ip_adapter', 'tcp_adapter']
 			env.SConscript(dirs = [
@@ -181,7 +193,7 @@ if ca_os in ['linux', 'tizen', 'android', 'ios']:
 		env.SConscript(os.path.join(ca_path, 'tcp_adapter/SConscript'))
 		env.AppendUnique(CPPDEFINES = ['WITH_TCP'])
 
-if ca_os in ['linux', 'tizen', 'android', 'arduino', 'ios']:
+if ca_os in ['linux', 'tizen', 'android', 'arduino', 'esp8266', 'ios']:
 	if (('BLE' in ca_transport) or ('BT' in ca_transport) or ('ALL' in ca_transport)):
 		env.AppendUnique(CPPDEFINES = ['WITH_TCP'])
 

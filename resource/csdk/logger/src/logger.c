@@ -38,7 +38,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_ARDUINO_TIME_H
+#if defined(HAVE_ARDUINO_TIME_H) || defined(HAVE_ESP8266_TIME_H)
 #include <Time.h>
 #else
 #include <time.h>
@@ -85,7 +85,25 @@ static oc_log_level LEVEL_XTABLE[] = {OC_LOG_DEBUG, OC_LOG_INFO,
     static const char * LEVEL[] __attribute__ ((unused)) = {"DEBUG", "INFO", "WARNING", "ERROR", "FATAL"};
 #elif defined(_MSC_VER)
     static const char * LEVEL[] = {"DEBUG", "INFO", "WARNING", "ERROR", "FATAL"};
-#elif defined ARDUINO
+#elif defined(ESP8266)
+#include <stdarg.h>
+#include "Arduino.h"
+#include "oic_string.h"
+
+    const char level0[] = "DEBUG";
+    const char level1[] = "INFO";
+    const char level2[] = "WARNING";
+    const char level3[] = "ERROR";
+    const char level4[] = "FATAL";
+
+    const char * const LEVEL[]  = {level0, level1, level2, level3, level4};
+
+    static void OCLogString(LogLevel level, const char * tag, const char * logStr);
+
+#ifdef ARDUINO_ARCH_ESP8266
+    #define GET_PROGMEM_BUFFER(buffer, addr) { const char nomeaning_temp=(pgm_read_word(addr)); OICStrcpy(buffer, sizeof(buffer), &nomeaning_temp);}
+#endif
+#elif defined(ARDUINO)
 #include <stdarg.h>
 #include "Arduino.h"
 #include "oic_string.h"
@@ -102,18 +120,18 @@ static oc_log_level LEVEL_XTABLE[] = {OC_LOG_DEBUG, OC_LOG_INFO,
 #ifdef ARDUINO_ARCH_AVR
     //Mega2560 and other 8-bit AVR microcontrollers
     #define GET_PROGMEM_BUFFER(buffer, addr) { OICStrcpy(buffer, sizeof(buffer), (char*)pgm_read_word(addr));}
-#elif defined ARDUINO_ARCH_SAM
+#elif defined(ARDUINO_ARCH_SAM)
     //Arduino Due and other 32-bit ARM micro-controllers
     #define GET_PROGMEM_BUFFER(buffer, addr) { OICStrcpy(buffer, sizeof(buffer), (char*)pgm_read_dword(addr));}
 #else
     #define GET_PROGMEM_BUFFER(buffer, addr) { buffer[0] = '\0';}
 #endif
-#else // !defined(__ANDROID__) && !defined(ARDUINO)
+#else // !defined(__ANDROID__) && !defined(ARDUINO) && !defined(ESP8266)
     static const char *LEVEL[] __attribute__ ((unused)) =
     {"DEBUG", "INFO", "WARNING", "ERROR", "FATAL"};
 #endif
 
-#ifndef ARDUINO
+#if !defined(ARDUINO) && !defined(ESP8266)
 
 /**
  * Output the contents of the specified buffer (in hex) with the specified priority level.
@@ -263,8 +281,8 @@ void OCLog(LogLevel level, const char * tag, const char * logStr)
    #endif
    }
 #endif //__TIZEN__
-#endif //ARDUINO
-#ifdef ARDUINO
+#endif //ARDUINO || ESP8266
+#if defined(ARDUINO) || defined(ESP8266)
 /**
  * Initialize the serial logger for Arduino
  * Only defined for Arduino
@@ -283,7 +301,11 @@ void OCLogInit()
  * @param tag    - Module name
  * @param logStr - log string
  */
+#ifdef ESP8266
+void OCLogString(LogLevel level, const char * tag, const char * logStr)
+#elif defined(ARDUINO)
 void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
+#endif
 {
     if (!logStr || !tag)
     {
@@ -316,8 +338,12 @@ void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
  * @param buffer     - pointer to buffer of bytes
  * @param bufferSize - max number of byte in buffer
  */
+#ifdef ESP8266
+ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, size_t bufferSize)
+#elif defined(ARDUINO)
  void OCLogBuffer(LogLevel level, PROGMEM const char * tag,
                   const uint8_t * buffer, size_t bufferSize)
+#endif
  {
      if (!buffer || !tag || (bufferSize == 0))
      {
@@ -329,7 +355,11 @@ void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
      for (uint8_t i = 0; i < bufferSize; i++)
      {
         // Format the buffer data into a line
-        snprintf(&lineBuffer[lineIndex*3], sizeof(lineBuffer)-lineIndex*3, "%02X ", buffer[i]);
+#ifdef ARDUINO
+    	 snprintf(&lineBuffer[lineIndex*3], sizeof(lineBuffer)-lineIndex*3, "%02X ", buffer[i]);
+#elif defined(ESP8266)
+    	 snprintf_P(&lineBuffer[lineIndex*3], sizeof(lineBuffer)-lineIndex*3, "%02X ", buffer[i]);
+#endif
         lineIndex++;
          // Output 16 values per line
          if (((i+1)%16) == 0)
@@ -354,8 +384,12 @@ void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
  * @param tag    - Module name
  * @param logStr - log string
  */
+#ifdef ESP8266
+void OCLog(LogLevel level, const char *tag, const int lineNum, const char *logStr)
+#elif defined(ARDUINO)
 void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
            PROGMEM const char *logStr)
+#endif
 {
     if (!logStr || !tag)
     {
@@ -390,8 +424,12 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
  * @param tag    - Module name
  * @param format - variadic log string
  */
+#ifdef ESP8266
+void OCLogv(LogLevel level, const char *tag, const int lineNum, const char *format, ...)
+#elif defined(ARDUINO)
 void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
                 PROGMEM const char *format, ...)
+#endif
 {
     char buffer[LINE_BUFFER_SIZE];
     va_list ap;
@@ -410,10 +448,14 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
     Serial.print(lineNum);
     Serial.print(F(": "));
 
+#ifdef ESP8266
+    vsnprintf_P(buffer, sizeof(buffer), format, ap);
+#elif defined(ARDUINO)
 #ifdef __AVR__
     vsnprintf_P(buffer, sizeof(buffer), format, ap);
 #else
     vsnprintf(buffer, sizeof(buffer), format, ap);
+#endif
 #endif
     for (char *p = &buffer[0]; *p; p++)
     {
@@ -454,10 +496,14 @@ void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, 
     Serial.print(tag);
     Serial.print(F(": "));
 
+#ifdef ESP8266
+    vsnprintf_P(buffer, sizeof(buffer), (const char *)format, ap);
+#elif defined (ARDUINO)
 #ifdef __AVR__
     vsnprintf_P(buffer, sizeof(buffer), (const char *)format, ap); // progmem for AVR
 #else
     vsnprintf(buffer, sizeof(buffer), (const char *)format, ap); // for the rest of the world
+#endif
 #endif
     for (char *p = &buffer[0]; *p; p++)
     {
@@ -474,4 +520,4 @@ void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, 
     va_end(ap);
 }
 
-#endif //ARDUINO
+#endif //ARDUINO || ESP8266

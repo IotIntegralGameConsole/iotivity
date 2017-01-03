@@ -32,6 +32,9 @@
 #include <android/log.h>
 #elif defined(__TIZEN__)
 #include <dlog.h>
+#elif defined(ESP8266)
+#include "Arduino.h"
+#include "pgmspace.h" 
 #elif defined(ARDUINO)
 #include "Arduino.h"
 #include "avr/pgmspace.h"
@@ -49,7 +52,15 @@ extern "C"
 
 // Use the PCF macro to wrap strings stored in FLASH on the Arduino
 // Example:  OIC_LOG(INFO, TAG, PCF("Entering function"));
-#ifdef ARDUINO
+#ifdef ESP8266
+
+#ifdef __cplusplus
+#define PCF(str)  ((const char *)(F(str)))
+#else
+#define PCF(str)  ((const char *)(PSTR(str)))
+#endif //__cplusplus
+#elif defined(ARDUINO)
+
 #ifdef __cplusplus
 #define PCF(str)  ((PROGMEM const char *)(F(str)))
 #else
@@ -100,7 +111,7 @@ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint1
 
 #define OCLog(level,tag,mes) LOG_(LOG_ID_MAIN, (level), (tag), mes)
 #define OCLogv(level,tag,fmt,args...) LOG_(LOG_ID_MAIN, (level),tag,fmt,##args)
-#elif !defined(ARDUINO)
+#elif !defined(ARDUINO) && !defined(ESP8266)
     /**
      * Configure logger to use a context that defines a custom logger function
      *
@@ -153,7 +164,7 @@ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint1
      * @param bufferSize - max number of byte in buffer
      */
     void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint16_t bufferSize);
-#else  // For arduino platforms
+#else  // For arduino and esp8266 platforms
     /**
      * Initialize the serial logger for Arduino
      * Only defined for Arduino
@@ -169,9 +180,12 @@ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint1
      * @param lineNum- line Number
      * @param logStr - log string
      */
+#ifdef ESP8266
+    void OCLog(LogLevel level, const char *tag, const int lineNum, const char *logStr);
+#elif defined(ARDUINO)
     void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
                PROGMEM const char *logStr);
-
+#endif
     /**
      * Output the contents of the specified buffer (in hex) with the specified priority level.
      *
@@ -190,10 +204,18 @@ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint1
      * @param lineNum- line Number
      * @param format - variadic log string
      */
+#ifdef ESP8266
+    void OCLogv(LogLevel level, const char *tag, const int lineNum,
+                const char *format, ...)
+#if defined(__GNUC__)
+    __attribute__ ((format(printf, 4, 5)))
+#endif
+#elif defined(ARDUINO)
     void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
                 PROGMEM const char *format, ...)
 #if defined(__GNUC__)
     __attribute__ ((format(printf, 4, 5)))
+#endif
 #endif
 ;
 #endif
@@ -207,11 +229,23 @@ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint1
 #define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)\
     OCLogBuffer((level), (tag), (buffer), (bufferSize))
 
-#else // These macros are defined for Linux, Android, Win32, and Arduino
+#else // These macros are defined for Linux, Android, Win32, Arduino and esp8266
 
 #define OIC_LOG_INIT()    OCLogInit()
 
-#ifdef ARDUINO
+#ifdef ESP8266
+
+#define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)  OCLogBuffer((level), PCF(tag), (buffer), (bufferSize))
+// Don't define variable argument log function for esp8266
+#define OIC_LOG_V(level, tag, format, ...) OCLogv((level), PCF(tag), __LINE__, PCF(format),__VA_ARGS__)
+
+#define OIC_LOG_CONFIG(ctx)
+#define OIC_LOG_SHUTDOWN()
+#define OIC_LOG(level, tag, logStr) OCLog((level), PCF(tag), __LINE__, PCF(logStr))
+#define OIC_LOG_V(level, tag, ...)
+
+#elif defined(ARDUINO)
+
 
 #define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)  OCLogBuffer((level), PCF(tag), (buffer), (bufferSize))
 
@@ -232,7 +266,7 @@ void OCLogBuffer(LogLevel level, const char * tag, const uint8_t * buffer, uint1
 // Define variable argument log function for Linux, Android, and Win32
 #define OIC_LOG_V(level, tag, ...)  OCLogv((level), (tag), __VA_ARGS__)
 
-#endif //ARDUINO
+#endif //ARDUINO || ESP8266
 #endif //__TIZEN__
 
 #else //TB_LOG

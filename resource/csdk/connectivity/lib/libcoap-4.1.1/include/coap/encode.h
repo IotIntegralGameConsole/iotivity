@@ -12,7 +12,7 @@
 #if (BSD >= 199103) || defined(WITH_CONTIKI)
 # include <string.h>
 #else
-#if !defined(WITH_ARDUINO) && !defined(_MSC_VER)
+#if !defined(WITH_ARDUINO) && !defined(ESP8266) && !defined(_MSC_VER)
 # include <strings.h>
 #endif
 #endif

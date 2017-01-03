@@ -48,7 +48,11 @@
 
 #ifndef INLINE_API
 #  if defined(__cplusplus)
-#    define INLINE_API inline
+#    ifdef ESP8266    // to prevent the __c section type conflict
+#      define INLINE_API static inline
+#    else
+#      define INLINE_API inline
+#    endif
 #  else
 #    ifdef _MSC_VER
 #      define INLINE_API static __inline

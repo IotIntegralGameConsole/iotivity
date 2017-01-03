@@ -76,7 +76,7 @@
 #include "directpairing.h"
 //#endif
 
-#ifdef HAVE_ARDUINO_TIME_H
+#if defined(HAVE_ARDUINO_TIME_H) || defined(HAVE_ESP8266_TIME_H)
 #include "Time.h"
 #endif
 #ifdef HAVE_SYS_TIME_H
@@ -4183,7 +4183,7 @@ OCStackResult initResources()
             &(((OCResource *) presenceResource.handle)->resourceProperties),
             OC_ACTIVE, 0);
 #endif
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
     if (result == OC_STACK_OK)
     {
         result = SRMInitSecureResources();

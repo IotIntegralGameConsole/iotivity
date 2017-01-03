@@ -101,9 +101,21 @@ if target_os == 'arduino':
         env.get('ARDUINO_HOME') + '/hardware/arduino/avr/libraries/SPI',
         env.get('ARDUINO_HOME') + '/libraries/Ethernet/src/utility',
         ])
-
+if target_os == 'esp8266':
+    libcoap_env.Replace(CFLAGS = libcoap_env.get('CXXFLAGS'))
+    libcoap_env.PrependUnique(CPPPATH = [
+        './',
+        env.get('ESP8266_HOME') + '/',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/cores/esp8266',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/include',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/variants/generic',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/libraries/Time',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/libraries/TimedAction',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/libraries/SPI',
+        env.get('ESP8266_HOME') + '/hardware/esp8266com/esp8266/libraries/Ethernet/src/utility',
+        ])
 # Build flags
-if target_os not in ['arduino', 'windows', 'winrt', 'msys_nt']:
+if target_os not in ['arduino', 'esp8266', 'windows', 'winrt', 'msys_nt']:
     libcoap_env.AppendUnique(CPPDEFINES = ['WITH_POSIX', '_DEFAULT_SOURCE'])
     libcoap_env.AppendUnique(CFLAGS = ['-std=gnu99','-fPIC'])
 
@@ -115,17 +127,20 @@ if target_os == 'msys_nt':
     libcoap_env.AppendUnique(CPPDEFINES = ['_DEFAULT_SOURCE'])
     libcoap_env.AppendUnique(CFLAGS = ['-std=c99'])
 
-if target_os in ['linux', 'tizen', 'android', 'ios', 'arduino']:
+if target_os in ['linux', 'tizen', 'android', 'ios', 'arduino', 'esp8266']:
     if with_tcp == True:
         libcoap_env.AppendUnique(CPPDEFINES = ['WITH_TCP'])
 
-if target_os in ['linux', 'tizen', 'android', 'arduino']:
+if target_os in ['linux', 'tizen', 'android', 'arduino', 'esp8266']:
     libcoap_env.AppendUnique(LIBS = ['log'])
     if (('BLE' in ca_transport) or ('BT' in ca_transport) or ('ALL' in ca_transport)):
         libcoap_env.AppendUnique(CPPDEFINES = ['WITH_TCP'])
 
 if target_os == 'arduino':
     libcoap_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'WITH_ARDUINO'])
+
+if target_os == 'esp8266':
+    libcoap_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'WITH_ESP8266'])
 
 if target_os in ['darwin', 'ios']:
     libcoap_env.AppendUnique(CPPDEFINES = ['_DARWIN_C_SOURCE'])

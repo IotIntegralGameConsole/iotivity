@@ -35,7 +35,7 @@ with_tcp = env.get('WITH_TCP')
 with_mq = env.get('WITH_MQ')
 # As in the source code, it includes arduino Time library (C++)
 # It requires compile the .c with g++
-if target_os == 'arduino':
+if target_os in ['arduino', 'esp8266']:
 	liboctbstack_env.Replace(CC = env.get('CXX'))
 	liboctbstack_env.Replace(CFLAGS = env.get('CXXFLAGS'))
 
@@ -74,7 +74,7 @@ if 'PUB' in with_mq:
 if 'BROKER' in with_mq:
 	liboctbstack_env.AppendUnique(CPPDEFINES = ['MQ_BROKER', 'WITH_MQ'])
 
-if target_os not in ['arduino', 'windows']:
+if target_os not in ['arduino', 'esp8266', 'windows']:
 	liboctbstack_env.AppendUnique(CPPDEFINES  = ['WITH_POSIX', '_GNU_SOURCE'])
 	liboctbstack_env.AppendUnique(CFLAGS = ['-std=c99'])
 
@@ -136,13 +136,15 @@ if target_os in ['tizen', 'linux']:
 
 if target_os == 'arduino':
 	liboctbstack_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'WITH_ARDUINO'])
+elif target_os == 'esp8266':
+	liboctbstack_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'WITH_ESP8266'])
 elif target_os not in ['darwin','ios', 'msys_nt', 'windows']:
 	liboctbstack_env.AppendUnique(CFLAGS = ['-fPIC'])
 if target_os in ['darwin', 'ios']:
 	env.AppendUnique(CPPDEFINES = ['_DARWIN_C_SOURCE'])
 	liboctbstack_env.AppendUnique(CPPDEFINES = ['_DARWIN_C_SOURCE'])
 	liboctbstack_env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
-if target_os not in ['arduino', 'windows']:
+if target_os not in ['arduino', 'esp8266', 'windows']:
 	liboctbstack_env.AppendUnique(LINKFLAGS = ['-Wl,--no-undefined'])
 if target_os == 'android':
 	liboctbstack_env.AppendUnique(LINKFLAGS = ['-Wl,-soname,liboctbstack.so'])
@@ -200,6 +202,7 @@ if target_os in ['linux']:
 else:
     test_liboctbstack = liboctbstack_env.StaticLibrary('octbstack_test', liboctbstack_src)
 
+
 octbstack_libs = Flatten(test_liboctbstack)
 
 if target_os in ['windows', 'msys_nt']:
@@ -210,7 +213,7 @@ else:
 
 octbstack_libs = Flatten(static_liboctbstack)
 
-if target_os not in ['arduino','darwin','ios'] :
+if target_os not in ['arduino','esp8266','darwin','ios'] :
 	shared_liboctbstack = liboctbstack_env.SharedLibrary('octbstack', liboctbstack_src)
 	octbstack_libs += Flatten(shared_liboctbstack)
 	liboctbstack_env.UserInstallTargetHeader('stack/include/ocstack.h', 'resource', 'ocstack.h')

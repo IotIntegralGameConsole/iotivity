@@ -69,7 +69,7 @@ extern "C"
 
 #ifdef SINGLE_THREAD
 /**
- * Network Interface Information. Only needed for Arduino.
+ * Network Interface Information. Only needed for Arduino and ESP8266.
  */
 typedef struct
 {
@@ -199,7 +199,7 @@ void CAClearNetInterfaceInfoList(u_arraylist_t *infoList);
  */
 void CAClearServerInfoList(u_arraylist_t *serverInfoList);
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 /**
  * Convert address from binary to string.
  * @param[in]    sockAddr     IP address info.
@@ -217,7 +217,7 @@ void CAConvertAddrToName(const struct sockaddr_storage *sockAddr, socklen_t sock
  * @param[out]  ipaddr    IP address info.
  */
 void CAConvertNameToAddr(const char *host, uint16_t port, struct sockaddr_storage *sockaddr);
-#endif /* WITH_ARDUINO */
+#endif /* WITH_ARDUINO  || WITH_ESP8266*/
 
 #ifdef __ANDROID__
 /**

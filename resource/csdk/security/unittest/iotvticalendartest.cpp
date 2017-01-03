@@ -17,7 +17,7 @@
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 //Not supported on Arduino due lack of absolute time need to implement iCalendar
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 
 #include "gtest/gtest.h"
 #include "iotvticalendar.h"

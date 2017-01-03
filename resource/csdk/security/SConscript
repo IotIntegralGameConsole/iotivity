@@ -31,7 +31,7 @@ libocsrm_env = lib_env.Clone()
 target_os = libocsrm_env.get('TARGET_OS')
 # As in the source code, it includes arduino Time library (C++)
 # It requires compile the .c with g++
-if target_os == 'arduino':
+if target_os in ['arduino','esp8266']:
 	libocsrm_env.Replace(CC = libocsrm_env.get('CXX'))
 	libocsrm_env.Replace(CFLAGS = libocsrm_env.get('CXXFLAGS'))
 
@@ -62,7 +62,7 @@ libocsrm_env.PrependUnique(CPPPATH = [
 		'../security/provisioning/include'
 		])
 
-if target_os not in ['arduino', 'windows']:
+if target_os not in ['arduino', 'esp8266', 'windows']:
 	libocsrm_env.AppendUnique(CPPDEFINES  = ['WITH_POSIX', '_GNU_SOURCE'])
 	libocsrm_env.AppendUnique(CFLAGS = ['-std=c99', '-Wall'])
 
@@ -71,6 +71,8 @@ libocsrm_env.AppendUnique(LIBS = ['coap'])
 
 if target_os == 'arduino':
 	libocsrm_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'WITH_ARDUINO'])
+elif target_os == 'esp8266':
+	libocsrm_env.AppendUnique(CPPDEFINES = ['NDEBUG', 'WITH_ESP8266'])
 elif target_os not in ['windows', 'msys_nt']:
 	libocsrm_env.AppendUnique(CFLAGS = ['-fPIC'])
 	libocsrm_env.AppendUnique(LIBS = ['m'])

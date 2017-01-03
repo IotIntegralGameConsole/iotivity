@@ -12,8 +12,8 @@
 # include <assert.h>
 #endif
 
-#ifdef WITH_ARDUINO
-/* On Arduino the abort function, needed for assert, is defined in std lib */
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
+/* On Arduino and ES8266 the abort function, needed for assert, is defined in std lib */
 #include <stdlib.h>
 #endif
 

@@ -28,7 +28,7 @@ import platform
 print "Inside the Config SConscript"
 # Map of host os and allowed target os (host: allowed target os)
 host_target_map = {
-        'linux': ['linux', 'android', 'arduino', 'yocto', 'tizen'],
+        'linux': ['linux', 'android', 'arduino', 'esp8266', 'yocto', 'tizen'],
         'windows': ['windows', 'android', 'arduino', 'tizen'],
         'darwin': ['darwin', 'ios', 'android', 'arduino'],
         }
@@ -41,7 +41,8 @@ os_arch_map = {
         'darwin': ['i386', 'x86_64'],
         'ios': ['i386', 'x86_64', 'armv7', 'armv7s', 'arm64'],
         'arduino': ['avr', 'arm'],
-                'yocto': ['x86', 'x86_64'],
+        'esp8266': ['esp8266'],
+        'yocto': ['x86', 'x86_64'],
         'tizen': ['armv7'],
         }
 
@@ -89,7 +90,7 @@ if target_os in targets_support_cc:
             'Toolchain path (Generally only be required for cross-compiling)',
             os.environ.get('TC_PATH')))
 
-if target_os in ['android', 'arduino']: # Android/Arduino always uses GNU compiler regardless of the host
+if target_os in ['android', 'arduino', 'esp8266']: # Android/Arduino and esp8266 always uses GNU compiler regardless of the host
     env = Environment(variables = help_vars,
             tools = ['gnulink', 'gcc', 'g++', 'ar', 'as']
             )

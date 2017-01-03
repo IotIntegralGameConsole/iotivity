@@ -36,7 +36,9 @@ if os.environ.get('TERM') != None:
 SConscript('extra_options.scons')
 
 target_os = env.get('TARGET_OS')
-if target_os == 'arduino':
+if target_os == 'esp8266':
+	SConscript('esp8266.scons')
+elif target_os == 'arduino':
 	SConscript('arduino.scons')
 
 if target_os == 'android':
@@ -56,7 +58,7 @@ build_dir = env.get('BUILD_DIR')
 # Build 'resource' sub-project
 SConscript(build_dir + 'resource/SConscript')
 
-if target_os not in ['arduino','darwin','ios', 'android', 'msys_nt', 'windows']:
+if target_os not in ['arduino', 'esp8266', 'darwin', 'ios', 'android', 'msys_nt', 'windows']:
 	SConscript(build_dir + 'examples/OICMiddle/SConscript')
 
 # Build 'service' sub-project
@@ -72,8 +74,8 @@ SConscript(build_dir + 'plugins/SConscript')
 #     $ scon [options] -h
 env.PrintTargets()
 
-# Print bin upload command line (arduino only)
-if target_os == 'arduino':
+# Print bin upload command line (for arduino and esp8266)
+if target_os in ['arduino', 'esp8266']:
 	env.UploadHelp()
 
 # to install the generated pc file into custom prefix location

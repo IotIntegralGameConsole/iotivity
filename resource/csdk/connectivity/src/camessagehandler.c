@@ -958,14 +958,14 @@ CAResult_t CADetachSendMessage(const CAEndpoint_t *endpoint, const void *sendMsg
         return CA_STATUS_FAILED;
     }
 
-#ifdef ARDUINO
+#if defined (ARDUINO) || defined (ESP8266)
     // If max retransmission queue is reached, then don't handle new request
     if (CA_MAX_RT_ARRAY_SIZE == u_arraylist_length(g_retransmissionContext.dataList))
     {
         OIC_LOG(ERROR, TAG, "max RT queue size reached!");
         return CA_SEND_FAILED;
     }
-#endif // ARDUINO
+#endif /* ARDUINO || ESP8266 */
 
     CAData_t *data = CAPrepareSendData(endpoint, sendMsg, dataType);
     if(!data)

@@ -120,6 +120,7 @@ CAResult_t CAIPStopListenServer();
  */
 void CAIPSetPacketReceiveCallback(CAIPPacketReceivedCallback callback);
 
+#if defined(WITH_ARDUINO) || defined (WITH_ESP8266)
 /**
  * Set socket description for sending unicast UDP data.
  * Once the Unicast server is started,

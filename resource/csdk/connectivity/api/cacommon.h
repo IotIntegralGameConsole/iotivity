@@ -28,7 +28,7 @@
 
 #include "iotivity_config.h"
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 #ifdef TCP_ADAPTER
 #define HAVE_SYS_POLL_H
 #endif
@@ -70,7 +70,7 @@ extern "C"
 /**
  * Max header options data length.
  */
-#ifdef ARDUINO
+#if defined(ARDUINO) || defined(ESP8266)
 #define CA_MAX_HEADER_OPTION_DATA_LENGTH 20
 #else
 #define CA_MAX_HEADER_OPTION_DATA_LENGTH 1024
@@ -84,7 +84,7 @@ extern "C"
 /**
  * Max URI length.
  */
-#ifdef ARDUINO
+#if defined(ARDUINO) || defined(ESP8266)
 #define CA_MAX_URI_LENGTH 128  /* maximum size of URI for embedded platforms*/
 #else
 #define CA_MAX_URI_LENGTH 512 /* maximum size of URI for other platforms*/
@@ -93,7 +93,7 @@ extern "C"
 /**
  * Max PDU length supported.
  */
-#ifdef ARDUINO
+#if defined(ARDUINO) || defined(ESP8266)
 #define COAP_MAX_PDU_SIZE           320  /* maximum size of a CoAP PDU for embedded platforms*/
 #else
 #define COAP_MAX_PDU_SIZE           1400 /* maximum size of a CoAP PDU for big platforms*/

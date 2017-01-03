@@ -41,7 +41,7 @@ IoTivity includes a series of projects. You can find all these projects here:
     https://gerrit.iotivity.org/gerrit/#/admin/projects/
 
 You can build IoTivity project on Linux / Windows / MAC OSX for various OS(
-Linux, Tizen, Android, Arduino, Windows, MAC OSX, IOS ...).
+Linux, Tizen, Android, Arduino, ESP8266, Windows, MAC OSX, IOS ...).
 The output of the build is in:
   <top directory of the project>/out/<target_os>/<target_arch>/<build_type>/
 e.g.
@@ -84,7 +84,7 @@ Please refer to the following page to install scons:
 (Note: on Windows, install Python 2.x before installing scons)
 
 * 2. IDE/SDK Prerequites
-To build for some OS (Android / Arduino / IOS ...), an IDE/SDK may be required,
+To build for some OS (Android / Arduino / ESP8266 / IOS ...), an IDE/SDK may be required,
 please go to the relative page to download and install the required IDE/SDK.
 
 Android:
@@ -107,6 +107,22 @@ and extract to <arduino_ide_root>/libraries/
 dll isn't found. please copy relative dll from the IDE directory to
 C:\Windows\SysWOW64. IDE 1.5.7 doesn't have this issue. Other version IDE isn't
 tested.)
+
+ESP8266:
+To build for ESP8266, the esp8266/Arduino project is required.
+- Go to ESP8266 install directory (any directory you want)
+- Clone the esp8266/Arduino repository into hardware/esp8266com/esp8266 directory
+    $ cd hardware
+    $ mkdir esp8266com
+    $ cd esp8266com
+    $ git clone https://github.com/esp8266/Arduino.git esp8266
+- Download binary tools (you need Python 2.7)
+    $ cd esp8266/tools
+    $ python get.py
+
+ESP8266 builds are dependent on latest Time library. Download it from here:
+  http://playground.arduino.cc/code/time
+and extract to <esp8266_root>/hardware/esp8266com/esp8266/libraries/
 
 Apple:
 To build for Mac OSX or IOS, Xcode is required.
@@ -233,6 +249,20 @@ some boards have different processors, to specify the processor, add 'CPU=zzz'
 in the command line. If no 'CPU' option exists, that means the board only
 support one kind of processor, it's unnecessary to specify it)
 
+ESP8266:
+  * Possible values for <TARGET_TRANSPORT> is only: IP (unnecessary to specify it)
+  * Possible values for <TARGET_ARCH> is only: esp8266 (unnecessary to specify it)
+  * Possible values for <BOARD> is only: Generic ESP8266 Module (unnecessary to specify it)
+  * Possible values for <SHIELD> is only: WIFI (unnecessary to specify it)
+ 1. Go to root directory
+    $ cd <top directory of the project>
+    $ sudo apt-get install dos2unix
+
+ 2. Execute following command(s) to start building
+    -> Building:
+    $ scons TARGET_OS=esp8266 ESP8266_HOME=${ESP8266_HOME}
+    i.e ESP8266_HOME=/usr/local/opt/esp8266
+
 Mac OSX:
  * Possible values for <SYS_VERSION> are: OSX version, e.g. 10.9
 
@@ -278,7 +308,7 @@ See run.bat for more example usage parameters
  * TEST=1 or 0 (Run unit tests)
  * BUILD_SAMPLE=ON or OFF (Build with sample)
  * ROUTING=GW or EP (Enable routing)
- * WITH_TCP=true or false (Enable CoAP over TCP Transport, arduino is not supported)
+ * WITH_TCP=true or false (Enable CoAP over TCP Transport, arduino and esp8266 are not supported)
  * WITH_RA=true or false (Build with Remote Access module)
  * RD_MODE=CLIENT or SERVER (Build including Resource Directory)
  * SIMULATOR=true or false (Build with simulator module)

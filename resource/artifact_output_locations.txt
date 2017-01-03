@@ -167,7 +167,23 @@ TB Examples:
 		debug:
 			<oic-resource>/csdk/stack/samples/arduino/SimpleClientServer/ocserver/arduinodue/wifi_shield/debug/ocserver.hex
 
+===============================================================================
+====           ESP8266 Generic Module - Release & Debug - WiFi Shield         ====
+===============================================================================
 
+TB Stack:
+	WiFi:
+		release:			
+			<oic-resource>/csdk/liboctbstack.a
+		debug:
+			<oic-resource>/csdk/liboctbstack.a
+
+TB Examples:
+	WiFi:
+		release:
+			<oic-resource>/csdk/stack/samples/esp8266/SimpleClientServer/ocserver/ocserver.hex
+		debug:
+			<oic-resource>/csdk/stack/samples/esp8266/SimpleClientServer/ocserver/ocserver.hex
 
 
 

@@ -57,8 +57,11 @@ OCStackResult DiscoverAmsService(PEContext_t *context)
     OCStackResult ret = OC_STACK_ERROR;
     const char DOXM_DEVICEID_QUERY_FMT[] = "%s?%s=%s";
     char uri[MAX_URI_LENGTH + MAX_QUERY_LENGTH] = {0};
+#ifdef WITH_ESP8266
+    OCCallbackData cbData = {};
+#else
     OCCallbackData cbData = {.context=NULL};
-
+#endif
     VERIFY_NON_NULL(TAG, context, ERROR);
     snprintf(uri, sizeof(uri), DOXM_DEVICEID_QUERY_FMT, OIC_RSRC_DOXM_URI,
                                        OIC_JSON_DEVICE_ID_NAME,
@@ -150,7 +153,11 @@ OCStackResult SendUnicastSecurePortDiscovery(PEContext_t *context,OCDevAddr *dev
     OIC_LOG(INFO, TAG, "IN SendUnicastSecurePortDiscovery");
 
     const char RES_DOXM_QUERY_FMT[] = "%s?%s=%s";
+#ifdef WITH_ESP8266
+    OCCallbackData cbData = {};
+#else
     OCCallbackData cbData = {.context=NULL};
+#endif
     char uri[MAX_URI_LENGTH + MAX_QUERY_LENGTH] = {0};
     snprintf(uri, sizeof(uri), RES_DOXM_QUERY_FMT, OC_RSRVD_WELL_KNOWN_URI,
             OC_RSRVD_RESOURCE_TYPE, OIC_RSRC_TYPE_SEC_DOXM);
@@ -227,7 +234,11 @@ OCStackResult SendAclReq(PEContext_t *context, OCDevAddr *devAddr, OCConnectivit
     OCStackResult ret = OC_STACK_ERROR;
     const char GET_ACE_QUERY_FMT[] = "%s?%s=%s;%s=%s";
     char uri[MAX_URI_LENGTH + MAX_QUERY_LENGTH] = {0};
+#ifdef WITH_ESP8266
+    OCCallbackData cbData = {};
+#else
     OCCallbackData cbData = {.context=NULL};
+#endif
     OCDevAddr destAddr = {.adapter = OC_ADAPTER_IP};
     char *subID = NULL;
 

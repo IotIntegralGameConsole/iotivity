@@ -36,7 +36,11 @@ typedef enum PEState
     STOPPED = 0,              //Policy engine state machine is not running
     AWAITING_REQUEST,         //Can process new request
     AWAITING_AMS_RESPONSE,    //Can't process new request; waiting for AMS response
+#ifdef WITH_ESP8266           //Make redeclaration conflict with the BUSY from esp8266/tools/sdk/include
+    ESP_BUSY
+#else
     BUSY                      //Can't process new request as processing other requests
+#endif
 } PEState_t;
 
 typedef struct PEContext

@@ -36,7 +36,7 @@
  */
 typedef struct
 {
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(ESP8266)
     unsigned long int num : 20;
 #else
     unsigned int num : 20;

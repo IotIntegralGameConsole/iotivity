@@ -9,10 +9,9 @@
 #ifndef _COAP_NET_H_
 #define _COAP_NET_H_
 
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 #include "Time.h"
-#endif /* WITH_ARDUINO */
-
+#endif /* WITH_ARDUINO || WITH_ESP8266*/
 #ifdef __cplusplus
 extern "C"
 {
@@ -113,9 +112,9 @@ extern "C"
      * to sendqueue_basetime. */
     coap_tick_t sendqueue_basetime;
     coap_queue_t *sendqueue, *recvqueue;
-#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(_WIN32)
+#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(WITH_ESP8266) || defined(_WIN32)
     int sockfd; /**< send/receive socket */
-#endif /* WITH_POSIX || WITH_ARDUINO */
+#endif /* WITH_POSIX || WITH_ARDUINO || WITH_ESP8266*/
 #ifdef WITH_CONTIKI
         struct uip_udp_conn *conn; /**< uIP connection object */
 
@@ -200,7 +199,7 @@ extern "C"
 INLINE_API unsigned short coap_new_message_id(coap_context_t *context)
 {
     ++(context->message_id);
-#if defined(WITH_ARDUINO)
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
     return ((context->message_id << 8) | ((context->message_id >> 8) & (0xFF)));
 #elif defined(WITH_CONTIKI)
     return uip_htons(context->message_id);

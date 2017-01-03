@@ -1,0 +1,57 @@
+diff --rupN ld_Old/hardware/esp8266com/esp8266/tools/sdk/ld/eagle.app.v6.common.ld ld_New/hardware/esp8266com/esp8266/tools/sdk/ld/eagle.app.v6.common.ld
+--- ld_Old/hardware/esp8266com/esp8266/tools/sdk/ld/eagle.app.v6.common.ld	2016-10-10 23:27:07.906640425 +0200
++++ ld_New/hardware/esp8266com/esp8266/tools/sdk/ld/eagle.app.v6.common.ld	2016-10-10 23:28:49.154640752 +0200
+@@ -162,6 +162,22 @@
+     *libgcc.a:_umoddi3.o(.literal .text)
+     *libgcc.a:_udivdi3.o(.literal .text)
+     *libsmartconfig.a:(.literal .text .literal.* .text.*)
++
++    *libgeneric_core.a:(.literal .text .literal* .text*)
++    *libcoap.a:(.literal .text .literal.* .text.*)
++    *libconnectivity_abstraction.a:(.literal .text .literal.* .text.*)
++    *libc_common.a:(.literal .text .literal.* .text.*)
++    *libESP8266WiFi.a:(.literal .text .literal.* .text.*)
++    *libTime.a:(.literal .text .literal.* .text.*)
++    *libESP8266mDNS.a:(.literal .text .literal.* .text.*)
++    *libESP8266WebServer.a:(.literal .text .literal.* .text.*)
++    *libocsrm.a:(.literal .text .literal.* .text.*)
++    *liboctbstack.a:(.literal .text .literal.* .text.*)
++    *libroutingmanager.a:(.literal .text .literal.* .text.*)
++    *libSPI.a:(.literal .text .literal.* .text.*)
++    *libWire.a:(.literal .text .literal.* .text.*)
++    *libGDBStub.a:(.literal .text .literal.* .text.*)
++
+     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
+     _irom0_text_end = ABSOLUTE(.);
+     _flash_code_end = ABSOLUTE(.);
+@@ -199,8 +215,7 @@
+     *(.init.literal)
+     *(.init)
+     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+-    *.cpp.o(.iram.text)
+-    *.c.o(.iram.text)
++    *.o(.iram.text)
+     *(.fini.literal)
+     *(.fini)
+     *(.gnu.version)
+diff --rupN ld_Old/hardware/esp8266com/esp8266/cores/esp8266/libc_replacements.c ld_New/hardware/esp8266com/esp8266/cores/esp8266/libc_replacements.c
+--- ld_Old/hardware/esp8266com/esp8266/cores/esp8266/libc_replacements.c	2016-10-13 19:53:50.662568103 +0200
++++ ld_New/hardware/esp8266com/esp8266/cores/esp8266/libc_replacements.c	2016-10-13 19:54:22.090569754 +0200
+@@ -98,7 +98,7 @@
+     }
+     return EOF;
+ }
+-
++/*
+ int ICACHE_RAM_ATTR puts(const char * str) {
+     char c;
+     while((c = *str) != 0) {
+@@ -108,7 +108,7 @@
+     ets_putc('\n');
+     return true;
+ }
+-
++*/
+ #undef putchar
+ int ICACHE_RAM_ATTR putchar(int c) {
+     ets_putc(c);

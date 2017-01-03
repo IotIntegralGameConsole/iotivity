@@ -112,6 +112,24 @@ extern "C"
     extern time_t clock_offset;
 #endif /* WITH_POSIX || _WIN32 */
 
+#ifdef WITH_ESP8266
+#include <sys/time.h>
+#include "Time.h"
+typedef time_t coap_tick_t;
+/**
+* This data type is used to represent the difference between two
+* clock_tick_t values. This data type must have the same size in
+* memory as coap_tick_t to allow wrapping.
+*/
+typedef int coap_tick_diff_t;
+
+/* TODO: Ticks per second value for ESP8266 needs verification from
+* documentation */
+#define COAP_TICKS_PER_SECOND 1000
+
+extern time_t clock_offset;
+#endif /* WITH_ESP8266 */
+
 #ifdef WITH_ARDUINO
 #include "Time.h"
 #ifdef ARDUINO_ARCH_SAM
@@ -142,7 +160,9 @@ extern time_t clock_offset;
 #ifdef HAVE_TIME_H
         clock_offset = time(NULL);
 #else
-#  ifdef WITH_ARDUINO
+#  ifdef WITH_ESP8266
+    clock_offset = now();
+#  elif defined WITH_ARDUINO
 #ifdef __AVR__
     clock_offset = 1; //now();
 #else
@@ -170,7 +190,11 @@ extern time_t clock_offset;
         *t = (tv.tv_sec - clock_offset) * COAP_TICKS_PER_SECOND
                 + (tv.tv_usec * COAP_TICKS_PER_SECOND / 1000000);
 #else
-#  ifdef WITH_ARDUINO
+#  ifdef WITH_ESP8266
+    coap_tick_t tv;
+    tv = now();
+    *t = (tv - clock_offset) * COAP_TICKS_PER_SECOND;
+#  elif defined WITH_ARDUINO
     coap_tick_t tv;
 #ifdef __AVR__
     tv = 1; //now();

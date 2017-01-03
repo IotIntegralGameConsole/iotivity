@@ -67,14 +67,22 @@
 */
 #define OCRANDOM_TAG "OIC_OCRANDOM"
 
-#ifdef ARDUINO
+#if defined(ARDUINO) || defined(ESP8266)
 #include "Arduino.h"
-
+/*
+//Original code of KQ for ESP8266
+#ifdef ESP8266
+#undef HAVE_SRANDOM
+// ARM GCC compiler doesnt define srandom function.
+#elif defined(ARDUINO) && !defined(ARDUINO_ARCH_SAM)
+#define HAVE_SRANDOM 1
+*/
 /*
  * ARM GCC compiler doesnt define random/srandom functions, fallback to 
  * rand/srand.
  */
-#if !defined(ARDUINO_ARCH_SAM)
+//This needs to be checked for ESP8266: KE DEc. 21, 2016
+#if !defined(ARDUINO_ARCH_SAM) && !defined(ESP8266)
 #define OC_arduino_srandom_function srandom
 #define OC_arduino_random_function random
 #else
@@ -85,6 +93,8 @@
 uint8_t GetRandomBitRaw()
 {
     return analogRead((uint8_t)ANALOG_IN) & 0x1;
+    delay(0);
+    /*ESP8266: What is this suppoed to do after retun: KE DEc. 21, 2016 */
 }
 
 uint8_t GetRandomBitRaw2()
@@ -134,7 +144,7 @@ static void OCSeedRandom()
     {
         return;
     }
-    
+/* ESP8266 patch. Original line has 4 dots ....: KE Dec. 21, 2016 */
     uint32_t result =0;
     uint8_t i;
     for (i=32; i--;)

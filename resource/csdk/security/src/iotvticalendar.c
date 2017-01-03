@@ -19,7 +19,7 @@
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 //Not supported on Arduino due lack of absolute time need to implement iCalendar
-#if !defined(WITH_ARDUINO)
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 
 #define _XOPEN_SOURCE  //Needed by strptime
 #include "iotivity_config.h"

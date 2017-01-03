@@ -14,8 +14,11 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef ESP8266
+#include <c_types.h>
+#else
 #include <ctype.h>
-
+#endif
 #include "include/coap/mem.h"
 #include "include/coap/debug.h"
 #include "include/coap/pdu.h"

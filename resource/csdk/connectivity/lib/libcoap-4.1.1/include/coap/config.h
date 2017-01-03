@@ -30,7 +30,7 @@
 #define HAVE_MEMSET 1
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
-#if !defined(WITH_ARDUINO) && !defined(_WIN32)
+#if !defined(WITH_ARDUINO) && !defined(ESP8266) && !defined(_WIN32)
 #define HAVE_NETINET_IN_H 1
 #endif
 
@@ -62,7 +62,7 @@
 #define HAVE_STRRCHR 1
 
 /* Define to 1 if you have the <syslog.h> header file. */
-#if !defined(WITH_ARDUINO) && !defined(_WIN32)
+#if !defined(WITH_ARDUINO) && !defined(ESP8266) && !defined(_WIN32)
 #define HAVE_SYSLOG_H 1
 #endif
 
@@ -70,12 +70,12 @@
 #define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-#if !defined(WITH_ARDUINO) && !defined(_WIN32)
+#if !defined(WITH_ARDUINO) && !defined(ESP8266) && !defined(_WIN32)
 #define HAVE_SYS_TYPES_H 1
 #endif
 
 /* Define to 1 if you have the <sys/unistd.h> header file. */
-#if !defined(WITH_ARDUINO) && !defined(_WIN32)
+#if !defined(WITH_ARDUINO) && !defined(ESP8266) && !defined(_WIN32)
 #define HAVE_SYS_UNISTD_H 1
 #endif
 
@@ -95,12 +95,12 @@
 #endif
 
 /* Define to 1 if you have the <time.h> header file. */
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(ESP8266)
 #define HAVE_TIME_H 1
 #endif
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#if !defined(WITH_ARDUINO) && !defined(_WIN32)
+#if !defined(WITH_ARDUINO) && !defined(ESP8266) && !defined(_WIN32)
 #define HAVE_UNISTD_H 1
 #endif
 

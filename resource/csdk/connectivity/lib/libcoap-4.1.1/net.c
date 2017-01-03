@@ -56,7 +56,7 @@
 #include "include/coap/block.h"
 #include "include/coap/net.h"
 
-#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(_WIN32)
+#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(WITH_ESP8266) || defined(_WIN32)
 
 time_t clock_offset=0;
 
@@ -71,7 +71,7 @@ coap_free_node(coap_queue_t *node)
 {
     coap_free(node);
 }
-#endif /* WITH_POSIX || WITH_ARDUINO */
+#endif /* WITH_POSIX || WITH_ARDUINO  || WITH_ESP8266*/
 #ifdef WITH_LWIP
 
 #include <lwip/memp.h>
@@ -326,7 +326,7 @@ is_wkc(coap_key_t k)
 #endif
 
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 coap_context_t *
 coap_new_context(const coap_address_t *listen_addr)
 {
@@ -395,7 +395,7 @@ coap_new_context(const coap_address_t *listen_addr)
     coap_register_option(c, COAP_OPTION_BLOCK2);
     coap_register_option(c, COAP_OPTION_BLOCK1);
 
-#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(_WIN32)
+#if defined(WITH_POSIX) || defined(WITH_ARDUINO) || defined(WITH_ESP8266) || defined(_WIN32)
     c->sockfd = socket(listen_addr->addr.sa.sa_family, SOCK_DGRAM, 0);
     if ( c->sockfd < 0 )
     {
@@ -428,7 +428,7 @@ coap_new_context(const coap_address_t *listen_addr)
     coap_free( c );
     return NULL;
 
-#endif /* WITH_POSIX || WITH_ARDUINO */
+#endif /* WITH_POSIX || WITH_ARDUINO  || WITH_ESP8266 */
 #ifdef WITH_CONTIKI
     c->conn = udp_new(NULL, 0, NULL);
     udp_bind(c->conn, listen_addr->port);
@@ -477,7 +477,7 @@ void coap_free_context(coap_context_t *context)
     coap_retransmittimer_restart(context);
 #endif
 
-#if defined(WITH_POSIX) || defined(WITH_LWIP) || defined(WITH_ARDUINO) || defined(_WIN32)
+#if defined(WITH_POSIX) || defined(WITH_LWIP) || defined(WITH_ARDUINO) || defined(WITH_ESP8266) || defined(_WIN32)
 #ifdef COAP_RESOURCES_NOHASH
     LL_FOREACH(context->resources, res)
     {
@@ -487,7 +487,7 @@ void coap_free_context(coap_context_t *context)
 #endif
             coap_delete_resource(context, res->key);
         }
-#endif /* WITH_POSIX || WITH_LWIP */
+#endif /* WITH_POSIX || WITH_LWIP || WITH_ARDUINO || WITH_ESP8266 */
 
 #if defined(WITH_POSIX) || defined(_WIN32)
     /* coap_delete_list(context->subscriptions); */
@@ -503,7 +503,8 @@ void coap_free_context(coap_context_t *context)
     initialized = 0;
 #endif /* WITH_CONTIKI */
 }
-#endif //ifndef WITH_ARDUINO
+#endif /* ifndef WITH_ARDUINO  && ifndef WITH_ESP8266 */
+
 int coap_option_check_critical(coap_context_t *ctx, coap_pdu_t *pdu, coap_opt_filter_t unknown)
 {
 
@@ -564,9 +565,9 @@ void coap_transaction_id(const coap_address_t *peer, const coap_pdu_t *pdu, coap
     }
 #endif
 
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
     coap_hash((const unsigned char *)peer->addr, peer->size, h);
-#endif /* WITH_ARDUINO */
+#endif /* WITH_ARDUINO || WITH_ESP8266 */
 
 #if defined(WITH_LWIP) || defined(WITH_CONTIKI)
     /* FIXME: with lwip, we can do better */
@@ -597,7 +598,7 @@ coap_tid_t coap_send_ack(coap_context_t *context, const coap_address_t *dst, coa
     return result;
 }
 
-#if defined(WITH_ARDUINO)
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 coap_tid_t
 coap_send_impl(coap_context_t *context,
                const coap_address_t *dst,
@@ -605,7 +606,7 @@ coap_send_impl(coap_context_t *context,
 {
     return 0;
 }
-#endif
+#endif /* WITH_ARDUINO || WITH_ESP8266 */
 
 #if defined(WITH_POSIX) || defined(_WIN32)
 /* releases space allocated by PDU if free_pdu is set */
@@ -716,9 +717,9 @@ coap_send_impl(coap_context_t *context,
 
 coap_tid_t coap_send(coap_context_t *context, const coap_address_t *dst, coap_pdu_t *pdu)
 {
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
     return coap_send_impl(context, dst, pdu);
-#endif
+#endif /*  ifndef WITH_ARDUINO && ifndef WITH_ESP8266 */
 }
 
 coap_tid_t coap_send_error(coap_context_t *context, coap_pdu_t *request, const coap_address_t *dst,
@@ -859,7 +860,7 @@ coap_tid_t coap_retransmit(coap_context_t *context, coap_queue_t *node)
 
     /* no more retransmissions, remove node from system */
 
-#if !defined(WITH_CONTIKI) && !defined(WITH_ARDUINO)
+#if !defined(WITH_CONTIKI) && !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
     debug("** removed transaction %d\n", ntohs(node->id));
 #endif
 
@@ -898,7 +899,7 @@ INLINE_API int check_opt_size(coap_opt_t *opt, unsigned char *maxpos)
     return 0;
 }
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 int coap_read(coap_context_t *ctx)
 {
 #if defined(WITH_POSIX) || defined(_WIN32)
@@ -1025,7 +1026,7 @@ int coap_read(coap_context_t *ctx)
 #endif
     return -1;
 }
-#endif //#ifndef WITH_ARDUINO
+#endif // ifndef WITH_ARDUINO && ifndef WITH_ESP8266
 
 int coap_remove_from_queue(coap_queue_t **queue, coap_tid_t id, coap_queue_t **node)
 {

@@ -252,7 +252,7 @@ bool DPGenerateQuery(bool isSecure,
 // @todo: Remove this ifdef. On Arduino, CT_ADAPTER_TCP resolves to the same value
 // as CT_ADAPTER_IP, resulting in a compiler error.
 #ifdef WITH_TCP
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
         case CT_ADAPTER_TCP:
             prefix = (isSecure == true) ? QPREFIX_COAPS_TCP : QPREFIX_COAP_TCP;
 #endif
@@ -298,7 +298,7 @@ bool DPGenerateQuery(bool isSecure,
             }
 
             break;
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
         // TODO: We need to verify tinyDTLS in below cases
         case CT_ADAPTER_GATT_BTLE:
         case CT_ADAPTER_RFCOMM_BTEDR:
@@ -954,7 +954,7 @@ static OCStackApplicationResult DirectPairingDiscoveryHandler(void* ctx, OCDoHan
 
     return OC_STACK_DELETE_TRANSACTION;
 }
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 /**
  * Discover direct-pairing devices in the same IP subnet. .
  *

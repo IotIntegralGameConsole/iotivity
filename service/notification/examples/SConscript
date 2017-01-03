@@ -8,3 +8,7 @@ if target_os == 'linux':
 	SConscript('linux/SConscript')
 elif target_os == 'android':
 	SConscript('android/SConscript')
+elif target_os == 'esp8266':
+	SConscript('esp8266/SConscript')
+elif target_os == 'arduino':
+	SConscript('arduino/SConscript')

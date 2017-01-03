@@ -7,22 +7,23 @@ import platform
 
 # Map of host os and allowed target os (host: allowed target os)
 host_target_map = {
-		'linux': ['linux', 'android', 'arduino', 'yocto', 'tizen'],
-		'windows': ['windows', 'android', 'arduino'],
-		'darwin': ['darwin', 'ios', 'android', 'arduino'],
-		}
+	'linux': ['linux', 'android', 'arduino', 'esp8266', 'yocto', 'tizen'],
+	'windows': ['windows', 'android', 'arduino'],
+	'darwin': ['darwin', 'ios', 'android', 'arduino'],
+}
 
 # Map of os and allowed archs (os: allowed archs)
 os_arch_map = {
-		'linux': ['x86', 'x86_64', 'arm', 'arm64', 'mips', 'mipsel', 'mips64', 'mips64el', 'i386', 'powerpc', 'sparc', 'aarch64'],
-		'tizen': ['x86', 'x86_64', 'arm', 'arm64'],
-		'android': ['x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'armeabi-v7a-hard', 'arm64-v8a'],
-		'windows': ['x86', 'amd64', 'arm'],
-		'darwin': ['i386', 'x86_64'],
-		'ios': ['i386', 'x86_64', 'armv7', 'armv7s', 'arm64'],
-		'arduino': ['avr', 'arm'],
-                'yocto': ['i586', 'i686', 'x86_64', 'arm', 'aarch64', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
-		}
+	'linux': ['x86', 'x86_64', 'arm', 'arm64', 'mips', 'mipsel', 'mips64', 'mips64el', 'i386', 'powerpc', 'sparc', 'aarch64'],
+	'tizen': ['x86', 'x86_64', 'arm', 'arm64'],
+	'android': ['x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'armeabi-v7a-hard', 'arm64-v8a'],
+	'windows': ['x86', 'amd64', 'arm'],
+	'darwin': ['i386', 'x86_64'],
+	'ios': ['i386', 'x86_64', 'armv7', 'armv7s', 'arm64'],
+	'arduino': ['avr', 'arm'],
+        'yocto': ['i586', 'i686', 'x86_64', 'arm', 'aarch64', 'powerpc', 'powerpc64', 'mips', 'mipsel'],
+        'esp8266': ['esp8266'],
+}
 
 host = platform.system().lower()
 
@@ -62,7 +63,7 @@ help_vars.Add(EnumVariable('TARGET_OS', 'Target platform', host, host_target_map
 help_vars.Add(ListVariable('TARGET_TRANSPORT', 'Target transport', 'ALL', ['ALL', 'BT', 'BLE', 'IP']))
 help_vars.Add(EnumVariable('TARGET_ARCH', 'Target architecture', default_arch, os_arch_map[target_os]))
 help_vars.Add(EnumVariable('SECURED', 'Build with DTLS', '0', allowed_values=('0', '1')))
-help_vars.Add(BoolVariable('UPLOAD', 'Upload binary ? (For Arduino)', require_upload))
+help_vars.Add(BoolVariable('UPLOAD', 'Upload binary ? (For Arduino or ESP8266)', require_upload))
 help_vars.Add(EnumVariable('ROUTING', 'Enable routing', 'EP', allowed_values=('GW', 'EP')))
 help_vars.Add(EnumVariable('BUILD_SAMPLE', 'Build with sample', 'ON', allowed_values=('ON', 'OFF')))
 help_vars.Add(BoolVariable('WITH_TCP', 'Enable TCP', False))
@@ -81,7 +82,7 @@ AddOption('--prefix',
 ######################################################################
 # Platform(build target) specific options: SDK/NDK & toolchain
 ######################################################################
-targets_support_cc = ['linux', 'arduino', 'tizen']
+targets_support_cc = ['linux', 'arduino', 'esp8266', 'tizen']
 
 if target_os in targets_support_cc:
 	# Set cross compile toolchain
@@ -90,7 +91,7 @@ if target_os in targets_support_cc:
 			'Toolchain path (Generally only be required for cross-compiling)',
 			os.environ.get('TC_PATH')))
 
-if target_os in ['android', 'arduino']: # Android/Arduino always uses GNU compiler regardless of the host
+if target_os in ['android', 'arduino', 'esp8266']: # Android/Arduino/ESP8266 always uses GNU compiler regardless of the host
 	env = Environment(variables = help_vars,
 			tools = ['gnulink', 'gcc', 'g++', 'ar', 'as']
 			)

@@ -333,14 +333,14 @@ coap_show_pdu(const coap_pdu_t *pdu) {
 
 #endif /* NDEBUG */
 
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 void
 coap_log_impl(coap_log_t level, const char *format, ...) {
     //TODO: Implement logging functionalities for Arduino
 }
 #endif
 
-#ifndef WITH_ARDUINO
+#if !defined(WITH_ARDUINO) && !defined(WITH_ESP8266)
 #ifndef WITH_CONTIKI
 void
 coap_log_impl(coap_log_t level, const char *format, ...) {

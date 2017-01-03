@@ -32,7 +32,7 @@ rd_mode = env.get('RD_MODE')
 # Build liblogger
 SConscript('csdk/logger/SConscript')
 
-if target_os not in ['arduino', 'darwin', 'ios', 'android', 'msys_nt', 'windows']:
+if target_os not in ['arduino', 'esp8266', 'darwin', 'ios', 'android', 'msys_nt', 'windows']:
 	env.AppendUnique(LIBS=['rt'])
 
 # Download (if not already present) & build libcoap
@@ -57,14 +57,14 @@ SConscript('csdk/security/SConscript')
 # Build liboctbstack
 SConscript('csdk/SConscript')
 
-if target_os not in ['arduino','darwin']:
+if target_os not in ['arduino',  'esp8266', 'darwin']:
 	# Build liboc_logger
 	SConscript('oc_logger/SConscript')
 
 	# Build liboc
 	SConscript('src/SConscript')
 
-if target_os not in ['arduino','darwin','ios','android']:
+if target_os not in ['arduino','esp8266','darwin','ios','android']:
 	# Build examples
 	SConscript('examples/SConscript')
 
@@ -87,6 +87,10 @@ elif target_os == 'darwin':
 
 	# Build C stack's unit tests.
 	SConscript('unit_tests.scons')
+
+elif target_os == 'esp8266':
+	SConscript('csdk/stack/samples/esp8266/SimpleClientServer/ocserver/SConscript')
+	#SConscript('csdk/stack/samples/esp8266/SimpleClientServer/occlient/SConscript')
 
 elif target_os == 'arduino':
 	SConscript('csdk/stack/samples/arduino/SimpleClientServer/ocserver/SConscript')

@@ -24,7 +24,7 @@
 #define COAP_DEFAULT_PORT           5683 /* CoAP default UDP port */
 #define COAP_DEFAULT_MAX_AGE          60 /* default maximum object lifetime in seconds */
 #ifndef COAP_MAX_PDU_SIZE
-#ifdef WITH_ARDUINO
+#if defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 #define COAP_MAX_PDU_SIZE           320 /* maximum size of a CoAP PDU for embedded platforms*/
 #else
 #define COAP_MAX_PDU_SIZE           1400 /* maximum size of a CoAP PDU for big platforms*/
@@ -470,7 +470,7 @@ coap_transport_t coap_get_tcp_header_type_from_size(unsigned int size);
  * through first nibble(0~E) of init-byte .
  *
  * @param legnth   length value of init byte.
-* @return The transport type.
+ * @return The transport type.
  */
 coap_transport_t coap_get_tcp_header_type_from_initbyte(unsigned int length);
 

@@ -85,8 +85,8 @@ cxx_headers = ['arpa/inet.h',
                'winsock2.h',
                'ws2tcpip.h']
 
-if target_os == 'arduino':
-	# Detection of headers on the Arduino platform is currently broken.
+if target_os in ['arduino', 'esp8266']:
+	# Detection of headers on the Arduino platform or ESP8266 platform is currently broken.
 	cxx_headers = []
 
 if target_os == 'msys_nt':

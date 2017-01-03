@@ -52,7 +52,7 @@ samples_env.AppendUnique(LIBPATH = [samples_env.get('BUILD_DIR')])
 
 samples_env.PrependUnique(LIBS = ['octbstack', 'ocsrm', 'connectivity_abstraction', 'coap'])
 
-if target_os not in ['arduino', 'windows', 'darwin', 'ios', 'msys_nt']:
+if target_os not in ['arduino', 'esp8266', 'windows', 'darwin', 'ios', 'msys_nt']:
 	samples_env.AppendUnique(LIBS = ['rt'])
 
 if target_os not in ['windows']:

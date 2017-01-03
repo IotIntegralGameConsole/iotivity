@@ -18,7 +18,7 @@
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-#ifdef ARDUINO
+#if defined(ARDUINO) || defined(ESP8266)
 #define __STDC_LIMIT_MACROS
 #endif
 
