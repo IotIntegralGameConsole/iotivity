@@ -31,33 +31,31 @@ import org.iotivity.cloud.util.Log;
 
 public class MessageQueueServer {
 
+    private static int          coapServerPort;
+    private static boolean      tlsMode;
+    private static String       zookeeperHost;
+    private static String       kafkaHost;
+
     public static void main(String[] args) throws Exception {
         Log.Init();
 
         System.out.println("-----MQ SERVER-----");
-
-        if (args.length != 6) {
-            Log.e("coap server port, Kafka_zookeeper_Address port"
-                    + " and Kafka_broker_Address Port and TLS mode required\n"
-                    + "ex) 5686 127.0.0.1 2181 127.0.0.1 9092 0\n");
-
+        
+        if (!parseConfiguration(args)) {
+            Log.e("\nCoAP-server <Port> Zookeeper <Address> <Port> Kafka <Address> <Port> TLS-mode <0|1> are required.\n"
+                    + "ex) " + Constants.DEFAULT_COAP_PORT + " 127.0.0.1 2181 127.0.0.1 9092 0\n");
             return;
         }
 
         ServerSystem serverSystem = new ServerSystem();
 
         MQBrokerResource MQBroker = new MQBrokerResource();
-
-        String kafka_zookeeper = args[1] + ":" + args[2];
-        String kafka_broker = args[3] + ":" + args[4];
-        MQBroker.setKafkaInformation(kafka_zookeeper, kafka_broker);
+        MQBroker.setKafkaInformation(zookeeperHost, kafkaHost);
 
         serverSystem.addResource(MQBroker);
 
         serverSystem.addServer(new CoapServer(
-                new InetSocketAddress(Integer.parseInt(args[0]))));
-
-        boolean tlsMode = Integer.parseInt(args[5]) == 1;
+                new InetSocketAddress(coapServerPort)));
 
         serverSystem.startSystem(tlsMode);
 
@@ -65,7 +63,7 @@ public class MessageQueueServer {
 
         System.out.println("press 'q' to terminate");
 
-        while (!in.nextLine().equals("q"));
+        while (!(in.hasNextLine() && in.nextLine().equals("q")));
 
         in.close();
 
@@ -74,5 +72,26 @@ public class MessageQueueServer {
         serverSystem.stopSystem();
 
         System.out.println("Terminated");
+    }
+
+    private static boolean parseConfiguration(String[] args) {
+        // configuration provided by arguments
+        if (args.length == 6) {
+            coapServerPort = Integer.parseInt(args[0]);
+            tlsMode = Integer.parseInt(args[5]) == 1;
+            zookeeperHost = args[1] + ":" + args[2];
+            kafkaHost = args[3] + ":" + args[4];
+            return true;
+        }
+        // configuration provided by docker env
+        String tlsModeEnv = System.getenv("TLS_MODE"); 
+        if (tlsModeEnv != null) {
+            coapServerPort = Constants.DEFAULT_COAP_PORT;
+            tlsMode = Integer.parseInt(tlsModeEnv) == 1;
+            zookeeperHost = System.getenv("ZOOKEEPER_ADDRESS") + ":" + System.getenv("ZOOKEEPER_PORT");
+            kafkaHost = System.getenv("KAFKA_ADDRESS") + ":" + System.getenv("KAFKA_PORT");
+            return true;
+        }
+        return false;
     }
 }

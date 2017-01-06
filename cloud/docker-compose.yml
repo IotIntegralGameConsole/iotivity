@@ -1,0 +1,61 @@
+version: '2'
+services:
+
+  mongodb:
+    image: mongo
+
+  kafka-zookeeper:
+    image: spotify/kafka
+      
+  iotivity-messagequeue:
+    image: opencf/iotivity-messagequeue
+    # build:
+    #   context: ./messagequeue/
+    #   dockerfile: Dockerfile
+    links:
+      - "kafka-zookeeper"
+    environment:
+      - TLS_MODE=0
+    volumes:
+      - "./certificate:/iotivity/certs/"
+  
+  iotivity-accountserver:
+    image: opencf/iotivity-accountserver
+    # build:
+    #   context: ./account/
+    #   dockerfile: Dockerfile
+    links:
+      - "mongodb"
+    environment:
+      - TLS_MODE=0
+    volumes:
+      - "./certificate:/iotivity/certs/"
+
+  iotivity-resourcedirectory:
+    image: opencf/iotivity-resourcedirectory
+    # build:
+    #   context: ./resourcedirectory/
+    #   dockerfile: Dockerfile
+    links:
+      - "mongodb"
+    environment:
+      - TLS_MODE=0
+    volumes:
+      - "./certificate:/iotivity/certs/"
+  
+  iotivity-interface:
+    image: opencf/iotivity-interface
+    # build:
+    #   context: ./interface/
+    #   dockerfile: Dockerfile
+    ports:
+      - "5683:5683"
+      - "80:80"
+    links:
+      - "iotivity-accountserver"
+      - "iotivity-resourcedirectory"
+      - "iotivity-messagequeue"
+    environment:
+      - TLS_MODE=0
+    volumes:
+      - "./certificate:/iotivity/certs/"

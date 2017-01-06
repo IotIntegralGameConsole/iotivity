@@ -23,6 +23,7 @@ package org.iotivity.cloud.ciserver;
 
 import java.net.InetSocketAddress;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.iotivity.cloud.base.connector.ConnectorPool;
 import org.iotivity.cloud.base.server.CoapServer;
@@ -46,37 +47,40 @@ import org.iotivity.cloud.util.Log;
 
 public class CloudInterfaceServer {
 
+    private static int          coapServerPort;
+    private static boolean      tlsMode;
+    private static boolean      hcProxyMode;
+    private static int          hcProxyPort;
+    private static String       resourceDirectoryAddress;
+    private static int          resourceDirectoryPort;
+    private static String       accountServerAddress;
+    private static int          accountServerPort;
+    private static String       messageQueueAddress;
+    private static int          messageQueuePort;
+
     public static void main(String[] args) throws Exception {
         Log.Init();
 
         System.out.println("-----CI SERVER-------");
 
-        if (!(args.length == 8 || args.length == 9)) {
-            Log.e("\nCoAP-server <Port> and RD-server <Address> <Port> Account-server <Address> <Port> MQ-broker <Address> <Port> HC-proxy [HTTP-port] and TLS-mode <0|1> are required.\n"
-                    + "ex) 5683 127.0.0.1 5684 127.0.0.1 5685 127.0.0.1 5686 80 0\n");
+        if (!parseConfiguration(args)) {
+            Log.e("\nCoAP-server <Port> RD-server <Address> <Port> Account-server <Address> <Port> MQ-broker <Address> <Port> HC-proxy [HTTP-port] and TLS-mode <0|1> are required.\n"
+                    + "ex) " + Constants.DEFAULT_COAP_PORT
+                    + " 127.0.0.1 " + Constants.RESOURCE_DIRECTORY_PORT
+                    + " 127.0.0.1 " + Constants.ACCOUNT_SERVER_PORT
+                    + " 127.0.0.1 " + Constants.MESSAGE_QUEUE_PORT
+                    + " 80 0\n");
             return;
         }
 
-        boolean hcProxyMode = false;
-        if (args.length == 9) {
-            hcProxyMode = true;
-        }
-
-        boolean tlsMode = false;
-        if (hcProxyMode) {
-            tlsMode = Integer.parseInt(args[8]) == 1;
-        } else {
-            tlsMode = Integer.parseInt(args[7]) == 1;
-        }
-
         ConnectorPool.addConnection("rd",
-                new InetSocketAddress(args[1], Integer.parseInt(args[2])),
+                new InetSocketAddress(resourceDirectoryAddress, resourceDirectoryPort),
                 tlsMode);
         ConnectorPool.addConnection("account",
-                new InetSocketAddress(args[3], Integer.parseInt(args[4])),
+                new InetSocketAddress(accountServerAddress, accountServerPort),
                 tlsMode);
         ConnectorPool.addConnection("mq",
-                new InetSocketAddress(args[5], Integer.parseInt(args[6])),
+                new InetSocketAddress(messageQueueAddress, messageQueuePort),
                 tlsMode);
 
         DeviceServerSystem deviceServer = new DeviceServerSystem();
@@ -92,7 +96,7 @@ public class CloudInterfaceServer {
         AclGroup aclGroupHandler = new AclGroup();
         Certificate certHandler = new Certificate();
         AclInvite aclInviteHandler = new AclInvite();
-	Crl crlHandler = new Crl();
+        Crl crlHandler = new Crl();
         CoapDevicePool devicePool = deviceServer.getDevicePool();
 
         deviceServer.addResource(acHandler);
@@ -127,13 +131,12 @@ public class CloudInterfaceServer {
         deviceServer.addResource(new DiResource(devicePool));
 
         deviceServer.addServer(new CoapServer(
-                new InetSocketAddress(Integer.parseInt(args[0]))));
+                new InetSocketAddress(coapServerPort)));
 
         // Add HTTP Server for HTTP-to-CoAP Proxy
-        if (hcProxyMode) {
+        if (hcProxyMode)
             deviceServer.addServer(new HttpServer(
-                    new InetSocketAddress(Integer.valueOf(args[7]))));
-        }
+                    new InetSocketAddress(hcProxyPort)));
 
         deviceServer.startSystem(tlsMode);
 
@@ -143,7 +146,7 @@ public class CloudInterfaceServer {
 
         System.out.println("press 'q' to terminate");
 
-        while (!in.nextLine().equals("q"));
+        while (!(in.hasNextLine() && in.nextLine().equals("q")));
 
         in.close();
 
@@ -154,5 +157,42 @@ public class CloudInterfaceServer {
         deviceServer.stopSystem();
 
         System.out.println("Terminated");
+    }
+
+    private static boolean parseConfiguration(String[] args) {
+        // configuration provided by arguments
+        if (args.length == 8 || args.length == 9) {
+            coapServerPort = Integer.parseInt(args[0]);
+            resourceDirectoryAddress = args[1];
+            resourceDirectoryPort = Integer.parseInt(args[2]);
+            accountServerAddress = args[3];
+            accountServerPort = Integer.parseInt(args[4]);
+            messageQueueAddress = args[5];
+            messageQueuePort = Integer.parseInt(args[6]);
+            if (args.length == 9) {
+                hcProxyMode = true;
+                hcProxyPort = Integer.parseInt(args[7]);
+                tlsMode = Integer.parseInt(args[8]) == 1;
+            }
+            else
+                tlsMode = Integer.parseInt(args[7]) == 1;
+            return true;
+        }
+        // configuration provided by docker env
+        String tlsModeEnv = System.getenv("TLS_MODE");
+        if (tlsModeEnv != null) {
+            coapServerPort = Constants.DEFAULT_COAP_PORT;
+            resourceDirectoryAddress = System.getenv("RESOURCE_DIRECTORY_ADDRESS");
+            resourceDirectoryPort = Constants.RESOURCE_DIRECTORY_PORT;
+            accountServerAddress = System.getenv("ACCOUNT_SERVER_ADDRESS");
+            accountServerPort = Constants.ACCOUNT_SERVER_PORT;
+            messageQueueAddress = System.getenv("MESSAGE_QUEUE_ADDRESS");
+            messageQueuePort = Constants.MESSAGE_QUEUE_PORT;
+            hcProxyMode = Integer.parseInt(System.getenv("HC_PROXY_MODE")) == 1;
+            hcProxyPort = Constants.DEFAULT_HC_PROXY_PORT;
+            tlsMode = Integer.parseInt(tlsModeEnv) == 1;
+            return true;
+        }
+        return false;
     }
 }

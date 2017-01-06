@@ -21,37 +21,28 @@
  */
 package org.iotivity.cloud.base.connector;
 
-import java.io.File;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.net.ssl.SSLException;
-
-import org.iotivity.cloud.base.OICConstants;
-import org.iotivity.cloud.base.protocols.coap.CoapDecoder;
-import org.iotivity.cloud.base.protocols.coap.CoapEncoder;
-import org.iotivity.cloud.base.protocols.coap.CoapLogHandler;
-import org.iotivity.cloud.base.protocols.coap.CoapResponse;
-
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.*;
 import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
+import org.iotivity.cloud.base.OICConstants;
+import org.iotivity.cloud.base.protocols.coap.CoapDecoder;
+import org.iotivity.cloud.base.protocols.coap.CoapEncoder;
+import org.iotivity.cloud.base.protocols.coap.CoapLogHandler;
+import org.iotivity.cloud.base.protocols.coap.CoapResponse;
+import org.iotivity.cloud.util.Log;
+
+import javax.net.ssl.SSLException;
+import java.io.File;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class CoapConnector {
 
@@ -153,8 +144,17 @@ public class CoapConnector {
         mBootstrap.handler(initializer);
 
         ChannelFuture channelFuture = null;
-        channelFuture = mBootstrap.connect(inetSocketAddress).sync();
-
+        while (true) {
+            channelFuture = mBootstrap.connect(inetSocketAddress).await();
+            if (channelFuture.isSuccess())
+                break;
+            Log.d("Connection to " + inetSocketAddress.getAddress() + " was not successful. Retrying in 10s.");
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                Log.e(e.getMessage(), e);
+            }
+        }
         CoapClient coapClient = null;
         coapClient = new CoapClient(channelFuture.channel());
         mChannelMap.put(channelFuture.channel(), coapClient);
