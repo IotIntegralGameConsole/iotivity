@@ -174,6 +174,7 @@ cp %{SOURCE1001} ./%{name}-test.manifest
 
 %build
 scons \
+    %{?_smp_mflags} \
     --prefix=%{_prefix} \
     ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} \
     LIB_INSTALL_DIR=%{_libdir} \
