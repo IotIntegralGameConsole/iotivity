@@ -173,7 +173,8 @@ cp %{SOURCE1001} ./%{name}-test.manifest
 %endif
 
 %build
-scons %{?_smp_mflags} --prefix=%{_prefix} \
+scons \
+    --prefix=%{_prefix} \
     ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} \
     LIB_INSTALL_DIR=%{_libdir} \
     LOGGING=%{LOGGING} \
