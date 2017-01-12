@@ -9,6 +9,7 @@ Source0: http://mirrors.kernel.org/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1001: %{name}.manifest
 Source1002: %{name}-test.manifest
 
+
 %if 0%{?tizen:1}
 %define TARGET_OS tizen
 %else
@@ -39,13 +40,13 @@ Source1002: %{name}-test.manifest
 %endif
 
 %ifarch armv7l armv7hl armv7nhl armv7tnhl armv7thl
-%if 3 <= %{tizen_version_major}
+%if "3" <= "0%{tizen_version_major}"
 BuildRequires: python-accel-armv7l-cross-arm
 %endif
 %define TARGET_ARCH "armeabi-v7a"
 %endif
 %ifarch aarch64
-%if 3 <= %{tizen_version_major}
+%if "3" <= "0%{tizen_version_major}"
 BuildRequires: python-accel-aarch64-cross-aarch64
 %endif
 %define TARGET_ARCH "arm64"
