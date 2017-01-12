@@ -9,6 +9,8 @@ Source0: http://mirrors.kernel.org/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1001: %{name}.manifest
 Source1002: %{name}-test.manifest
 
+%define _smp_mflags -j4
+
 %if 0%{?tizen:1}
 %define TARGET_OS tizen
 %else
