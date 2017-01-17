@@ -25,7 +25,7 @@
 #include "OCApi.h"
 #include "OCProvisioningManager.hpp"
 
-#include "EasySetup.h"
+#include "EasySetup.hpp"
 #include "ESRichCommon.h"
 
 #define ES_SAMPLE_APP_TAG "ES_SAMPLE_APP_TAG"
