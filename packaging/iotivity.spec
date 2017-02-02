@@ -9,27 +9,13 @@ Source0: http://mirrors.kernel.org/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1001: %{name}.manifest
 Source1002: %{name}-test.manifest
 
-%if 0%{?tizen:1}
-%define TARGET_OS tizen
-%else
-%define TARGET_OS linux
-%endif
-
-%if "%{tizen}" == "2.3"
+# Use the official macros that are defined in Project Config (build.tizen.org).
+# https://build.tizen.org/project/prjconf?project=<project_name>
+#  - tizen_version_major 4
+#  - tizen_version_minor 0
+# For backward compatibility. Not needed (always true) in unified environment.
+#  - unified (undefined)
 %define TARGET_TRANSPORT IP
-%endif
-
-%if "%{profile}" == "ivi"
-%define TARGET_TRANSPORT IP
-%endif
-
-%if "%{TARGET_OS}" == "linux"
-%define TARGET_TRANSPORT IP
-%endif
-
-%if "%{TARGET_OS}" == "tizen"
-%define TARGET_TRANSPORT IP
-%endif
 
 # default is RELEASE mode.
 # If DEBUG mode is needed, please use tizen_build_devel_mode
