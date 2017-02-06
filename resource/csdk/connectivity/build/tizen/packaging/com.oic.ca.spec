@@ -32,7 +32,6 @@ Source0: http://mirrors.kernel.org/%{name}/%{version}/%{name}-%{version}.tar.gz
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(capi-network-connection)
-BuildRequires: pkgconfig(capi-network-wifi)
 BuildRequires: pkgconfig(capi-network-bluetooth)
 BuildRequires: boost-devel
 BuildRequires: boost-thread

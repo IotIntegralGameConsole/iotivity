@@ -91,7 +91,6 @@ BuildRequires:  pkgconfig(sqlite3)
 BuildRequires:  gettext-tools
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(capi-network-connection)
-BuildRequires:  pkgconfig(capi-network-wifi)
 BuildRequires:  pkgconfig(capi-network-bluetooth) >= 0.1.52
 %else
 %if 0%{?fedora:1}
