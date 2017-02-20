@@ -79,7 +79,7 @@ void CAEDRCoreJniInit();
  * @retval  ::CA_STATUS_OK  Successful.
  * @retval  ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendUnicastMessage(const char *address, const uint8_t *data, uint32_t dataLen);
+CAResult_t CAEDRSendUnicastMessage(const char *address, const uint8_t *data, const size_t dataLen);
 
 /**
  * Send data for multicast.
@@ -89,7 +89,7 @@ CAResult_t CAEDRSendUnicastMessage(const char *address, const uint8_t *data, uin
  * @retval  ::CA_STATUS_OK  Successful.
  * @retval  ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendMulticastMessage(const uint8_t *data, uint32_t dataLen);
+CAResult_t CAEDRSendMulticastMessage(const uint8_t *data, const size_t dataLen);
 
 /**
  * Get Local EDR Address.

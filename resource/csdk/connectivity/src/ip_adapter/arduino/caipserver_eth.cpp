@@ -55,7 +55,7 @@ CAResult_t CAIPStartUnicastServer(const char *localAddress, uint16_t *port,
 static CAResult_t CAArduinoRecvData(int32_t sockFd);
 static void CAArduinoCheckData();
 static void CAPacketReceivedCallback(const char *ipAddress, const uint16_t port,
-                              const void *data, const uint32_t dataLength);
+                              const void *data, const size_t dataLength);
 
 static CAIPPacketReceivedCallback g_packetReceivedCallback = NULL;
 static int g_unicastSocket = 0;
@@ -227,7 +227,7 @@ void CAIPStopServer()
 }
 
 void CAPacketReceivedCallback(const char *ipAddress, const uint16_t port,
-                              const void *data, const uint32_t dataLength)
+                              const void *data, const size_t dataLength)
 {
     OIC_LOG(DEBUG, TAG, "IN");
     if (g_packetReceivedCallback)
@@ -294,7 +294,7 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
     }
 
     // Read available data.
-    int32_t ret = recvfrom(sockFd, (uint8_t *)data, recvLen + 1, senderAddr, &senderPort);
+    size_t ret = recvfrom(sockFd, (uint8_t *)data, recvLen + 1, senderAddr, &senderPort);
     if (ret < 0)
     {
         OIC_LOG(ERROR, TAG, "rcv fail");

@@ -73,7 +73,7 @@ CAResult_t CAStartRA();
  * @return The number of bytes sent on the network, or -1 upon error.
  */
 int32_t CASendRAUnicastData(const CAEndpoint_t *endpoint, const void *data,
-                            uint32_t dataLen, CADataType_t dataType);
+                            const size_t dataLen, CADataType_t dataType);
 
 /**
  * Get RA Connectivity network information.

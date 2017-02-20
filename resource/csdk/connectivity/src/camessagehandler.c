@@ -77,7 +77,7 @@ static CAErrorCallback g_errorHandler = NULL;
 static CANetworkMonitorCallback g_nwMonitorHandler = NULL;
 
 static void CAErrorHandler(const CAEndpoint_t *endpoint,
-                           const void *data, size_t dataLen,
+                           const void *data, const size_t dataLen,
                            CAResult_t result);
 
 static CAData_t* CAGenerateHandlerData(const CAEndpoint_t *endpoint,
@@ -741,7 +741,7 @@ static bool CADropSecondMessage(CAHistory_t *history, const CAEndpoint_t *ep, ui
 }
 
 static void CAReceivedPacketCallback(const CASecureEndpoint_t *sep,
-                                     const void *data, size_t dataLen)
+                                     const void *data, const size_t dataLen)
 {
     VERIFY_NON_NULL_VOID(sep, TAG, "remoteEndpoint");
     VERIFY_NON_NULL_VOID(data, TAG, "data");
