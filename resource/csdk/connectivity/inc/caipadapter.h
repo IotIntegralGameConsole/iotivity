@@ -24,7 +24,7 @@
  */
 #ifndef CA_IP_ADAPTER_H_
 #define CA_IP_ADAPTER_H_
-
+#include <stdint.h>
 #include "cacommon.h"
 #include "caadapterinterface.h"
 #include "cathreadpool.h"
@@ -97,7 +97,7 @@ CAResult_t CAStartIPDiscoveryServer();
  * @return  The number of bytes sent on the network, or -1 upon error.
  */
 int32_t CASendIPUnicastData(const CAEndpoint_t *endpoint, const void *data,
-                            uint32_t dataLen, CADataType_t dataType);
+                            size_t dataLen, CADataType_t dataType);
 
 /**
  * Send Multicast data to the endpoint using the IP connectivity.
@@ -110,7 +110,7 @@ int32_t CASendIPUnicastData(const CAEndpoint_t *endpoint, const void *data,
  * @return  The number of bytes sent on the network, or -1 upon error.
  */
 int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data,
-                              uint32_t dataLen, CADataType_t dataType);
+                              size_t dataLen, CADataType_t dataType);
 
 /**
  * Get IP Connectivity network information.
@@ -119,7 +119,7 @@ int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data,
  * @param[out]   size        Number of local connectivity structures.
  * @return  ::CA_STATUS_OK or Appropriate error code.
  */
-CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, uint32_t *size);
+CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size);
 
 /**
  * Read Synchronous API callback.

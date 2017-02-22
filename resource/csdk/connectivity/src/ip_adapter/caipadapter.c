@@ -42,8 +42,8 @@
  * Logging tag for module name.
  */
 #define TAG "OIC_CA_IP_ADAP"
-//#undef OIC_LOG_V
-//#define OIC_LOG_V OIC_LOG_V_
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 #ifndef SINGLE_THREAD
 /**
  * Holds inter thread ip data information.
@@ -52,7 +52,7 @@ typedef struct
 {
     CAEndpoint_t *remoteEndpoint;
     void *data;
-    uint32_t dataLen;
+    size_t dataLen;
     bool isMulticast;
 } CAIPData_t;
 
@@ -100,12 +100,12 @@ static void CAIPDeinitializeQueueHandles();
 static void CAIPSendDataThread(void *threadData);
 
 static CAIPData_t *CACreateIPData(const CAEndpoint_t *remoteEndpoint,
-                                  const void *data, uint32_t dataLength,
+                                  const void *data, size_t dataLength,
                                   bool isMulticast);
 
 void CAFreeIPData(CAIPData_t *ipData);
 
-static void CADataDestroyer(void *data, uint32_t size);
+static void CADataDestroyer(void *data, size_t size);
 
 CAResult_t CAIPInitializeQueueHandles()
 {
@@ -189,7 +189,7 @@ static void CAUpdateStoredIPAddressInfo(CANetworkStatus_t status)
         OIC_LOG(DEBUG, TAG, "IP adapter status is on. Store the own IP address info");
 
         CAEndpoint_t *eps = NULL;
-        uint32_t numOfEps = 0;
+        size_t numOfEps = 0;
 
         CAResult_t res = CAGetIPInterfaceInformation(&eps, &numOfEps);
         if (CA_STATUS_OK != res)
@@ -211,8 +211,8 @@ static void CAUpdateStoredIPAddressInfo(CANetworkStatus_t status)
         OICFree(headEp);
         headEp = NULL;
 
-        uint32_t len = u_arraylist_length(g_ownIpEndpointList);
-        for (uint32_t i = len; i > 0; i--)
+        size_t len = u_arraylist_length(g_ownIpEndpointList);
+        for (size_t i = len; i > 0; i--)
         {
             u_arraylist_remove(g_ownIpEndpointList, i - 1);
         }
@@ -270,7 +270,7 @@ bool CAIPIsLocalEndpoint(const CAEndpoint_t *ep)
 }
 
 void CAIPErrorHandler(const CAEndpoint_t *endpoint, const void *data,
-                      uint32_t dataLength, CAResult_t result)
+                      size_t dataLength, CAResult_t result)
 {
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");
     VERIFY_NON_NULL_VOID(data, TAG, "data is NULL");
@@ -442,7 +442,7 @@ CAResult_t CAStartIPDiscoveryServer()
 }
 
 static int32_t CAQueueIPData(bool isMulticast, const CAEndpoint_t *endpoint,
-                             const void *data, uint32_t dataLength)
+                             const void *data, size_t dataLength)
 {
     VERIFY_NON_NULL_RET(endpoint, TAG, "remoteEndpoint", -1);
     VERIFY_NON_NULL_RET(data, TAG, "data", -1);
@@ -477,14 +477,14 @@ static int32_t CAQueueIPData(bool isMulticast, const CAEndpoint_t *endpoint,
 }
 
 int32_t CASendIPUnicastData(const CAEndpoint_t *endpoint,
-                            const void *data, uint32_t dataLength,
+                            const void *data, size_t dataLength,
                             CADataType_t dataType)
 {
     (void)dataType;
     return CAQueueIPData(false, endpoint, data, dataLength);
 }
 
-int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data, uint32_t dataLength,
+int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data, size_t dataLength,
                               CADataType_t dataType)
 {
     (void)dataType;
@@ -578,7 +578,7 @@ void CAIPSendDataThread(void *threadData)
 
 #ifndef SINGLE_THREAD
 CAIPData_t *CACreateIPData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                           uint32_t dataLength, bool isMulticast)
+                           size_t dataLength, bool isMulticast)
 {
     VERIFY_NON_NULL_RET(remoteEndpoint, TAG, "remoteEndpoint is NULL", NULL);
     VERIFY_NON_NULL_RET(data, TAG, "IPData is NULL", NULL);
@@ -616,7 +616,7 @@ void CAFreeIPData(CAIPData_t *ipData)
     OICFree(ipData);
 }
 
-void CADataDestroyer(void *data, uint32_t size)
+void CADataDestroyer(void *data, size_t size)
 {
     if (size < sizeof(CAIPData_t))
     {

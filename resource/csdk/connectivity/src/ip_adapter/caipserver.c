@@ -257,8 +257,8 @@ static void CASelectReturned(fd_set *readFds, int ret)
             u_arraylist_t *iflist = CAFindInterfaceChange();
             if (iflist)
             {
-                uint32_t listLength = u_arraylist_length(iflist);
-                for (uint32_t i = 0; i < listLength; i++)
+                size_t listLength = u_arraylist_length(iflist);
+                for (size_t i = 0; i < listLength; i++)
                 {
                     CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
                     if (ifitem)
@@ -424,8 +424,8 @@ static void CAFindReadyMessage()
                         u_arraylist_t *iflist = CAFindInterfaceChange();
                         if (iflist)
                         {
-                            uint32_t listLength = u_arraylist_length(iflist);
-                            for (uint32_t i = 0; i < listLength; i++)
+                            size_t listLength = u_arraylist_length(iflist);
+                            for (size_t i = 0; i < listLength; i++)
                             {
                                 CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
                                 if (ifitem)
@@ -618,8 +618,8 @@ static CAResult_t CAReceiveMessage(CASocketFd_t fd, CATransportFlags_t flags)
                   .Control = {.buf = cmsg.data, .len = sizeof (cmsg)}
                  };
 
-    uint32_t recvLen = 0;
-    uint32_t ret = caglobals.ip.wsaRecvMsg(fd, &msg, &recvLen, 0,0);
+    size_t recvLen = 0;
+    size_t ret = caglobals.ip.wsaRecvMsg(fd, &msg, &recvLen, 0,0);
     OIC_LOG_V(DEBUG, TAG, "WSARecvMsg recvd %u bytes", recvLen);
     if (OC_SOCKET_ERROR == ret)
     {
@@ -1260,7 +1260,7 @@ void CAIPSetPacketReceiveCallback(CAIPPacketReceivedCallback callback)
 }
 
 static void sendData(int fd, const CAEndpoint_t *endpoint,
-                     const void *data, uint32_t dlen,
+                     const void *data, size_t dlen,
                      const char *cast, const char *fam)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -1356,7 +1356,7 @@ static void sendData(int fd, const CAEndpoint_t *endpoint,
 
 static void sendMulticastData6(const u_arraylist_t *iflist,
                                CAEndpoint_t *endpoint,
-                               const void *data, uint32_t datalen)
+                               const void *data, size_t datalen)
 {
     if (!endpoint)
     {
@@ -1403,7 +1403,7 @@ static void sendMulticastData6(const u_arraylist_t *iflist,
 
 static void sendMulticastData4(const u_arraylist_t *iflist,
                                CAEndpoint_t *endpoint,
-                               const void *data, uint32_t datalen)
+                               const void *data, size_t datalen)
 {
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");
 
@@ -1449,7 +1449,7 @@ static void sendMulticastData4(const u_arraylist_t *iflist,
     }
 }
 
-void CAIPSendData(CAEndpoint_t *endpoint, const void *data, uint32_t datalen,
+void CAIPSendData(CAEndpoint_t *endpoint, const void *data, size_t datalen,
                   bool isMulticast)
 {
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");
@@ -1506,7 +1506,7 @@ void CAIPSendData(CAEndpoint_t *endpoint, const void *data, uint32_t datalen,
     }
 }
 
-CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
+CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
 {
     VERIFY_NON_NULL(info, TAG, "info is NULL");
     VERIFY_NON_NULL(size, TAG, "size is NULL");
