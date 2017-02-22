@@ -66,7 +66,8 @@ static CAQueueingThread_t g_receiveThread;
 #endif  // SINGLE_THREAD
 
 #define TAG "OIC_CA_MSG_HANDLE"
-
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 static CARetransmission_t g_retransmissionContext;
 
 // handler field
