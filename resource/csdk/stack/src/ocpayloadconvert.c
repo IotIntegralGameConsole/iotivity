@@ -35,6 +35,8 @@
 #include "ocendpoint.h"
 
 #define TAG "OIC_RI_PAYLOADCONVERT"
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
 
 // Arbitrarily chosen size that seems to contain the majority of packages
 #define INIT_SIZE (255)
@@ -85,7 +87,7 @@ OCStackResult OCConvertPayload(OCPayload* payload, uint8_t** outPayload, size_t*
     VERIFY_PARAM_NON_NULL(TAG, outPayload, "OutPayload parameter is NULL");
     VERIFY_PARAM_NON_NULL(TAG, size, "size parameter is NULL");
 
-    OIC_LOG_V(INFO, TAG, "Converting payload of type %d", payload->type);
+    OIC_LOG_V_(INFO, TAG, "Converting payload of type %d", payload->type);
     if (PAYLOAD_TYPE_SECURITY == payload->type)
     {
         size_t securityPayloadSize = ((OCSecurityPayload *)payload)->payloadSize;
@@ -123,7 +125,7 @@ OCStackResult OCConvertPayload(OCPayload* payload, uint8_t** outPayload, size_t*
 
         *size = curSize;
         *outPayload = out;
-        OIC_LOG_V(DEBUG, TAG, "Payload Size: %zd Payload : ", *size);
+        OIC_LOG_V_(DEBUG, TAG, "Payload Size: %zd Payload : ", *size);
         OIC_LOG_BUFFER(DEBUG, TAG, *outPayload, *size);
         return OC_STACK_OK;
     }
@@ -149,7 +151,7 @@ static int64_t OCConvertPayloadHelper(OCPayload* payload, uint8_t* outPayload, s
         case PAYLOAD_TYPE_SECURITY:
             return OCConvertSecurityPayload((OCSecurityPayload*)payload, outPayload, size);
         default:
-            OIC_LOG_V(INFO,TAG, "ConvertPayload default %d", payload->type);
+            OIC_LOG_V_(INFO,TAG, "ConvertPayload default %d", payload->type);
             return CborErrorUnknownType;
     }
 }
@@ -163,6 +165,7 @@ static int64_t checkError(int64_t err, CborEncoder* encoder, uint8_t* outPayload
     }
     else if (err != CborNoError)
     {
+        OIC_LOG(ERROR,TAG, __FILE__);
         OIC_LOG_V(ERROR, TAG, "Convert Payload failed : %s", cbor_error_string((CborError) err));
         return err;
     }
