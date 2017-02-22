@@ -405,5 +405,5 @@ void CAUtilSetLogLevel(CAUtilLogLevel_t level, bool hidePrivateLogEntries)
             break;
     }
 
-    OCSetLogLevel(logLevel, hidePrivateLogEntries);
+    //OCSetLogLevel(logLevel, hidePrivateLogEntries);
 }
