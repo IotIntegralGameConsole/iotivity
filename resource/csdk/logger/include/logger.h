@@ -236,7 +236,7 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 //#define OIC_LOG_V(...) OIC_LOG_V_(__VA_ARGS__)
 /// Display context instead of args (to preserve memory)
 #define OIC_LOG_V(level, tag, format, ...)      \
-    OIC_LOG(level, tag, format ## __FILE__)
+    OIC_LOG(level, tag, format "@" __FILE__)
     
 
 #define OIC_LOG_CONFIG(ctx)
