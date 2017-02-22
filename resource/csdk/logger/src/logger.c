@@ -106,7 +106,7 @@ static oc_log_level LEVEL_XTABLE[] = {OC_LOG_DEBUG, OC_LOG_INFO,
     static void OCLogString(LogLevel level, PROGMEM const char * tag, PROGMEM const char * logStr);
 #ifdef ARDUINO_ARCH_AVR
     //Mega2560 and other 8-bit AVR microcontrollers
-    #define GET_PROGMEM_BUFFER(buffer, addr) { OICStrcpy(buffer, sizeof(buffer), (char*)pgm_read_word(addr));}
+    #define GET_PROGMEM_BUFFER(buffer, addr) { strcpy_P(buffer, (char*)pgm_read_word(addr)); }
 #elif defined ARDUINO_ARCH_SAM
     //Arduino Due and other 32-bit ARM micro-controllers
     #define GET_PROGMEM_BUFFER(buffer, addr) { OICStrcpy(buffer, sizeof(buffer), (char*)pgm_read_dword(addr));}
@@ -408,7 +408,7 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
     {
         return;
     }
-    char buffer[LINE_BUFFER_SIZE] = {0};
+    static char buffer[LINE_BUFFER_SIZE] = {0};
     GET_PROGMEM_BUFFER(buffer, &(LEVEL[level]));
     Serial.print(buffer);
     char c;
@@ -440,7 +440,7 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
 void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
                 PROGMEM const char *format, ...)
 {
-    char buffer[LINE_BUFFER_SIZE];
+    static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
     va_start(ap, format);
     GET_PROGMEM_BUFFER(buffer, &(LEVEL[level]));
@@ -484,7 +484,7 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
  */
 void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, ...)
 {
-    char buffer[LINE_BUFFER_SIZE];
+    static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
     va_start(ap, format);
     // strcpy_P(buffer, (char*)pgm_read_word(&(LEVEL[level])));
