@@ -226,12 +226,18 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 #define OIC_LOG_INIT()    OCLogInit()
 
 #ifdef ARDUINO
-void local_printf(const char *format, ...);
-#define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)  OCLogBuffer((level), PCF(tag), (buffer), (bufferSize))
-
-// Don't define variable argument log function for Arduino but display context instead
-#define OIC_LOG_V_(level, tag, format, ...)   OCLogv((level), PCF(tag), __LINE__, PCF(format),__VA_ARGS__)
-#define OIC_LOG_V(level, tag, ...)    OIC_LOG(level, tag, __FILE__)
+#define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)          \
+    OCLogBuffer((level), PCF(tag), (buffer), (bufferSize))
+    
+/// should be called only where needed (to preserve memory)
+#define OIC_LOG_V_(level, tag, format, ...)                             \
+    OCLogv((level), PCF(tag), __LINE__, PCF(format),__VA_ARGS__)
+/// Variable arguments are Hidden by default
+//#define OIC_LOG_V(...) OIC_LOG_V_(__VA_ARGS__)
+/// Display context instead of args (to preserve memory)
+#define OIC_LOG_V(level, tag, ...)              \
+    OIC_LOG(level, tag, __FILE__)
+    
 
 #define OIC_LOG_CONFIG(ctx)
 #define OIC_LOG_SHUTDOWN()
@@ -239,13 +245,15 @@ void local_printf(const char *format, ...);
     OCLog((level), PCF(tag), __LINE__, PCF(logStr))
 #else
 
-#define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)  OCLogBuffer((level), (tag), (buffer), (bufferSize))
+#define OIC_LOG_BUFFER(level, tag, buffer, bufferSize)  \
+    OCLogBuffer((level), (tag), (buffer), (bufferSize))
 #define OIC_LOG_CONFIG(ctx)    OCLogConfig((ctx))
 #define OIC_LOG_SHUTDOWN()     OCLogShutdown()
 #define OIC_LOG(level, tag, logStr)  OCLog((level), (tag), (logStr))
 // Define variable argument log function for Linux, Android, and Win32
 #define OIC_LOG_V(level, tag, ...)  OCLogv((level), (tag), __VA_ARGS__)
 
+#define OIC_LOG_INIT()    OCLogInit()
 #endif //ARDUINO
 #endif //__TIZEN__
 
