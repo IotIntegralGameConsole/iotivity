@@ -850,8 +850,8 @@ static void CAReceivedPacketCallback(const CASecureEndpoint_t *sep,
     coap_delete_pdu(pdu);
 
 exit:
-    OIC_LOG(DEBUG, TAG, "received pdu data :");
-    OIC_LOG_BUFFER(DEBUG, TAG,  data, dataLen);
+    OIC_LOG(DEBUG, TAG, "received pdu data : TODO");
+    //OIC_LOG_BUFFER(DEBUG, TAG,  data, dataLen);
 
     OIC_TRACE_END();
 }
