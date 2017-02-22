@@ -200,7 +200,6 @@ void OCLogShutdown()
  */
 void OCLogv(LogLevel level, const char * tag, const char * format, ...)
 {
-    OC_LOG(DEBUG, TAG, __FILE__);
     if (!format || !tag) {
         return;
     }
@@ -444,8 +443,6 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
 void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
                 PROGMEM const char *format, ...)
 {
-    OIC_LOG(DEBUG, TAG, "__FILE__");
-#if 0
     static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
     va_start(ap, format);
@@ -479,7 +476,6 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
     }
     Serial.println();
     va_end(ap);
-#endif
 }
 /**
  * Output a variable argument list log string with the specified priority level.
@@ -491,8 +487,6 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
  */
 void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, ...)
 {
-    OIC_LOG(DEBUG, TAG, "__FILE__");
-#if 0
     static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
     va_start(ap, format);
@@ -528,7 +522,23 @@ void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, 
     }
     Serial.println();
     va_end(ap);
-#endif
 }
 
 #endif //ARDUINO
+
+void local_printf(const char *format, ...)
+{
+    static char line[80];
+    va_list args;
+    va_start(args, format);
+    int len = vsnprintf(line, sizeof(line), format, args);
+    va_end(args);
+    for (char *p = &line[0]; *p; p++) {
+        if (*p == '\n') {
+            Serial.write('\r');
+        }
+        Serial.write(*p);
+    }
+    if (len >= sizeof(line))
+        Serial.write('$');
+}
