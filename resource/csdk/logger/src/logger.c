@@ -199,7 +199,7 @@ void OCLogv(LogLevel level, const char * tag, const char * format, ...)
         return;
     }
 
-    if (g_level > level)
+    if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
     {
         return;
     }
@@ -317,13 +317,13 @@ void OCLog(LogLevel level, const char * tag, const char * logStr)
 void OCLogInit()
 {
     Serial.begin(115200);
-    Serial.println(__PRETTY_FUNCTION__);
-    OCSetLogLevel(WARNING, true);
+    //OCSetLogLevel(WARNING, true);
+//OCSetLogLevel(INFO, true);
+//OCSetLogLevel(DEBUG, true);
 }
 
 void OCSetLogLevel(LogLevel level, bool hidePrivateLogEntries)
 {
-Serial.print(__PRETTY_FUNCTION__);
     g_level = level;
     g_hidePrivateLogEntries = hidePrivateLogEntries;
 }
@@ -339,7 +339,6 @@ Serial.print(__PRETTY_FUNCTION__);
  */
 void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
 {
-
     if (!logStr || !tag)
     {
       return;
@@ -515,7 +514,6 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
  */
 void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, ...)
 {
-
     if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
     {
         return;
