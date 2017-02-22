@@ -42,7 +42,8 @@
  * Logging tag for module name.
  */
 #define TAG "OIC_CA_IP_ADAP"
-
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 #ifndef SINGLE_THREAD
 /**
  * Holds inter thread ip data information.
