@@ -161,6 +161,9 @@ static OCPersistentStorage *g_PersistentStorageHandler = NULL;
 // Macros
 //-----------------------------------------------------------------------------
 #define TAG  "OIC_RI_STACK"
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
+
 #define VERIFY_SUCCESS(op, successCode) { if ((op) != (successCode)) \
             {OIC_LOG_V(FATAL, TAG, "%s failed!!", #op); goto exit;} }
 #define VERIFY_NON_NULL(arg, logLevel, retVal) { if (!(arg)) { OIC_LOG((logLevel), \
