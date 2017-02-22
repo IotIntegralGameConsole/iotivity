@@ -163,7 +163,7 @@ static int64_t checkError(int64_t err, CborEncoder* encoder, uint8_t* outPayload
     }
     else if (err != CborNoError)
     {
-        OIC_LOG_V(ERROR, TAG, "Convert Payload failed : %s", cbor_error_string(err));
+        OIC_LOG_V(ERROR, TAG, "Convert Payload failed : %s", cbor_error_string((CborError) err));
         return err;
     }
     else

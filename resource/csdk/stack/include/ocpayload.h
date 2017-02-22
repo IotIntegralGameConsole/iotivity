@@ -50,7 +50,7 @@ extern "C"
         if ((log_tag) && (log_message)) \
         { \
             OIC_LOG_V(ERROR, (log_tag), "%s with cbor error: \'%s\'.", \
-                    (log_message), (cbor_error_string(err))); \
+                    (log_message), (cbor_error_string((CborError) err))); \
         } \
         goto exit; \
     } \
