@@ -39,8 +39,8 @@
 #include "oic_string.h"
 
 #define TAG "IPS"
-//#undef OIC_LOG_V
-//#define OIC_LOG_V OIC_LOG_V_
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 // Length of the IP address decimal notation string
 #define IPNAMESIZE (16)
 
@@ -333,7 +333,7 @@ void CAIPPullData()
     CAArduinoCheckData();
 }
 
-CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
+CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
 {
     OIC_LOG(DEBUG, TAG, "IN");
 
