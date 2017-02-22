@@ -57,7 +57,7 @@ typedef enum
  */
 typedef void (*CAIPPacketReceivedCallback)(const CASecureEndpoint_t *sep,
                                            const void *data,
-                                           size_t const dataLength);
+                                           uint32_t dataLength);
 
 /**
   * Callback to notify error in the IP adapter.
@@ -69,7 +69,7 @@ typedef void (*CAIPPacketReceivedCallback)(const CASecureEndpoint_t *sep,
   * @pre  Callback must be registered using CAIPSetPacketReceiveCallback().
  */
 typedef void (*CAIPErrorHandleCallback)(const CAEndpoint_t *endpoint, const void *data,
-                                        size_t const dataLength, CAResult_t result);
+                                        uint32_t dataLength, CAResult_t result);
 
 /**
  * Start IP server.
@@ -147,7 +147,7 @@ void CAIPSetUnicastPort(uint16_t port);
  */
 void CAIPSendData(CAEndpoint_t *endpoint,
                   const void *data,
-                  const size_t dataLength,
+                  uint32_t dataLength,
                   bool isMulticast);
 
 /**

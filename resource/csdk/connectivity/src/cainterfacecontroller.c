@@ -227,7 +227,7 @@ CAResult_t CASetAdapterRAInfo(const CARAInfo_t *caraInfo)
 #endif
 
 static void CAReceivedPacketCallback(const CASecureEndpoint_t *sep,
-                                     const void *data, const size_t dataLen)
+                                     const void *data, size_t dataLen)
 {
     if (g_networkPacketReceivedCallback != NULL)
     {
@@ -277,7 +277,7 @@ static void CAConnectionChangedCallback(const CAEndpoint_t *info, bool isConnect
 #endif
 
 static void CAAdapterErrorHandleCallback(const CAEndpoint_t *endpoint,
-                                         const void *data, const size_t dataLen,
+                                         const void *data, size_t dataLen,
                                          CAResult_t result)
 {
     OIC_LOG(DEBUG, TAG, "received error from adapter in interfacecontroller");
@@ -568,7 +568,7 @@ CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data, uin
             return CA_STATUS_INVALID_PARAM;
         }
 
-        size_t sentDataLen = 0;
+        int32_t sentDataLen = 0;
 
         if (NULL != g_adapterHandler[index].sendData)
         {
@@ -576,7 +576,7 @@ CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data, uin
             sentDataLen = g_adapterHandler[index].sendData(endpoint, data, length, dataType);
         }
 
-        if (sentDataLen != length)
+        if (sentDataLen != (int32_t)length)
         {
             OIC_LOG(ERROR, TAG, "error in sending data. Error will be reported in adapter");
 #ifdef SINGLE_THREAD
@@ -626,7 +626,7 @@ CAResult_t CASendMulticastData(const CAEndpoint_t *endpoint, const void *data, u
             continue;
         }
 
-        size_t sentDataLen = 0;
+        uint32_t sentDataLen = 0;
 
         if (NULL != g_adapterHandler[index].sendDataToAll)
         {

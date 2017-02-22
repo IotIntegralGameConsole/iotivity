@@ -1449,7 +1449,7 @@ static void sendMulticastData4(const u_arraylist_t *iflist,
     }
 }
 
-void CAIPSendData(CAEndpoint_t *endpoint, const void *data, const size_t datalen,
+void CAIPSendData(CAEndpoint_t *endpoint, const void *data, uint32_t datalen,
                   bool isMulticast)
 {
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");

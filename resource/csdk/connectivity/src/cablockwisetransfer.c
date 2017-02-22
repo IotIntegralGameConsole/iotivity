@@ -304,7 +304,7 @@ CAResult_t CACheckBlockOptionType(CABlockData_t *currData)
 
 // TODO make pdu const after libcoap is updated to support that.
 CAResult_t CAReceiveBlockWiseData(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
-                                  const CAData_t *receivedData, const size_t dataLen)
+                                  const CAData_t *receivedData, size_t dataLen)
 {
     OIC_LOG(DEBUG, TAG, "CAReceiveBlockWiseData");
     VERIFY_NON_NULL(pdu, TAG, "pdu");
