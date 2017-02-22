@@ -40,7 +40,8 @@
 #include "doxmresource.h"
 
 #define TAG  "OIC_SRM_PSI"
-
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 //SVR database buffer block size
 #ifdef _WIN32
 #define DB_FILE_SIZE_BLOCK 1023
