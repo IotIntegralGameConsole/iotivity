@@ -55,6 +55,9 @@
 #include "string.h"
 #include "logger_types.h"
 
+#define TAG "LOG"
+
+
 // log level
 LogLevel g_level = DEBUG;
 // privacy log
@@ -441,7 +444,7 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
 void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
                 PROGMEM const char *format, ...)
 {
-    OIC_LOG(DEBUG, __FILE__, __FILE__);
+    OIC_LOG(DEBUG, TAG, "__FILE__");
 #if 0
     static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
@@ -488,7 +491,7 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
  */
 void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, ...)
 {
-    OIC_LOG(DEBUG, __FILE__, __FILE__);
+    OIC_LOG(DEBUG, TAG, "__FILE__");
 #if 0
     static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
