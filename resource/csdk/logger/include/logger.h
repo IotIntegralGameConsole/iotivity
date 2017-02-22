@@ -46,6 +46,9 @@ extern "C"
 // Use the PCF macro to wrap strings stored in FLASH on the Arduino
 // Example:  OIC_LOG(INFO, TAG, PCF("Entering function"));
 #ifdef ARDUINO
+#ifndef PRIuPTR
+#define PRIuPTR
+#endif
 #ifdef __cplusplus
 #define PCF(str)  ((PROGMEM const char *)(F(str)))
 #else
@@ -228,7 +231,10 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 
 // Don't define variable argument log function for Arduino but display context instead
 #define OIC_LOG_V(level, tag, format, ...) OCLogv((level), PCF(tag), __LINE__, PCF(format),__VA_ARGS__)
-#define OIC_LOG_V(level, tag, ...)    OIC_LOG(level, tag, __FILE__)
+//#define OIC_LOG_V(level, tag, format, ...) OCLogv((level), PCF(tag), __LINE__, __FILE__)
+//#define OIC_LOG_V(level, tag, ...)    OIC_LOG(level, tag, __FILE__)
+//#define OIC_LOG_V(level, tag, format, ...)  OIC_LOG(level, tag, __FILE__)
+//#define OIC_LOG_V(level, tag, logStr)    OIC_LOG(level, tag, logStr)
 
 #define OIC_LOG_CONFIG(ctx)
 #define OIC_LOG_SHUTDOWN()
