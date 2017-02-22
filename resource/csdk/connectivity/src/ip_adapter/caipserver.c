@@ -81,7 +81,8 @@
  * Logging tag for module name
  */
 #define TAG "OIC_CA_IP_SERVER"
-
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 #define SELECT_TIMEOUT 1     // select() seconds (and termination latency)
 
 #define IPv4_MULTICAST     "224.0.1.187"
