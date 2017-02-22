@@ -45,8 +45,8 @@
 #include "cacommonutil.h"
 
 #define TAG "OIC_CA_PRTCL_MSG"
-#undef OIC_LOG_V
-#define OIC_LOG_V OIC_LOG_V_
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
 
 #define CA_PDU_MIN_SIZE (4)
 #define CA_ENCODE_BUFFER_SIZE (4)
