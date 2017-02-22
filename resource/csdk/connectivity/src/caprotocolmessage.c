@@ -53,6 +53,9 @@ static const char COAP_URI_HEADER[] = "coap://[::]/";
 
 static char g_chproxyUri[CA_MAX_URI_LENGTH];
 
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+
 CAResult_t CASetProxyUri(const char *uri)
 {
     VERIFY_NON_NULL(uri, TAG, "uri");
