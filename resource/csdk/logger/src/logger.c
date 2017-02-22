@@ -163,11 +163,6 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
     }
 }
 
-void OCSetLogLevel(LogLevel level, bool hidePrivateLogEntries)
-{
-    g_level = level;
-    g_hidePrivateLogEntries = hidePrivateLogEntries;
-}
 
 #ifndef __TIZEN__
 void OCLogConfig(oc_log_ctx_t *ctx)
@@ -204,7 +199,7 @@ void OCLogv(LogLevel level, const char * tag, const char * format, ...)
         return;
     }
 
-    if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
+    if (g_level > level)
     {
         return;
     }
@@ -322,6 +317,15 @@ void OCLog(LogLevel level, const char * tag, const char * logStr)
 void OCLogInit()
 {
     Serial.begin(115200);
+    Serial.println(__PRETTY_FUNCTION__);
+    OCSetLogLevel(WARNING, true);
+}
+
+void OCSetLogLevel(LogLevel level, bool hidePrivateLogEntries)
+{
+Serial.print(__PRETTY_FUNCTION__);
+    g_level = level;
+    g_hidePrivateLogEntries = hidePrivateLogEntries;
 }
 
 /**
@@ -335,9 +339,15 @@ void OCLogInit()
  */
 void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
 {
+
     if (!logStr || !tag)
     {
       return;
+    }
+
+    if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
+    {
+        return;
     }
 
     char buffer[LINE_BUFFER_SIZE];
@@ -373,7 +383,16 @@ void OCLogString(LogLevel level, PROGMEM const char * tag, const char * logStr)
      {
          return;
      }
-
+     if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
+     {
+         return;
+     }
+     
+     if (true == g_hidePrivateLogEntries && INFO_PRIVATE == level)
+     {
+         return;
+     }
+     
      char lineBuffer[LINE_BUFFER_SIZE] = {0};
      uint8_t lineIndex = 0;
      for (uint8_t i = 0; i < bufferSize; i++)
@@ -411,6 +430,10 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
     {
         return;
     }
+    if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
+    {
+        return;
+    }
     static char buffer[LINE_BUFFER_SIZE] = {0};
     GET_PROGMEM_BUFFER(buffer, &(LEVEL[level]));
     Serial.print(buffer);
@@ -443,6 +466,11 @@ void OCLog(LogLevel level, PROGMEM const char *tag, const int lineNum,
 void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
                 PROGMEM const char *format, ...)
 {
+    if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
+    {
+        return;
+    }
+
     static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
     va_start(ap, format);
@@ -487,6 +515,12 @@ void OCLogv(LogLevel level, PROGMEM const char *tag, const int lineNum,
  */
 void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, ...)
 {
+
+    if (g_level > level && ERROR != level && WARNING != level && FATAL != level)
+    {
+        return;
+    }
+
     static char buffer[LINE_BUFFER_SIZE];
     va_list ap;
     va_start(ap, format);
@@ -525,20 +559,3 @@ void OCLogv(LogLevel level, const char *tag, const __FlashStringHelper *format, 
 }
 
 #endif //ARDUINO
-
-void local_printf(const char *format, ...)
-{
-    static char line[80];
-    va_list args;
-    va_start(args, format);
-    int len = vsnprintf(line, sizeof(line), format, args);
-    va_end(args);
-    for (char *p = &line[0]; *p; p++) {
-        if (*p == '\n') {
-            Serial.write('\r');
-        }
-        Serial.write(*p);
-    }
-    if (len >= sizeof(line))
-        Serial.write('$');
-}
