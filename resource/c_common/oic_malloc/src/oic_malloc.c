@@ -30,13 +30,13 @@
 #include <windows.h>
 #endif
 
-//#define ENABLE_MALLOC_DEBUG
+#define ENABLE_MALLOC_DEBUG
 // Enable extra debug logging for malloc.  Comment out to disable
 #ifdef ENABLE_MALLOC_DEBUG
 #include "logger.h"
 #define TAG "OIC_MALLOC"
-//#undef OIC_LOG_V
-//#define OIC_LOG_V OIC_LOG_V_
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 #endif
 
 //-----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ static uint32_t count;
 #endif
 
 void *OICMalloc(size_t size)
-{
+{OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (0 == size)
     {
         return NULL;
