@@ -1428,7 +1428,7 @@ static OCStackResult HandleVirtualResource (OCServerRequest *request, OCResource
         char *resourceTypeQuery = NULL;
 
         CAEndpoint_t *networkInfo = NULL;
-        uint32_t infoSize = 0;
+        size_t infoSize = 0;
 
         CAResult_t caResult = CAGetNetworkInformation(&networkInfo, &infoSize);
         if (CA_STATUS_FAILED == caResult)
