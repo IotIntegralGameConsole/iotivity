@@ -1201,7 +1201,8 @@ size_t CACheckPayloadLengthFromHeader(const void *data, size_t dlen)
     coap_transport_t transport = coap_get_tcp_header_type_from_initbyte(
             ((unsigned char *)data)[0] >> 4);
 
-    coap_pdu_t *pdu = coap_new_pdu2(transport, dlen);
+    OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
+    coap_pdu_t *pdu = coap_new_pdu2(transport, len);
     if (!pdu)
     {
         OIC_LOG(ERROR, TAG, "outpdu is null");
