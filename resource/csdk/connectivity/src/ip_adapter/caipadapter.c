@@ -42,8 +42,9 @@
  * Logging tag for module name.
  */
 #define TAG "OIC_CA_IP_ADAP"
-#undef OIC_LOG_V
-#define OIC_LOG_V OIC_LOG_V_
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
+
 #ifndef SINGLE_THREAD
 /**
  * Holds inter thread ip data information.
@@ -235,7 +236,7 @@ void CAIPPacketReceivedCB(const CASecureEndpoint_t *sep, const void *data,
 { OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_VOID(sep, TAG, "sep is NULL");
     VERIFY_NON_NULL_VOID(data, TAG, "data is NULL");
-    OIC_LOG_V_(DEBUG,TAG, "len=%d @%s", dataLength, __FILE__);
+    OIC_LOG_V(DEBUG,TAG, "len=%d @%s", dataLength, __FILE__);
     OIC_LOG_V(DEBUG, TAG, "Address: %s, port:%d", sep->endpoint.addr, sep->endpoint.port);
 
     if (g_networkPacketCallback)
