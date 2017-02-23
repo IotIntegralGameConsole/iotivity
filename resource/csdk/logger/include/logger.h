@@ -267,6 +267,8 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 #define OIC_LOG_INIT()
 #endif
 
+#include "MemoryFree.h"
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
