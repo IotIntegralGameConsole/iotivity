@@ -89,7 +89,7 @@ typedef struct
     CADataType_t dataType;              /**< data Type (Request/Response) */
     CAEndpoint_t *endpoint;             /**< remote endpoint */
     void *pdu;                          /**< coap PDU */
-    uint32_t size;                      /**< coap PDU size */
+    size_t size;                      /**< coap PDU size */
 } CARetransmissionData_t;
 
 static const uint64_t USECS_PER_SEC = 1000000;
@@ -152,7 +152,7 @@ static bool CACheckTimeout(uint64_t currentTime, CARetransmissionData_t *retData
 {
 #ifndef SINGLE_THREAD
     // #1. calculate timeout
-    uint32_t milliTimeoutValue = retData->timeout * 0.001;
+    size_t milliTimeoutValue = retData->timeout * 0.001;
     uint64_t timeout = ((uint64_t) milliTimeoutValue << retData->triedCount) * MSECS_PER_SEC;
 
     if (currentTime >= retData->timeStamp + timeout)
@@ -186,8 +186,8 @@ static void CACheckRetransmissionList(CARetransmission_t *context)
     // mutex lock
     oc_mutex_lock(context->threadMutex);
 
-    uint32_t i = 0;
-    uint32_t len = u_arraylist_length(context->dataList);
+    size_t i = 0;
+    size_t len = u_arraylist_length(context->dataList);
 
     for (i = 0; i < len; i++)
     {
@@ -371,7 +371,7 @@ CAResult_t CARetransmissionInitialize(CARetransmission_t *context,
 CAResult_t CARetransmissionSentData(CARetransmission_t *context,
                                     const CAEndpoint_t *endpoint,
                                     CADataType_t dataType,
-                                    const void *pdu, uint32_t size)
+                                    const void *pdu, size_t size)
 {
     if (NULL == context || NULL == endpoint || NULL == pdu)
     {
@@ -443,8 +443,8 @@ CAResult_t CARetransmissionSentData(CARetransmission_t *context,
     // mutex lock
     oc_mutex_lock(context->threadMutex);
 
-    uint32_t i = 0;
-    uint32_t len = u_arraylist_length(context->dataList);
+    size_t i = 0;
+    size_t len = u_arraylist_length(context->dataList);
 
     // #3. add data into list
     for (i = 0; i < len; i++)
@@ -490,7 +490,7 @@ CAResult_t CARetransmissionSentData(CARetransmission_t *context,
 
 CAResult_t CARetransmissionReceivedData(CARetransmission_t *context,
                                         const CAEndpoint_t *endpoint, const void *pdu,
-                                        uint32_t size, void **retransmissionPdu)
+                                        size_t size, void **retransmissionPdu)
 {
     OIC_LOG(DEBUG, TAG, "IN");
     if (NULL == context || NULL == endpoint || NULL == pdu || NULL == retransmissionPdu)
@@ -523,10 +523,10 @@ CAResult_t CARetransmissionReceivedData(CARetransmission_t *context,
 
     // mutex lock
     oc_mutex_lock(context->threadMutex);
-    uint32_t len = u_arraylist_length(context->dataList);
+    size_t len = u_arraylist_length(context->dataList);
 
     // find index
-    uint32_t i;
+    size_t i;
     for (i = 0; i < len; i++)
     {
         CARetransmissionData_t *retData = (CARetransmissionData_t *) u_arraylist_get(
@@ -639,8 +639,8 @@ CAResult_t CARetransmissionDestroy(CARetransmission_t *context)
     OIC_LOG(DEBUG, TAG, "retransmission context destroy..");
 
     oc_mutex_lock(context->threadMutex);
-    uint32_t len = u_arraylist_length(context->dataList);
-    for (uint32_t i = 0; i < len; i++)
+    size_t len = u_arraylist_length(context->dataList);
+    for (size_t i = 0; i < len; i++)
     {
         CARetransmissionData_t *data = u_arraylist_get(context->dataList, i);
         if (NULL == data)
