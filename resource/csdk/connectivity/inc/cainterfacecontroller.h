@@ -118,7 +118,7 @@ CAResult_t CASetAdapterRAInfo(const CARAInfo_t *caraInfo);
  * @param[out]   size           number of connectivity information structures.
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, uint32_t *size);
+CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, size_t *size);
 
 /**
  * Sends unicast data to the remote endpoint.
@@ -129,7 +129,7 @@ CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, uint32_t *size);
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data,
-                             uint32_t length, CADataType_t dataType);
+                             size_t length, CADataType_t dataType);
 
 /**
  * Sends multicast data to all endpoints in the network.
@@ -141,7 +141,7 @@ CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data,
  */
 
 CAResult_t CASendMulticastData(const CAEndpoint_t *endpoint, const void *data,
-                               uint32_t length, CADataType_t dataType);
+                               size_t length, CADataType_t dataType);
 
 /**
  * Start listening servers to receive search requests from clients.
