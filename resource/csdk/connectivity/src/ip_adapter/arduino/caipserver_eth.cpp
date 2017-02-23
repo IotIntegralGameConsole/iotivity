@@ -294,7 +294,7 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
     }
 
     // Read available data.
-    size_t ret = recvfrom(sockFd, (uint8_t *)data, recvLen + 1, senderAddr, &senderPort);
+    ssize_t ret = recvfrom(sockFd, (uint8_t *)data, recvLen + 1, senderAddr, &senderPort);
     if (ret < 0)
     {
         OIC_LOG(ERROR, TAG, "rcv fail");
@@ -306,7 +306,7 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
         OIC_LOG(DEBUG, TAG, "data recvd");
         snprintf(addr, sizeof(addr), "%d.%d.%d.%d", senderAddr[0], senderAddr[1], senderAddr[2],
                  senderAddr[3]);
-        CAPacketReceivedCallback(addr, senderPort, data, ret);
+        CAPacketReceivedCallback(addr, senderPort, data, (size_t) ret);
     }
 
     OICFree(data);
