@@ -292,8 +292,8 @@ namespace OCRepresentationEncodingTest
     TEST(PresencePayload, Normal)
     {
         static const char uri1[] = "/testuri";
-        size_t maxAge = 0;
-        size_t sequenceNumber = 0;
+        uint32_t maxAge = 0;
+        uint32_t sequenceNumber = 0;
         OCPresenceTrigger trigger = OC_PRESENCE_TRIGGER_CREATE;
         OCPresencePayload *presence = OCPresencePayloadCreate(sequenceNumber, maxAge, trigger, uri1);
 

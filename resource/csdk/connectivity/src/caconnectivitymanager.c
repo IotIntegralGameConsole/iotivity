@@ -155,7 +155,7 @@ const CASecureEndpoint_t *CAGetSecureEndpointData(const CAEndpoint_t *peer)
 }
 #endif //MULTIPLE_OWNER
 
-bool CASetSecureEndpointAttribute(const CAEndpoint_t* peer, size_t attribute)
+bool CASetSecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t attribute)
 {
     bool success = false;
     OIC_LOG_V(DEBUG, TAG, "In %s", __func__);
@@ -169,11 +169,11 @@ bool CASetSecureEndpointAttribute(const CAEndpoint_t* peer, size_t attribute)
         success = SetCASecureEndpointAttribute(peer, attribute);
     }
 
-    OIC_LOG_V(DEBUG, TAG, "Out %s -> %u", __func__, (size_t)success);
+    OIC_LOG_V(DEBUG, TAG, "Out %s -> %u", __func__, (uint32_t)success);
     return success;
 }
 
-bool CAGetSecureEndpointAttributes(const CAEndpoint_t* peer, size_t* attributes)
+bool CAGetSecureEndpointAttributes(const CAEndpoint_t* peer, uint32_t* attributes)
 {
     bool success = false;
     OIC_LOG_V(DEBUG, TAG, "In %s", __func__);
@@ -187,7 +187,7 @@ bool CAGetSecureEndpointAttributes(const CAEndpoint_t* peer, size_t* attributes)
         success = GetCASecureEndpointAttributes(peer, attributes);
     }
 
-    OIC_LOG_V(DEBUG, TAG, "Out %s -> %u", __func__, (size_t)success);
+    OIC_LOG_V(DEBUG, TAG, "Out %s -> %u", __func__, (uint32_t)success);
     return success;
 }
 
@@ -288,7 +288,7 @@ void CADestroyToken(CAToken_t token)
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
-CAResult_t CAGetNetworkInformation(CAEndpoint_t **info, size_t *size)
+CAResult_t CAGetNetworkInformation(CAEndpoint_t **info, uint32_t *size)
 {
     OIC_LOG(DEBUG, TAG, "CAGetNetworkInformation");
 

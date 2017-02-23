@@ -75,7 +75,7 @@ extern void* defaultDeviceHandlerCallbackParameter;
 typedef struct
 {
     /** Observe option field.*/
-    size_t observationOption;
+    uint32_t observationOption;
 
     /** The REST method retrieved from received request PDU.*/
     OCMethod method;
@@ -123,13 +123,13 @@ typedef struct
     uint8_t reqMorePacket;
 
     /** The number of requested packet.*/
-    size_t reqPacketNum;
+    uint32_t reqPacketNum;
 
     /** The size of requested packet.*/
     uint16_t reqPacketSize;
 
     /** The number of responded packet.*/
-    size_t resPacketNum;
+    uint32_t resPacketNum;
 
     /** Responded packet size.*/
     uint16_t resPacketSize;
@@ -294,7 +294,7 @@ void CopyDevAddrToEndpoint(const OCDevAddr *in, CAEndpoint_t *out);
  * @param milliSeconds Milli-seconds.
  * @return CoAP ticks
  */
-size_t GetTicks(size_t milliSeconds);
+uint32_t GetTicks(uint32_t milliSeconds);
 
 /**
  * Extract interface and resource type from the query.
@@ -342,7 +342,7 @@ void OCDeleteResourceAttributes(OCAttribute *rsrcAttributes);
  */
 void OCDiscoveryPayloadAddResourceWithEps(OCDiscoveryPayload *payload, const OCResource *res,
                                           uint16_t securePort, bool isVirtual,
-                                          void *networkInfo, size_t infoSize,
+                                          void *networkInfo, uint32_t infoSize,
                                           const OCDevAddr *devAddr);
 #else
 /**
@@ -359,7 +359,7 @@ void OCDiscoveryPayloadAddResourceWithEps(OCDiscoveryPayload *payload, const OCR
  */
 void OCDiscoveryPayloadAddResourceWithEps(OCDiscoveryPayload *payload, const OCResource *res,
                                           uint16_t securePort, bool isVirtual,
-                                          void *networkInfo, size_t infoSize,
+                                          void *networkInfo, uint32_t infoSize,
                                           const OCDevAddr *devAddr, uint16_t tcpPort);
 #endif
 #ifdef __cplusplus

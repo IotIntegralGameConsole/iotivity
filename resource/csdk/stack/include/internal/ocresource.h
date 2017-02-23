@@ -50,7 +50,7 @@
 #ifdef WITH_PRESENCE
 typedef struct PRESENCERESOURCE{
     OCResourceHandle handle;
-    size_t presenceTTL;
+    uint32_t presenceTTL;
 } PresenceResource;
 #endif
 
@@ -223,7 +223,7 @@ typedef struct OCResource {
 
 
     /** Sequence number for observable resources. Per the CoAP standard it is a 24 bit value.*/
-    size_t sequenceNum;
+    uint32_t sequenceNum;
 
     /** Pointer of ActionSet which to support group action.*/
     OCActionSet *actionsetHead;

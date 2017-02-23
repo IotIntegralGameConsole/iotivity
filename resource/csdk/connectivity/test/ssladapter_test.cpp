@@ -1200,7 +1200,7 @@ static void * client(void *)
 {
     int ret, len;
     mbedtls_net_context server_fd;
-    size_t flags;
+    uint32_t flags;
     unsigned char buf[1024];
     const char *pers = "ssl_client1";
 
@@ -1502,7 +1502,7 @@ exit:
 
 static int mbedtls_entropy_func_clutch(void *, unsigned char *output, size_t len)
 {
-    for (size_t i = 0; i < len; i++) output[i] = 0x11;
+    for (uint32_t i = 0; i < len; i++) output[i] = 0x11;
     return 0;
 }
 

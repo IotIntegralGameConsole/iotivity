@@ -46,7 +46,7 @@
 /**
  * Unique gateway ID generated before hosting a gateway resource.
  */
-static size_t g_GatewayID = 0;
+static uint32_t g_GatewayID = 0;
 
 /**
  * Used for assigning unique ID.to endpoint's connected to this gateway
@@ -76,7 +76,7 @@ static uint64_t g_refreshTableTime = 0;
 /**
  * Sequence number for the notification.
  */
-static size_t g_sequenceNumber = 1;
+static uint32_t g_sequenceNumber = 1;
 
 /**
  * To check if the routing table is validated on 25th seconds.
@@ -281,7 +281,7 @@ OCStackResult RMHandleRequestPayload(OCDevAddr devAddr, const uint8_t *reqPayloa
     OIC_LOG(DEBUG, TAG, "RMHandleRequestPayload IN");
     RM_NULL_CHECK_WITH_RET(reqPayload, TAG, "reqPayload");
 
-    size_t gatewayId = 0;
+    uint32_t gatewayId = 0;
 
     OCStackResult result = RMPParseRequestPayload(reqPayload, payloadSize, &gatewayId);
     RM_VERIFY_SUCCESS(result, OC_STACK_OK);
@@ -352,8 +352,8 @@ OCStackResult RMHandleResponsePayload(const OCDevAddr *devAddr, const OCRepPaylo
     RM_NULL_CHECK_WITH_RET(respPayload, TAG, "respPayload");
 
     // Parse the Payload to get the Gateway ID of neighbouring node.
-    size_t gatewayId = 0;
-    size_t seqNum = 0;
+    uint32_t gatewayId = 0;
+    uint32_t seqNum = 0;
     u_linklist_t *gatewayTableList = NULL;
     bool isUpdateSeqNum = false;
 
@@ -630,7 +630,7 @@ OCStackResult RMHandleDELETERequest(const OCServerRequest *request, const OCReso
     RM_NULL_CHECK_WITH_RET(request, TAG, "request");
     RM_NULL_CHECK_WITH_RET(resource, TAG, "resource");
 
-    size_t gatewayId = 0;
+    uint32_t gatewayId = 0;
     OCStackResult result = RMPParseRequestPayload(request->payload, request->payloadSize,
                                                   &gatewayId);
     RM_VERIFY_SUCCESS(result, OC_STACK_OK);
@@ -858,7 +858,7 @@ void RMSendDeleteToNeighbourNodes()
         RTMGatewayEntry_t *entry = (RTMGatewayEntry_t *) u_linklist_get_data(iterTable);
         if (entry)
         {
-            for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+            for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *dest = u_arraylist_get(entry->destination->destIntfAddr, i);
                 if (!dest)
@@ -881,7 +881,7 @@ void RMSendDeleteToNeighbourNodes()
     OIC_LOG(DEBUG, TAG, "RMSendDeleteToNeighbourNodes OUT");
 }
 
-size_t RMGetGatewayId()
+uint32_t RMGetGatewayId()
 {
     if (!g_isRMInitialized)
     {

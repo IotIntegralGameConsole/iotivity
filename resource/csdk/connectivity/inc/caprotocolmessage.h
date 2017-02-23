@@ -36,7 +36,7 @@ extern "C"
 {
 #endif
 
-typedef size_t code_t;
+typedef uint32_t code_t;
 
 #define CA_RESPONSE_CLASS(C) (((C) >> 5)*100)
 #define CA_RESPONSE_CODE(C) (CA_RESPONSE_CLASS(C) + (C - COAP_RESPONSE_CODE(CA_RESPONSE_CLASS(C))))
@@ -59,7 +59,7 @@ static const uint8_t PAYLOAD_MARKER = 1;
  * @param[in]   endpoint             endpoint information.
  * @return  generated pdu.
  */
-coap_pdu_t *CAGeneratePDU(size_t code, const CAInfo_t *info, const CAEndpoint_t *endpoint,
+coap_pdu_t *CAGeneratePDU(uint32_t code, const CAInfo_t *info, const CAEndpoint_t *endpoint,
                           coap_list_t **optlist, coap_transport_t *transport);
 
 /**
@@ -133,7 +133,7 @@ CAResult_t CAParseUriPartial(const unsigned char *str, size_t length, int target
  * @param[out]  optlist              options information.
  * @return  CA_STATUS_OK or ERROR CODES (CAResult_t error codes in cacommon.h).
  */
-CAResult_t CAParseHeadOption(size_t code, const CAInfo_t *info, coap_list_t **optlist);
+CAResult_t CAParseHeadOption(uint32_t code, const CAInfo_t *info, coap_list_t **optlist);
 
 /**
  * Helper to parse content format and accept format header options
@@ -157,7 +157,7 @@ CAResult_t CAParsePayloadFormatHeadOption(CAPayloadFormat_t format, uint16_t for
  * @param[in]   data                 data that needs to be sent.
  * @return  created list.
  */
-coap_list_t *CACreateNewOptionNode(uint16_t key, size_t length, const char *data);
+coap_list_t *CACreateNewOptionNode(uint16_t key, uint32_t length, const char *data);
 
 /**
  * order the inserted options.
@@ -173,7 +173,7 @@ int CAOrderOpts(void *a, void *b);
  * @param[in]   opt_iter            option iteration for count.
  * @return number of options.
  */
-size_t CAGetOptionCount(coap_opt_iterator_t opt_iter);
+uint32_t CAGetOptionCount(coap_opt_iterator_t opt_iter);
 
 /**
  * gets option data.
@@ -184,8 +184,8 @@ size_t CAGetOptionCount(coap_opt_iterator_t opt_iter);
  * @param[in]   buflen               buffer length of the result.
  * @return  option count.
  */
-size_t CAGetOptionData(uint16_t key, const uint8_t *data, size_t len,
-                         uint8_t *option, size_t buflen);
+uint32_t CAGetOptionData(uint16_t key, const uint8_t *data, uint32_t len,
+                         uint8_t *option, uint32_t buflen);
 
 /**
  * extracts request information from received pdu.
@@ -196,7 +196,7 @@ size_t CAGetOptionData(uint16_t key, const uint8_t *data, size_t len,
  * @return  CA_STATUS_OK or ERROR CODES (CAResult_t error codes in cacommon.h).
  */
 CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
-                            size_t *outCode, CAInfo_t *outInfo);
+                            uint32_t *outCode, CAInfo_t *outInfo);
 
 /**
  * create pdu from received data.
@@ -206,7 +206,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
  * @param[in]   endpoint            endpoint information.
  * @return  coap_pdu_t value.
  */
-coap_pdu_t *CAParsePDU(const char *data, size_t length, size_t *outCode,
+coap_pdu_t *CAParsePDU(const char *data, size_t length, uint32_t *outCode,
                        const CAEndpoint_t *endpoint);
 
 /**
@@ -240,7 +240,7 @@ void CADestroyTokenInternal(CAToken_t token);
  * @param[in]   size                size of pdu data.
  * @return  message type.
  */
-CAMessageType_t CAGetMessageTypeFromPduBinaryData(const void *pdu, size_t size);
+CAMessageType_t CAGetMessageTypeFromPduBinaryData(const void *pdu, uint32_t size);
 
 /**
  * gets message ID PDU binary data.
@@ -248,7 +248,7 @@ CAMessageType_t CAGetMessageTypeFromPduBinaryData(const void *pdu, size_t size);
  * @param[in]   size                size of pdu data.
  * @return  message ID.
  */
-uint16_t CAGetMessageIdFromPduBinaryData(const void *pdu, size_t size);
+uint16_t CAGetMessageIdFromPduBinaryData(const void *pdu, uint32_t size);
 
 /**
  * gets code PDU binary data.
@@ -256,7 +256,7 @@ uint16_t CAGetMessageIdFromPduBinaryData(const void *pdu, size_t size);
  * @param[in]   size                size of pdu data.
  * @return  code.
  */
-CAResponseResult_t CAGetCodeFromPduBinaryData(const void *pdu, size_t size);
+CAResponseResult_t CAGetCodeFromPduBinaryData(const void *pdu, uint32_t size);
 
 /**
  * convert format from CoAP media type encoding to CAPayloadFormat_t.

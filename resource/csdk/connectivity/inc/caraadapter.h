@@ -73,7 +73,7 @@ CAResult_t CAStartRA();
  * @return The number of bytes sent on the network, or -1 upon error.
  */
 int32_t CASendRAUnicastData(const CAEndpoint_t *endpoint, const void *data,
-                            size_t dataLen, CADataType_t dataType);
+                            uint32_t dataLen, CADataType_t dataType);
 
 /**
  * Get RA Connectivity network information.
@@ -82,7 +82,7 @@ int32_t CASendRAUnicastData(const CAEndpoint_t *endpoint, const void *data,
  * @param[out]   size        Number of local connectivity structures.
  * @return  ::CA_STATUS_OK or Appropriate error code.
  */
-CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, size_t *size);
+CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, uint32_t *size);
 
 /**
  * Stops RA server and de-register XMPP callback listeners.
@@ -108,7 +108,7 @@ CAResult_t CASetRAInfo(const CARAInfo_t *caraInfo);
  * These functions are not applicable to Remote Access adapter.
  */
 int32_t CASendRAMulticastData(const CAEndpoint_t *endpoint,
-                              const void *data, size_t dataLen, CADataType_t dataType);
+                              const void *data, uint32_t dataLen, CADataType_t dataType);
 
 /**
  * Start listening server for receiving search requests.

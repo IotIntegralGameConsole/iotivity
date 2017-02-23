@@ -92,7 +92,7 @@ void CAGattRecvInfoDestroy(CAGattRecvInfo * info);
  */
 bool CAGattRecv(CAGattRecvInfo * info,
                 uint8_t const * data,
-                size_t length);
+                uint32_t length);
 
 
 #endif  /* CA_BLE_LINUX_RECV_H */

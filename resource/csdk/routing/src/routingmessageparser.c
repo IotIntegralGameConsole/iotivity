@@ -64,7 +64,7 @@ static const char SEQ_NUM[] = "seqnum";
  */
 static const char UPDATE_SEQ_NUM[] = "updateseqnum";
 
-OCStackResult RMPConstructGatewayPayload(size_t gatewayId, OCRepPayload **payload)
+OCStackResult RMPConstructGatewayPayload(uint32_t gatewayId, OCRepPayload **payload)
 {
     OIC_LOG(DEBUG, TAG, "RMPConstructGatewayPayload IN");
     RM_NULL_CHECK_WITH_RET(payload, TAG, "payload");
@@ -85,7 +85,7 @@ OCStackResult RMPConstructGatewayPayload(size_t gatewayId, OCRepPayload **payloa
     return OC_STACK_OK;
 }
 
-OCStackResult RMPConstructObserveResPayload(size_t gatewayId, size_t seqNum,
+OCStackResult RMPConstructObserveResPayload(uint32_t gatewayId, uint32_t seqNum,
                                             const u_linklist_t *routingtable, bool isUpdateSeqNeeded,
                                             OCRepPayload **payload)
 {
@@ -113,7 +113,7 @@ OCStackResult RMPConstructObserveResPayload(size_t gatewayId, size_t seqNum,
     u_linklist_iterator_t *iterTable = NULL;
     u_linklist_init_iterator(routingtable, &iterTable);
 
-    size_t len = u_linklist_length(routingtable);
+    uint32_t len = u_linklist_length(routingtable);
     const OCRepPayload *arrayPayload[len];
 
     size_t dimensions[MAX_REP_ARRAY_DEPTH] = {len, 0, 0};
@@ -153,7 +153,7 @@ OCStackResult RMPConstructObserveResPayload(size_t gatewayId, size_t seqNum,
     return OC_STACK_OK;
 }
 
-OCStackResult RMPConstructRemovalPayload(size_t gatewayId, size_t seqNum,
+OCStackResult RMPConstructRemovalPayload(uint32_t gatewayId, uint32_t seqNum,
                                          const u_linklist_t *removedGateways, bool isUpdateSeqNeeded,
                                          OCRepPayload **removedPayload)
 {
@@ -171,7 +171,7 @@ OCStackResult RMPConstructRemovalPayload(size_t gatewayId, size_t seqNum,
         return OC_STACK_ERROR;
     }
 
-    size_t len = u_linklist_length(removedGateways);
+    uint32_t len = u_linklist_length(removedGateways);
     const OCRepPayload *arrayPayload[len];
 
     size_t dimensions[MAX_REP_ARRAY_DEPTH] = {len, 0, 0};
@@ -219,7 +219,7 @@ OCStackResult RMPConstructRemovalPayload(size_t gatewayId, size_t seqNum,
 }
 
 OCStackResult RMPParseRequestPayload(const uint8_t* payload, size_t payloadSize,
-                                     size_t *gatewayId)
+                                     uint32_t *gatewayId)
 {
     OCPayload *ocPayload = NULL;
     OCParsePayload(&ocPayload, PAYLOAD_TYPE_REPRESENTATION, payload, payloadSize);
@@ -233,8 +233,8 @@ OCStackResult RMPParseRequestPayload(const uint8_t* payload, size_t payloadSize,
     return res;
 }
 
-OCStackResult RMPParseResponsePayload(const OCRepPayload *payload, size_t *gatewayId,
-                                      size_t *seqNum, u_linklist_t **gatewayTable,
+OCStackResult RMPParseResponsePayload(const OCRepPayload *payload, uint32_t *gatewayId,
+                                      uint32_t *seqNum, u_linklist_t **gatewayTable,
                                       bool *isUpdateSeqNeeded)
 {
     OIC_LOG(DEBUG, TAG, "RMPParsePayload IN");

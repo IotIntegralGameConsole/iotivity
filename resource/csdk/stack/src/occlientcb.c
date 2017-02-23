@@ -45,7 +45,7 @@ AddClientCB (ClientCB** clientCB, OCCallbackData* cbData,
              CAToken_t token, uint8_t tokenLength,
              OCDoHandle *handle, OCMethod method,
              OCDevAddr *devAddr, char * requestUri,
-             char * resourceTypeName, size_t ttl)
+             char * resourceTypeName, uint32_t ttl)
 {
     if (!clientCB || !cbData || !handle || tokenLength > CA_MAX_TOKEN_LEN)
     {

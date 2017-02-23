@@ -59,7 +59,7 @@
 
 static void CAArduinoCheckData();
 static void CAPacketReceivedCallback(const char *ipAddress, const uint16_t port,
-                                     const void *data, const size_t dataLength);
+                                     const void *data, const uint32_t dataLength);
 
 static CAIPPacketReceivedCallback gPacketReceivedCallback = NULL;
 static int32_t gUnicastSocket = 0;
@@ -205,7 +205,7 @@ void CAIPStopServer()
 }
 
 void CAPacketReceivedCallback(const char *ipAddress, const uint16_t port,
-                              const void *data, const size_t dataLength)
+                              const void *data, const uint32_t dataLength)
 {
     OIC_LOG(DEBUG, TAG, "IN");
     if (gPacketReceivedCallback)
@@ -269,7 +269,7 @@ void CAIPPullData()
     CAArduinoCheckData();
 }
 
-CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
+CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
 {
     OIC_LOG(DEBUG, TAG, "IN");
 
@@ -283,7 +283,7 @@ CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
         return CA_STATUS_FAILED;
     }
 
-    size_t len = u_arraylist_length(iflist);
+    uint32_t len = u_arraylist_length(iflist);
 
     CAEndpoint_t *eps = (CAEndpoint_t *)OICCalloc(len, sizeof (CAEndpoint_t));
     if (!eps)
@@ -293,7 +293,7 @@ CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
         return CA_MEMORY_ALLOC_FAILED;
     }
 
-    for (size_t i = 0, j = 0; i < len; i++)
+    for (uint32_t i = 0, j = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
         if(!ifitem)

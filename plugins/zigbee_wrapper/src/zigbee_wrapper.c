@@ -183,7 +183,7 @@ typedef enum
 
 typedef struct
 {
-    size_t count;
+    uint32_t count;
     CIECommandMask CIEMask;
     OICZigBeeAttributePair list[MAX_ATTRIBUTES];
 } AttributeList;
@@ -813,7 +813,7 @@ OCEntityHandlerResult processGetRequest(PIPluginBase * plugin,
     {
         return OC_EH_ERROR;
     }
-    size_t attributeListIndex = 0;
+    uint32_t attributeListIndex = 0;
     OCStackResult stackResult = OC_STACK_OK;
     PIResource_Zigbee * piResource = NULL;
 
@@ -847,7 +847,7 @@ OCEntityHandlerResult processGetRequest(PIPluginBase * plugin,
         OCRepPayloadDestroy(*payload);
         return OC_EH_ERROR;
     }
-    for (size_t i = 0; i<attributeList.count; i++)
+    for (uint32_t i = 0; i<attributeList.count; i++)
     {
         char * outVal = NULL;
         uint8_t outValLength = 0;
@@ -1020,7 +1020,7 @@ OCEntityHandlerResult processPutRequest(PIPluginBase * plugin,
         return OC_EH_ERROR;
     }
 
-    size_t i = 0;
+    uint32_t i = 0;
     for (; i<attributeList.count; i++)
     {
         if (attributeList.list[i].oicType == OIC_ATTR_INT)

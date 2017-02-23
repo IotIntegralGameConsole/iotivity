@@ -32,27 +32,27 @@ static u_arraylist_t *g_selectedNetworkList = NULL;
 static CATransportAdapter_t CASelectedNetwork = CA_DEFAULT_ADAPTER;
 
 #ifdef EDR_ADAPTER
-static size_t NETWORK_RFCOMM = CA_ADAPTER_RFCOMM_BTEDR;
+static uint32_t NETWORK_RFCOMM = CA_ADAPTER_RFCOMM_BTEDR;
 #endif
 
 #ifdef LE_ADAPTER
-static size_t NETWORK_GATT = CA_ADAPTER_GATT_BTLE;
+static uint32_t NETWORK_GATT = CA_ADAPTER_GATT_BTLE;
 #endif
 
 #ifdef IP_ADAPTER
-static size_t NETWORK_IP = CA_ADAPTER_IP;
+static uint32_t NETWORK_IP = CA_ADAPTER_IP;
 #endif
 
 #ifdef NFC_ADAPTER
-static size_t NETWORK_NFC = CA_ADAPTER_NFC;
+static uint32_t NETWORK_NFC = CA_ADAPTER_NFC;
 #endif
 
 #ifdef RA_ADAPTER
-static size_t NETWORK_RA = CA_ADAPTER_REMOTE_ACCESS;
+static uint32_t NETWORK_RA = CA_ADAPTER_REMOTE_ACCESS;
 #endif
 
 #ifdef TCP_ADAPTER
-static size_t NETWORK_TCP = CA_ADAPTER_TCP;
+static uint32_t NETWORK_TCP = CA_ADAPTER_TCP;
 #endif
 
 CAResult_t CAAddNetworkType(CATransportAdapter_t transportType)
@@ -183,8 +183,8 @@ CAResult_t CARemoveNetworkType(CATransportAdapter_t transportType)
         return CA_STATUS_FAILED;
     }
 
-    size_t selectedNetworkLength = u_arraylist_length(g_selectedNetworkList);
-    for (size_t index = 0; index < selectedNetworkLength; index++)
+    uint32_t selectedNetworkLength = u_arraylist_length(g_selectedNetworkList);
+    for (uint32_t index = 0; index < selectedNetworkLength; index++)
     {
         void* ptrType = u_arraylist_get(g_selectedNetworkList, index);
         if (NULL == ptrType)
@@ -283,7 +283,7 @@ CATransportAdapter_t CAGetSelectedNetwork()
     return CASelectedNetwork;
 }
 
-CAResult_t CAGetNetworkInformationInternal(CAEndpoint_t **info, size_t *size)
+CAResult_t CAGetNetworkInformationInternal(CAEndpoint_t **info, uint32_t *size)
 {
     OIC_LOG(DEBUG, TAG, "get network information.");
 

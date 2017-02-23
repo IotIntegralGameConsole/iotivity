@@ -41,7 +41,7 @@ extern "C"
  * @param[out]      payload                 Encoded Payload for Gateway ID.
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
-OCStackResult RMPConstructGatewayPayload(size_t gatewayId, OCRepPayload **payload);
+OCStackResult RMPConstructGatewayPayload(uint32_t gatewayId, OCRepPayload **payload);
 
 /**
  * Constructs payload with the Gateway ID and routing table
@@ -53,7 +53,7 @@ OCStackResult RMPConstructGatewayPayload(size_t gatewayId, OCRepPayload **payloa
  * @param[out]     payload                 Payload with gateway Data.
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
-OCStackResult RMPConstructObserveResPayload(size_t gatewayId, size_t seqNum,
+OCStackResult RMPConstructObserveResPayload(uint32_t gatewayId, uint32_t seqNum,
                                             const u_linklist_t *routingtable, bool isUpdateSeqNeeded,
                                             OCRepPayload **payload);
 
@@ -66,7 +66,7 @@ OCStackResult RMPConstructObserveResPayload(size_t gatewayId, size_t seqNum,
  * @param[out]   removedPayload      Encoded Payloads of removed routing table entries.
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
-OCStackResult RMPConstructRemovalPayload(size_t gatewayId, size_t seqNum,
+OCStackResult RMPConstructRemovalPayload(uint32_t gatewayId, uint32_t seqNum,
                                          const u_linklist_t *removedGateways, bool isUpdateSeqNeeded,
                                          OCRepPayload **removedPayload);
 
@@ -78,7 +78,7 @@ OCStackResult RMPConstructRemovalPayload(size_t gatewayId, size_t seqNum,
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
 OCStackResult RMPParseRequestPayload(const uint8_t* payload, size_t payloadSize,
-                                     size_t *gatewayId);
+                                     uint32_t *gatewayId);
 
 /**
  * Parse payload for response and get required info.
@@ -89,8 +89,8 @@ OCStackResult RMPParseRequestPayload(const uint8_t* payload, size_t payloadSize,
  * @param[out]      isUpdateSeqNeeded    Response type of payload response/notification.
  * @return  ::OC_STACK_OK or Appropriate error code.
  */
-OCStackResult RMPParseResponsePayload(const OCRepPayload *payload, size_t *gatewayId,
-                                      size_t *seqNum, u_linklist_t **gatewayTable,
+OCStackResult RMPParseResponsePayload(const OCRepPayload *payload, uint32_t *gatewayId,
+                                      uint32_t *seqNum, u_linklist_t **gatewayTable,
                                       bool *isUpdateSeqNeeded);
 
 /**

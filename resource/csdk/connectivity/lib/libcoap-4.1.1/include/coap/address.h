@@ -147,7 +147,7 @@ _coap_is_mcast_impl(const coap_address_t *a)
 #ifdef WITH_ARDUINO
 typedef struct coap_address_t
 {
-    size_t     size;                    /**< length of the address stored in addr field. */
+    uint32_t     size;                    /**< length of the address stored in addr field. */
     uint8_t      addr[DEV_ADDR_SIZE_MAX]; /**< device address. */
 } coap_address_t;
 
@@ -155,7 +155,7 @@ INLINE_API int
 _coap_address_equals_impl(const coap_address_t *a,
                           const coap_address_t *b)
 {
-    size_t i;
+    uint32_t i;
 
     if ((a == NULL) || (b == NULL))
         return 0;

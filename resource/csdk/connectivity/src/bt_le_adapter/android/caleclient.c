@@ -76,8 +76,8 @@ static jobjectArray g_uuidList = NULL;
 static bool g_isStartedLEClient = false;
 
 static jbyteArray g_sendBuffer = NULL;
-static size_t g_targetCnt = 0;
-static size_t g_currentSentCnt = 0;
+static uint32_t g_targetCnt = 0;
+static uint32_t g_currentSentCnt = 0;
 static bool g_isFinishedSendData = false;
 static oc_mutex g_SendFinishMutex = NULL;
 static oc_mutex g_threadMutex = NULL;
@@ -700,7 +700,7 @@ CAResult_t CALEClientSendNegotiationMessage(const char* address)
 
 CAResult_t CALEClientSendUnicastMessage(const char* address,
                                         const uint8_t* data,
-                                        const size_t dataLen)
+                                        const uint32_t dataLen)
 {
     VERIFY_NON_NULL(address, TAG, "address is null");
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -709,7 +709,7 @@ CAResult_t CALEClientSendUnicastMessage(const char* address,
 }
 
 CAResult_t CALEClientSendMulticastMessage(const uint8_t* data,
-                                          const size_t dataLen)
+                                          const uint32_t dataLen)
 {
     OIC_LOG_V(DEBUG, TAG, "CALEClientSendMulticastMessage(%p)", data);
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -880,7 +880,7 @@ CAResult_t CALEClientIsThereScannedDevices(JNIEnv *env, const char* address)
 
 
 CAResult_t CALEClientSendUnicastMessageImpl(const char* address, const uint8_t* data,
-                                            const size_t dataLen)
+                                            const uint32_t dataLen)
 {
     OIC_LOG_V(INFO, TAG, "CALEClientSendUnicastMessageImpl, address: %s, data: %p", address,
               data);
@@ -919,8 +919,8 @@ CAResult_t CALEClientSendUnicastMessageImpl(const char* address, const uint8_t* 
 
     if (g_context && g_deviceList)
     {
-        size_t length = u_arraylist_length(g_deviceList);
-        for (size_t index = 0; index < length; index++)
+        uint32_t length = u_arraylist_length(g_deviceList);
+        for (uint32_t index = 0; index < length; index++)
         {
             jobject jarrayObj = (jobject) u_arraylist_get(g_deviceList, index);
             if (!jarrayObj)
@@ -1050,7 +1050,7 @@ error_exit:
 }
 
 CAResult_t CALEClientSendMulticastMessageImpl(JNIEnv *env, const uint8_t* data,
-                                              const size_t dataLen)
+                                              const uint32_t dataLen)
 {
     OIC_LOG_V(DEBUG, TAG, "CASendMulticastMessageImpl, send to, data: %p, %u", data, dataLen);
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -1080,14 +1080,14 @@ CAResult_t CALEClientSendMulticastMessageImpl(JNIEnv *env, const uint8_t* data,
         goto error_exit;
     }
 
-    size_t length = u_arraylist_length(g_deviceList);
+    uint32_t length = u_arraylist_length(g_deviceList);
     g_targetCnt = length;
 
     jbyteArray jni_arr = (*env)->NewByteArray(env, dataLen);
     (*env)->SetByteArrayRegion(env, jni_arr, 0, dataLen, (jbyte*) data);
     g_sendBuffer = (jbyteArray)(*env)->NewGlobalRef(env, jni_arr);
 
-    for (size_t index = 0; index < length; index++)
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_deviceList, index);
         if (!jarrayObj)
@@ -2645,9 +2645,9 @@ CAResult_t CALEClientDisconnectAll(JNIEnv *env)
         return CA_STATUS_OK;
     }
 
-    size_t length = u_arraylist_length(g_gattObjectList);
+    uint32_t length = u_arraylist_length(g_gattObjectList);
     OIC_LOG_V(DEBUG, TAG, "list length : %d", length);
-    for (size_t index = 0; index < length; index++)
+    for (uint32_t index = 0; index < length; index++)
     {
         OIC_LOG(DEBUG, TAG, "start CALEClientDisconnectAll");
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
@@ -2686,8 +2686,8 @@ CAResult_t CALEClientDisconnectforAddress(JNIEnv *env, jstring remote_address)
         return CA_STATUS_FAILED;
     }
 
-    size_t length = u_arraylist_length(g_gattObjectList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_gattObjectList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
         if (!jarrayObj)
@@ -3566,8 +3566,8 @@ bool CALEClientIsDeviceInScanDeviceList(JNIEnv *env, const char* remoteAddress)
         return true;
     }
 
-    size_t length = u_arraylist_length(g_deviceList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_deviceList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_deviceList, index);
         if (!jarrayObj)
@@ -3620,8 +3620,8 @@ CAResult_t CALEClientRemoveAllScanDevices(JNIEnv *env)
         return CA_STATUS_FAILED;
     }
 
-    size_t length = u_arraylist_length(g_deviceList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_deviceList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_deviceList, index);
         if (!jarrayObj)
@@ -3655,8 +3655,8 @@ CAResult_t CALEClientRemoveDeviceInScanDeviceList(JNIEnv *env, jstring address)
         return CA_STATUS_FAILED;
     }
 
-    size_t length = u_arraylist_length(g_deviceList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_deviceList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_deviceList, index);
         if (!jarrayObj)
@@ -3776,8 +3776,8 @@ bool CALEClientIsGattObjInList(JNIEnv *env, const char* remoteAddress)
     VERIFY_NON_NULL(env, TAG, "env is null");
     VERIFY_NON_NULL_RET(remoteAddress, TAG, "remoteAddress is null", true);
 
-    size_t length = u_arraylist_length(g_gattObjectList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_gattObjectList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
         if (!jarrayObj)
@@ -3824,8 +3824,8 @@ jobject CALEClientGetGattObjInList(JNIEnv *env, const char* remoteAddress)
     VERIFY_NON_NULL_RET(remoteAddress, TAG, "remoteAddress is null", NULL);
 
     oc_mutex_lock(g_gattObjectMutex);
-    size_t length = u_arraylist_length(g_gattObjectList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_gattObjectList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
         if (!jarrayObj)
@@ -3882,8 +3882,8 @@ CAResult_t CALEClientRemoveAllGattObjs(JNIEnv *env)
         return CA_STATUS_OK;
     }
 
-    size_t length = u_arraylist_length(g_gattObjectList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_gattObjectList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
         if (!jarrayObj)
@@ -3916,8 +3916,8 @@ CAResult_t CALEClientRemoveGattObj(JNIEnv *env, jobject gatt)
         return CA_STATUS_OK;
     }
 
-    size_t length = u_arraylist_length(g_gattObjectList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_gattObjectList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
         if (!jarrayObj)
@@ -4003,8 +4003,8 @@ CAResult_t CALEClientRemoveGattObjForAddr(JNIEnv *env, jstring addr)
         return CA_STATUS_OK;
     }
 
-    size_t length = u_arraylist_length(g_gattObjectList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(g_gattObjectList);
+    for (uint32_t index = 0; index < length; index++)
     {
         jobject jarrayObj = (jobject) u_arraylist_get(g_gattObjectList, index);
         if (!jarrayObj)
@@ -4617,7 +4617,7 @@ void CATerminateLEGattClient()
 }
 
 CAResult_t CAUpdateCharacteristicsToGattServer(const char *remoteAddress, const uint8_t  *data,
-                                               size_t dataLen, CALETransferType_t type,
+                                               uint32_t dataLen, CALETransferType_t type,
                                                int32_t position)
 {
     OIC_LOG(INFO, TAG, "call CALEClientSendUnicastMessage");
@@ -4632,7 +4632,7 @@ CAResult_t CAUpdateCharacteristicsToGattServer(const char *remoteAddress, const 
     return CALEClientSendUnicastMessage(remoteAddress, data, dataLen);
 }
 
-CAResult_t CAUpdateCharacteristicsToAllGattServers(const uint8_t *data, size_t dataLen)
+CAResult_t CAUpdateCharacteristicsToAllGattServers(const uint8_t *data, uint32_t dataLen)
 {
     OIC_LOG(DEBUG, TAG, "call CALEClientSendMulticastMessage");
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -5144,7 +5144,7 @@ Java_org_iotivity_ca_CaLeClientInterface_caLeGattCharacteristicChangedCallback(
     OIC_LOG_V(INFO, TAG, "CALeGattCharacteristicChangedCallback - data. : %p, %d",
               receivedData, length);
 
-    size_t sentLength = 0;
+    uint32_t sentLength = 0;
     oc_mutex_lock(g_bleServerBDAddressMutex);
     g_CABLEClientDataReceivedCallback(address, receivedData, length, &sentLength);
     oc_mutex_unlock(g_bleServerBDAddressMutex);

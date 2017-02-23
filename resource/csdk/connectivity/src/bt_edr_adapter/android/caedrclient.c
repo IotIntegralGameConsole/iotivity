@@ -146,7 +146,7 @@ CAResult_t CAEDRManagerReadData()
 }
 
 CAResult_t CAEDRClientSendUnicastData(const char *remoteAddress, const uint8_t *data,
-                                      size_t dataLength)
+                                      uint32_t dataLength)
 {
     VERIFY_NON_NULL(remoteAddress, TAG, "remoteAddress is null");
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -155,7 +155,7 @@ CAResult_t CAEDRClientSendUnicastData(const char *remoteAddress, const uint8_t *
     return result;
 }
 
-CAResult_t CAEDRClientSendMulticastData(const uint8_t *data, size_t dataLength)
+CAResult_t CAEDRClientSendMulticastData(const uint8_t *data, uint32_t dataLength)
 {
     VERIFY_NON_NULL(data, TAG, "data is null");
 
@@ -496,7 +496,7 @@ void CAEDRCoreJniInit()
     g_jvm = (JavaVM*) CANativeJNIGetJavaVM();
 }
 
-CAResult_t CAEDRSendUnicastMessage(const char* address, const uint8_t* data, size_t dataLen)
+CAResult_t CAEDRSendUnicastMessage(const char* address, const uint8_t* data, uint32_t dataLen)
 {
     VERIFY_NON_NULL(address, TAG, "address is null");
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -505,7 +505,7 @@ CAResult_t CAEDRSendUnicastMessage(const char* address, const uint8_t* data, siz
     return result;
 }
 
-CAResult_t CAEDRSendMulticastMessage(const uint8_t* data, size_t dataLen)
+CAResult_t CAEDRSendMulticastMessage(const uint8_t* data, uint32_t dataLen)
 {
     VERIFY_NON_NULL(data, TAG, "data is null");
 
@@ -592,7 +592,7 @@ void CAEDRGetLocalAddress(char **address)
     }
 }
 
-CAResult_t CAEDRSendUnicastMessageImpl(const char* address, const uint8_t* data, size_t dataLen)
+CAResult_t CAEDRSendUnicastMessageImpl(const char* address, const uint8_t* data, uint32_t dataLen)
 {
     VERIFY_NON_NULL(address, TAG, "address is null");
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -695,7 +695,7 @@ CAResult_t CAEDRSendUnicastMessageImpl(const char* address, const uint8_t* data,
     return CA_STATUS_OK;
 }
 
-CAResult_t CAEDRSendMulticastMessageImpl(JNIEnv *env, const uint8_t* data, size_t dataLen)
+CAResult_t CAEDRSendMulticastMessageImpl(JNIEnv *env, const uint8_t* data, uint32_t dataLen)
 {
     VERIFY_NON_NULL(env, TAG, "env is null");
     VERIFY_NON_NULL(data, TAG, "data is null");
@@ -754,7 +754,7 @@ CAResult_t CAEDRSendMulticastMessageImpl(JNIEnv *env, const uint8_t* data, size_
 }
 
 CAResult_t CAEDRNativeSendData(JNIEnv *env, const char *address, const uint8_t *data,
-                               size_t dataLength)
+                               uint32_t dataLength)
 {
     VERIFY_NON_NULL(env, TAG, "env is null");
     VERIFY_NON_NULL(address, TAG, "address is null");

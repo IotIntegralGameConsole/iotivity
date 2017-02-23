@@ -61,7 +61,7 @@ void CALEServerTerminate();
  * @param[in]   dataLen          data length.
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CALEServerSendUnicastMessage(const char *address, const uint8_t *data, size_t dataLen);
+CAResult_t CALEServerSendUnicastMessage(const char *address, const uint8_t *data, uint32_t dataLen);
 
 /**
  * send data for multicast (interface).
@@ -69,7 +69,7 @@ CAResult_t CALEServerSendUnicastMessage(const char *address, const uint8_t *data
  * @param[in]   dataLen          data length.
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CALEServerSendMulticastMessage(const uint8_t *data, size_t dataLen);
+CAResult_t CALEServerSendMulticastMessage(const uint8_t *data, uint32_t dataLen);
 
 /**
  * start multicast server (start advertise).
@@ -99,7 +99,7 @@ void CALEServerSetCallback(CAPacketReceiveCallback callback);
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CALEServerSendUnicastMessageImpl(JNIEnv *env, const char *address, const uint8_t *data,
-                                            size_t dataLen);
+                                            uint32_t dataLen);
 
 /**
  * send data for multicast (implement)
@@ -108,7 +108,7 @@ CAResult_t CALEServerSendUnicastMessageImpl(JNIEnv *env, const char *address, co
  * @param[in]   dataLen          data length
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CALEServerSendMulticastMessageImpl(JNIEnv *env, const uint8_t *data, size_t dataLen);
+CAResult_t CALEServerSendMulticastMessageImpl(JNIEnv *env, const uint8_t *data, uint32_t dataLen);
 
 /**
  * set context of application.

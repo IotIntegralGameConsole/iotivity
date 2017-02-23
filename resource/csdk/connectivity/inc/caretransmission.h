@@ -50,13 +50,13 @@
 /** retransmission data send method type. **/
 typedef CAResult_t (*CADataSendMethod_t)(const CAEndpoint_t *endpoint,
                                          const void *pdu,
-                                         size_t size,
+                                         uint32_t size,
                                          CADataType_t dataType);
 
 /** retransmission timeout callback type. **/
 typedef void (*CATimeoutCallback_t)(const CAEndpoint_t *endpoint,
                                     const void *pdu,
-                                    size_t size);
+                                    uint32_t size);
 
 typedef struct
 {
@@ -137,7 +137,7 @@ CAResult_t CARetransmissionStart(CARetransmission_t *context);
 CAResult_t CARetransmissionSentData(CARetransmission_t *context,
                                     const CAEndpoint_t *endpoint,
                                     CADataType_t dataType,
-                                    const void *pdu, size_t size);
+                                    const void *pdu, uint32_t size);
 
 /**
  * Pass the received pdu data. if received pdu is ACK data for the retransmission CON data,
@@ -151,7 +151,7 @@ CAResult_t CARetransmissionSentData(CARetransmission_t *context,
  */
 CAResult_t CARetransmissionReceivedData(CARetransmission_t *context,
                                         const CAEndpoint_t *endpoint, const void *pdu,
-                                        size_t size, void **retransmissionPdu);
+                                        uint32_t size, void **retransmissionPdu);
 
 /**
  * Stopping the retransmission context.

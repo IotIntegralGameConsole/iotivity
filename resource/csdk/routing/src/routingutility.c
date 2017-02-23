@@ -186,7 +186,7 @@ OCStackResult RMAddInfo(const char *destination, void *message, bool isRequest,
 
 #ifdef ROUTING_GATEWAY
     // A gateway is supposed to add its ID as source.
-    size_t gatewayId = RMGetGatewayId();
+    uint32_t gatewayId = RMGetGatewayId();
     if (gatewayId)
     {
         memcpy(&(routeOption.srcGw), &gatewayId, sizeof(routeOption.srcGw));
@@ -254,7 +254,7 @@ OCStackResult RMUpdateInfo(CAHeaderOption_t **options, uint8_t *numOptions,
             memcpy(endpoint->routeData, (*options + routeIndex)->optionData + count,
                    GATEWAY_ID_LENGTH);
             OIC_LOG_V(DEBUG, TAG, "adding srcgid: %u in endpoint [%d]",
-                     *((size_t *)endpoint->routeData), sLen);
+                     *((uint32_t *)endpoint->routeData), sLen);
 
             count += GATEWAY_ID_LENGTH;
 
@@ -294,7 +294,7 @@ void RMGetRouteOptionIndex(const CAHeaderOption_t *options, uint8_t numOptions, 
         return;
     }
 
-    for (size_t i = 0; i < numOptions; i++)
+    for (uint32_t i = 0; i < numOptions; i++)
     {
         OIC_LOG_V(DEBUG, TAG, "Request- optionID: %u", options[i].optionID);
         if (RM_OPTION_MESSAGE_SWITCHING == options[i].optionID)

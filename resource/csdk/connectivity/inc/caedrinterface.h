@@ -71,7 +71,7 @@ typedef struct
 {
     CAEndpoint_t *remoteEndpoint;       /**< Remote Endpoint. */
     uint8_t *data;                      /**< Data to be sent. */
-    size_t dataLen;                   /**< Length of the data to be sent. */
+    uint32_t dataLen;                   /**< Length of the data to be sent. */
 } CAEDRData;
 
 /**
@@ -92,7 +92,7 @@ typedef struct
  * @pre Callback must be registered using CAEDRSetPacketReceivedCallback().
  */
 typedef void (*CAEDRDataReceivedCallback)(const char *remoteAddress, const uint8_t *data,
-                                          size_t dataLength, size_t *sentLength);
+                                          uint32_t dataLength, uint32_t *sentLength);
 
 /**
  * This will be used during change in network status.
@@ -110,7 +110,7 @@ typedef void (*CAEDRNetworkStatusCallback)(CANetworkStatus_t status);
  */
 typedef void (*CAEDRErrorHandleCallback)(const char *remoteAddress,
                                          const uint8_t *data,
-                                         size_t dataLength,
+                                         uint32_t dataLength,
                                          CAResult_t result);
 
 /**
@@ -276,7 +276,7 @@ CAResult_t CAEDRGetAdapterEnableState(bool *state);
  */
 CAResult_t CAEDRClientSendUnicastData(const char *remoteAddress,
                                       const uint8_t *data,
-                                      size_t dataLength);
+                                      uint32_t dataLength);
 
 /**
  * This function sends data to all bluetooth devices running OIC service.
@@ -285,7 +285,7 @@ CAResult_t CAEDRClientSendUnicastData(const char *remoteAddress,
  * @return ::CA_STATUS_OK or Appropriate error code.
  */
 CAResult_t CAEDRClientSendMulticastData(const uint8_t *data,
-                                        size_t dataLength);
+                                        uint32_t dataLength);
 
 /**
  * This function gets bonded bluetooth device list

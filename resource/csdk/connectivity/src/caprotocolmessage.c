@@ -69,7 +69,7 @@ CAResult_t CAGetRequestInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *en
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(outReqInfo, TAG, "outReqInfo");
 
-    size_t code = CA_NOT_FOUND;
+    uint32_t code = CA_NOT_FOUND;
     CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outReqInfo->info));
     outReqInfo->method = code;
 
@@ -82,7 +82,7 @@ CAResult_t CAGetResponseInfoFromPDU(const coap_pdu_t *pdu, CAResponseInfo_t *out
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(outResInfo, TAG, "outResInfo");
 
-    size_t code = CA_NOT_FOUND;
+    uint32_t code = CA_NOT_FOUND;
     CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outResInfo->info));
     outResInfo->result = code;
 
@@ -94,13 +94,13 @@ CAResult_t CAGetErrorInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endp
 {
     VERIFY_NON_NULL(pdu, TAG, "pdu");
 
-    size_t code = 0;
+    uint32_t code = 0;
     CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &errorInfo->info);
 
     return ret;
 }
 
-coap_pdu_t *CAGeneratePDU(size_t code, const CAInfo_t *info, const CAEndpoint_t *endpoint,
+coap_pdu_t *CAGeneratePDU(uint32_t code, const CAInfo_t *info, const CAEndpoint_t *endpoint,
                           coap_list_t **optlist, coap_transport_t *transport)
 {
     VERIFY_NON_NULL_RET(info, TAG, "info", NULL);
@@ -141,14 +141,14 @@ coap_pdu_t *CAGeneratePDU(size_t code, const CAInfo_t *info, const CAEndpoint_t 
         {
             OIC_LOG_V(DEBUG, TAG, "uri : %s", info->resourceUri);
 
-            size_t length = strlen(info->resourceUri);
+            uint32_t length = strlen(info->resourceUri);
             if (CA_MAX_URI_LENGTH < length)
             {
                 OIC_LOG(ERROR, TAG, "URI len err");
                 return NULL;
             }
 
-            size_t uriLength = length + sizeof(COAP_URI_HEADER);
+            uint32_t uriLength = length + sizeof(COAP_URI_HEADER);
             char *coapUri = (char *) OICCalloc(1, uriLength);
             if (NULL == coapUri)
             {
@@ -187,7 +187,7 @@ coap_pdu_t *CAGeneratePDU(size_t code, const CAInfo_t *info, const CAEndpoint_t 
     return pdu;
 }
 
-coap_pdu_t *CAParsePDU(const char *data, size_t length, size_t *outCode,
+coap_pdu_t *CAParsePDU(const char *data, size_t length, uint32_t *outCode,
                        const CAEndpoint_t *endpoint)
 {
     VERIFY_NON_NULL_RET(data, TAG, "data", NULL);
@@ -247,7 +247,7 @@ coap_pdu_t *CAParsePDU(const char *data, size_t length, size_t *outCode,
 
     if (outCode)
     {
-        (*outCode) = (size_t) CA_RESPONSE_CODE(coap_get_code(outpdu, transport));
+        (*outCode) = (uint32_t) CA_RESPONSE_CODE(coap_get_code(outpdu, transport));
     }
 
     return outpdu;
@@ -357,7 +357,7 @@ coap_pdu_t *CAGeneratePDUImpl(code_t code, const CAInfo_t *info,
 
     if (info->token && CA_EMPTY != code)
     {
-        size_t tokenLength = info->tokenLength;
+        uint32_t tokenLength = info->tokenLength;
         OIC_LOG_V(DEBUG, TAG, "token info token length: %d, token :", tokenLength);
         OIC_LOG_BUFFER(DEBUG, TAG, (const uint8_t *)info->token, tokenLength);
 
@@ -514,7 +514,7 @@ CAResult_t CAParseUriPartial(const unsigned char *str, size_t length, int target
     return CA_STATUS_OK;
 }
 
-CAResult_t CAParseHeadOption(size_t code, const CAInfo_t *info, coap_list_t **optlist)
+CAResult_t CAParseHeadOption(uint32_t code, const CAInfo_t *info, coap_list_t **optlist)
 {
     (void)code;
     VERIFY_NON_NULL_RET(info, TAG, "info", CA_STATUS_INVALID_PARAM);
@@ -527,7 +527,7 @@ CAResult_t CAParseHeadOption(size_t code, const CAInfo_t *info, coap_list_t **op
         return CA_STATUS_INVALID_PARAM;
     }
 
-    for (size_t i = 0; i < info->numOptions; i++)
+    for (uint32_t i = 0; i < info->numOptions; i++)
     {
         if(!(info->options + i))
         {
@@ -535,7 +535,7 @@ CAResult_t CAParseHeadOption(size_t code, const CAInfo_t *info, coap_list_t **op
             return CA_STATUS_FAILED;
         }
 
-        size_t id = (info->options + i)->optionID;
+        uint32_t id = (info->options + i)->optionID;
         if (COAP_OPTION_URI_PATH == id || COAP_OPTION_URI_QUERY == id)
         {
             OIC_LOG_V(DEBUG, TAG, "not Header Opt: %d", id);
@@ -635,7 +635,7 @@ CAResult_t CAParsePayloadFormatHeadOption(CAPayloadFormat_t format, uint16_t for
     return CA_STATUS_OK;
 }
 
-coap_list_t *CACreateNewOptionNode(uint16_t key, size_t length, const char *data)
+coap_list_t *CACreateNewOptionNode(uint16_t key, uint32_t length, const char *data)
 {
     VERIFY_NON_NULL_RET(data, TAG, "data", NULL);
 
@@ -701,9 +701,9 @@ int CAOrderOpts(void *a, void *b)
     return COAP_OPTION_KEY(*(coap_option *) a) == COAP_OPTION_KEY(*(coap_option * ) b);
 }
 
-size_t CAGetOptionCount(coap_opt_iterator_t opt_iter)
+uint32_t CAGetOptionCount(coap_opt_iterator_t opt_iter)
 {
-    size_t count = 0;
+    uint32_t count = 0;
     coap_opt_t *option = NULL;
 
     while ((option = coap_option_next(&opt_iter)))
@@ -727,7 +727,7 @@ size_t CAGetOptionCount(coap_opt_iterator_t opt_iter)
 }
 
 CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
-                            size_t *outCode, CAInfo_t *outInfo)
+                            uint32_t *outCode, CAInfo_t *outInfo)
 {
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(endpoint, TAG, "endpoint");
@@ -751,11 +751,11 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
 
     if (outCode)
     {
-        (*outCode) = (size_t) CA_RESPONSE_CODE(coap_get_code(pdu, transport));
+        (*outCode) = (uint32_t) CA_RESPONSE_CODE(coap_get_code(pdu, transport));
     }
 
     // init HeaderOption list
-    size_t count = CAGetOptionCount(opt_iter);
+    uint32_t count = CAGetOptionCount(opt_iter);
     memset(outInfo, 0, sizeof(*outInfo));
 
     outInfo->numOptions = count;
@@ -793,8 +793,8 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
 
     coap_opt_t *option = NULL;
     char optionResult[CA_MAX_URI_LENGTH] = {0};
-    size_t idx = 0;
-    size_t optionLength = 0;
+    uint32_t idx = 0;
+    uint32_t optionLength = 0;
     bool isfirstsetflag = false;
     bool isQueryBeingProcessed = false;
     bool isProxyRequest = false;
@@ -802,7 +802,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     while ((option = coap_option_next(&opt_iter)))
     {
         char buf[COAP_MAX_PDU_SIZE] = {0};
-        size_t bufLength =
+        uint32_t bufLength =
             CAGetOptionData(opt_iter.type, (uint8_t *)(COAP_OPT_VALUE(option)),
                     COAP_OPT_LENGTH(option), (uint8_t *)buf, sizeof(buf));
         if (bufLength)
@@ -1127,8 +1127,8 @@ void CADestroyTokenInternal(CAToken_t token)
     OICFree(token);
 }
 
-size_t CAGetOptionData(uint16_t key, const uint8_t *data, size_t len,
-        uint8_t *option, size_t buflen)
+uint32_t CAGetOptionData(uint16_t key, const uint8_t *data, uint32_t len,
+        uint8_t *option, uint32_t buflen)
 {
     if (0 == buflen)
     {
@@ -1160,7 +1160,7 @@ size_t CAGetOptionData(uint16_t key, const uint8_t *data, size_t len,
     return len;
 }
 
-CAMessageType_t CAGetMessageTypeFromPduBinaryData(const void *pdu, size_t size)
+CAMessageType_t CAGetMessageTypeFromPduBinaryData(const void *pdu, uint32_t size)
 {
     VERIFY_NON_NULL_RET(pdu, TAG, "pdu", CA_MSG_NONCONFIRM);
 
@@ -1176,7 +1176,7 @@ CAMessageType_t CAGetMessageTypeFromPduBinaryData(const void *pdu, size_t size)
     return (CAMessageType_t) hdr->type;
 }
 
-uint16_t CAGetMessageIdFromPduBinaryData(const void *pdu, size_t size)
+uint16_t CAGetMessageIdFromPduBinaryData(const void *pdu, uint32_t size)
 {
     VERIFY_NON_NULL_RET(pdu, TAG, "pdu", 0);
 
@@ -1192,7 +1192,7 @@ uint16_t CAGetMessageIdFromPduBinaryData(const void *pdu, size_t size)
     return hdr->id;
 }
 
-CAResponseResult_t CAGetCodeFromPduBinaryData(const void *pdu, size_t size)
+CAResponseResult_t CAGetCodeFromPduBinaryData(const void *pdu, uint32_t size)
 {
     VERIFY_NON_NULL_RET(pdu, TAG, "pdu", CA_NOT_FOUND);
 

@@ -665,7 +665,7 @@ static CAResult_t CAReceiveMessage(CASocketFd_t fd, CATransportFlags_t flags)
         if (flags & CA_MULTICAST)
         {
             struct in_addr *addr = &((struct in_pktinfo *)pktinfo)->ipi_addr;
-            size_t host = ntohl(addr->s_addr);
+            uint32_t host = ntohl(addr->s_addr);
             unsigned char topbits = ((unsigned char *)&host)[3];
             if (topbits < 224 || topbits > 239)
             {
@@ -1048,7 +1048,7 @@ void CAWakeUpForChange()
 #endif
 }
 
-static void applyMulticastToInterface4(size_t ifindex)
+static void applyMulticastToInterface4(uint32_t ifindex)
 {
     if (!caglobals.ip.ipv4enabled)
     {
@@ -1101,7 +1101,7 @@ static void applyMulticastToInterface4(size_t ifindex)
     }
 }
 
-static void applyMulticast6(int fd, struct in6_addr *addr, size_t ifindex)
+static void applyMulticast6(int fd, struct in6_addr *addr, uint32_t ifindex)
 {
     struct ipv6_mreq mreq = { .ipv6mr_interface = ifindex };
 
@@ -1131,7 +1131,7 @@ static void applyMulticast6(int fd, struct in6_addr *addr, size_t ifindex)
     }
 }
 
-static void applyMulticastToInterface6(size_t ifindex)
+static void applyMulticastToInterface6(uint32_t ifindex)
 {
     if (!caglobals.ip.ipv6enabled)
     {
@@ -1163,10 +1163,10 @@ CAResult_t CAIPStartListenServer()
         return CA_STATUS_FAILED;
     }
 
-    size_t len = u_arraylist_length(iflist);
+    uint32_t len = u_arraylist_length(iflist);
     OIC_LOG_V(DEBUG, TAG, "IP network interfaces found: %d", len);
 
-    for (size_t i = 0; i < len; i++)
+    for (uint32_t i = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
 
@@ -1203,10 +1203,10 @@ CAResult_t CAIPStopListenServer()
         return CA_STATUS_FAILED;
     }
 
-    size_t len = u_arraylist_length(iflist);
+    uint32_t len = u_arraylist_length(iflist);
     OIC_LOG_V(DEBUG, TAG, "IP network interfaces found: %d", len);
 
-    for (size_t i = 0; i < len; i++)
+    for (uint32_t i = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
 
@@ -1375,8 +1375,8 @@ static void sendMulticastData6(const u_arraylist_t *iflist,
     OICStrcpy(endpoint->addr, sizeof(endpoint->addr), ipv6mcname);
     int fd = caglobals.ip.u6.fd;
 
-    size_t len = u_arraylist_length(iflist);
-    for (size_t i = 0; i < len; i++)
+    uint32_t len = u_arraylist_length(iflist);
+    for (uint32_t i = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
         if (!ifitem)
@@ -1420,8 +1420,8 @@ static void sendMulticastData4(const u_arraylist_t *iflist,
     OICStrcpy(endpoint->addr, sizeof(endpoint->addr), IPv4_MULTICAST);
     int fd = caglobals.ip.u4.fd;
 
-    size_t len = u_arraylist_length(iflist);
-    for (size_t i = 0; i < len; i++)
+    uint32_t len = u_arraylist_length(iflist);
+    for (uint32_t i = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
         if (!ifitem)
@@ -1519,8 +1519,8 @@ CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
         return CA_STATUS_FAILED;
     }
 
-    size_t len = u_arraylist_length(iflist);
-    size_t length = len;
+    uint32_t len = u_arraylist_length(iflist);
+    uint32_t length = len;
 
 #ifdef __WITH_DTLS__
     //If DTLS is supported, each interface can support secure port as well
@@ -1535,7 +1535,7 @@ CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
         return CA_MEMORY_ALLOC_FAILED;
     }
 
-    for (size_t i = 0, j = 0; i < len; i++)
+    for (uint32_t i = 0, j = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
         if(!ifitem)
@@ -1592,7 +1592,7 @@ void CAIPSetErrorHandler(CAIPErrorHandleCallback errorHandleCallback)
     g_ipErrorHandler = errorHandleCallback;
 }
 
-CAResult_t CAGetLinkLocalZoneId(size_t ifindex, char **zoneId)
+CAResult_t CAGetLinkLocalZoneId(uint32_t ifindex, char **zoneId)
 {
     return CAGetLinkLocalZoneIdInternal(ifindex, zoneId);
 }

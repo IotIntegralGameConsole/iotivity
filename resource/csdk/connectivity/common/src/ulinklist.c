@@ -183,7 +183,7 @@ CAResult_t u_linklist_remove(u_linklist_t *linklist, u_linklist_iterator_t **ite
 }
 
 
-size_t u_linklist_length(const u_linklist_t *linklist)
+uint32_t u_linklist_length(const u_linklist_t *linklist)
 {
     if (NULL == linklist)
     {

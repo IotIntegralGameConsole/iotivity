@@ -157,10 +157,10 @@ static void CAReceiveHandler(void *data)
 
         // if new socket object is added in socket list after below logic is ran.
         // new socket will be started to read after next while loop
-        size_t length = CAEDRGetSocketListLength();
+        uint32_t length = CAEDRGetSocketListLength();
         if (0 != length)
         {
-            for (size_t idx = 0; idx < length; idx++)
+            for (uint32_t idx = 0; idx < length; idx++)
             {
                 CAEDRNativeReadData(env, idx);
             }
@@ -597,7 +597,7 @@ CAResult_t CAEDRStopReceiveThread()
     return CA_STATUS_OK;
 }
 
-CAResult_t CAEDRNativeReadData(JNIEnv *env, size_t idx)
+CAResult_t CAEDRNativeReadData(JNIEnv *env, uint32_t idx)
 {
     if ((*env)->ExceptionCheck(env))
     {
@@ -774,7 +774,7 @@ CAResult_t CAEDRNativeReadData(JNIEnv *env, size_t idx)
                 OIC_LOG_V(DEBUG, TAG, "data will be sent to callback routine: %s, %d",
                           deviceInfo->recvData, deviceInfo->recvDataLen);
 
-                size_t sentLength = 0;
+                uint32_t sentLength = 0;
                 g_edrPacketReceivedCallback(address, (void*) deviceInfo->recvData,
                                             deviceInfo->recvDataLen, &sentLength);
 

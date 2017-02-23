@@ -174,7 +174,7 @@ INLINE_API void OCPayloadLogRepValues(LogLevel level, OCRepPayloadValue* val)
 INLINE_API void OCPayloadLogRep(LogLevel level, OCRepPayload* payload)
 {
     OIC_LOG(level, (PL_TAG), "Payload Type: Representation");
-    size_t i = 1;
+    uint32_t i = 1;
     for (OCRepPayload* rep = payload; rep; rep = rep->next, ++i)
     {
         OIC_LOG_V(level, PL_TAG, "\tResource #%d", i);
@@ -241,7 +241,7 @@ INLINE_API void OCPayloadLogDiscovery(LogLevel level, OCDiscoveryPayload* payloa
 
         OCResourcePayload* res = payload->resources;
 
-        size_t i = 1;
+        uint32_t i = 1;
         while(res)
         {
             OIC_LOG_V(level, PL_TAG, "\tLink#%d", i);
@@ -269,7 +269,7 @@ INLINE_API void OCPayloadLogDiscovery(LogLevel level, OCDiscoveryPayload* payloa
             OIC_LOG_V(level, PL_TAG, "\tSecure?: %s", res->secure ? "true" : "false");
             OIC_LOG_V(level, PL_TAG, "\tPort: %u", res->port);
 
-            size_t j = 1;
+            uint32_t j = 1;
             OCEndpointPayload* eps = res->eps;
             while (eps)
             {

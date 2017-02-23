@@ -105,7 +105,7 @@ CAResult_t CAStartEDRDiscoveryServer();
  * @return Number of bytes sent on the network. Returns -1 on error.
  */
 int32_t CASendEDRUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                              size_t dataLength);
+                              uint32_t dataLength);
 
 /**
  * @brief  Sends multicast data to all discovered bluetooth OIC devices using the adapter
@@ -114,7 +114,7 @@ int32_t CASendEDRUnicastData(const CAEndpoint_t *remoteEndpoint, const void *dat
  * @param  dataLength   [IN]  Length of data in bytes.
  * @return Number of bytes sent on the network. Returns -1 on error.
  */
-int32_t CASendEDRMulticastData(const void *data, size_t dataLength);
+int32_t CASendEDRMulticastData(const void *data, uint32_t dataLength);
 
 /**
  * @brief  Get EDR Connectivity network information.
@@ -129,7 +129,7 @@ int32_t CASendEDRMulticastData(const void *data, size_t dataLength);
  * @retval #CA_STATUS_FAILED Operation failed
  * @remarks info is allocated in this API and should be freed by the caller.
  */
-CAResult_t CAGetEDRInterfaceInformation(CAEndpoint_t **info, size_t *size);
+CAResult_t CAGetEDRInterfaceInformation(CAEndpoint_t **info, uint32_t *size);
 
 /**
  * @brief  Read Synchronous API callback.

@@ -165,7 +165,7 @@ bool CALEIsDeviceDiscovered(const char * address)
     if (g_deviceDiscoveredList)
     {
         oc_mutex_lock(g_deviceDiscoveredListMutex);
-        size_t arrayLength = u_arraylist_length(g_deviceDiscoveredList);
+        uint32_t arrayLength = u_arraylist_length(g_deviceDiscoveredList);
         for (int i = 0; i < arrayLength; i++)
         {
             char *deviceAddr = u_arraylist_get(g_deviceDiscoveredList, i);
@@ -198,7 +198,7 @@ void CALEGattCharacteristicChangedCb(bt_gatt_h characteristic,
         return;
     }
 
-    size_t sentLength = 0;
+    uint32_t sentLength = 0;
     g_LEClientDataReceivedCallback(userData, (uint8_t *)value, valueLen, &sentLength);
 
     OIC_LOG_V(DEBUG, TAG, "Sent data Length is %d", sentLength);
@@ -1019,7 +1019,7 @@ CAResult_t CALEGattDiscoverServices(const char *remoteAddress)
     if (g_multicastDataList)
     {
         oc_mutex_lock(g_multicastDataListMutex);
-        size_t arrayLength = u_arraylist_length(g_multicastDataList);
+        uint32_t arrayLength = u_arraylist_length(g_multicastDataList);
         for (int i = 0; i < arrayLength; i++)
         {
             CALEData_t *multicastData = u_arraylist_get(g_multicastDataList, i);
@@ -1039,7 +1039,7 @@ CAResult_t CALEGattDiscoverServices(const char *remoteAddress)
 }
 
 CAResult_t  CAUpdateCharacteristicsToGattServer(const char *remoteAddress,
-                                                const uint8_t *data, const size_t dataLen,
+                                                const uint8_t *data, const uint32_t dataLen,
                                                 CALETransferType_t type, const int32_t position)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -1121,7 +1121,7 @@ CAResult_t  CAUpdateCharacteristicsToGattServer(const char *remoteAddress,
     return CA_STATUS_OK;
 }
 
-CAResult_t CAUpdateCharacteristicsToAllGattServers(const uint8_t *data, size_t dataLen)
+CAResult_t CAUpdateCharacteristicsToAllGattServers(const uint8_t *data, uint32_t dataLen)
 {
     OIC_LOG(DEBUG,  TAG, "IN");
 

@@ -262,7 +262,7 @@ OCStackResult OCRegisterPersistentStorageHandler(OCPersistentStorage* persistent
  *
  * @return ::OC_STACK_OK on success, some other value upon failure.
  */
-OCStackResult OCStartPresence(const size_t ttl);
+OCStackResult OCStartPresence(const uint32_t ttl);
 
 /**
  * When operating in OCServer or OCClientServer mode, this API will stop sending
@@ -875,7 +875,7 @@ OCPersistentStorage *OCGetPersistentStorageHandler();
 *                        zoneId using OICFree() when it returned CA_STATUS_OK.
 * @return Returns ::OC_STACK_OK if success.
 */
-OCStackResult OCGetLinkLocalZoneId(size_t ifindex, char **zoneId);
+OCStackResult OCGetLinkLocalZoneId(uint32_t ifindex, char **zoneId);
 
 #ifdef __cplusplus
 }

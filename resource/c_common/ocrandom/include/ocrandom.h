@@ -50,7 +50,7 @@ extern "C" {
  * Generate a uniformly distributed 32-bit random number.
  * @retval On success, it returns the random value.
  */
-size_t OCGetRandom();
+uint32_t OCGetRandom();
 
 /**
  * Generate an array of uniformly distributed random bytes.
@@ -69,7 +69,7 @@ bool OCGetRandomBytes(uint8_t * output, size_t len);
  * @param[in] secondBound
  *              The output is less than or equal to secondBound
  */
-size_t OCGetRandomRange(size_t firstBound, size_t secondBound);
+uint32_t OCGetRandomRange(uint32_t firstBound, uint32_t secondBound);
 
 /**
  * Generate a Uniformly Unique Identifier based on RFC4122 and

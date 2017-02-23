@@ -123,7 +123,7 @@ B64Result b64Encode(const uint8_t* in, const size_t inLen,
  *
  * @return decoded value, 6-bit.
  */
-static size_t b64GetVal(char c)
+static uint32_t b64GetVal(char c)
 {
     if (('A' <= c) && ('Z' >= c))
     {
@@ -168,7 +168,7 @@ static B64Result b64DecodeBlk(const char* in, uint8_t* out)
         return B64_INVALID_PARAM;
     }
 
-    size_t val = (b64GetVal(in[0]) << 18) | (b64GetVal(in[1]) << 12) |
+    uint32_t val = (b64GetVal(in[0]) << 18) | (b64GetVal(in[1]) << 12) |
           (b64GetVal(in[2]) << 6) | (b64GetVal(in[3]));
 
     out[0] = (val >> 16) & 0xff;

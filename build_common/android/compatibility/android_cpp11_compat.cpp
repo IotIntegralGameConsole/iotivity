@@ -69,7 +69,7 @@ namespace std {
         return os.str();
     }
 
-    std::string to_string(size_t t)
+    std::string to_string(uint32_t t)
     {
         std::ostringstream os;
             os << t;

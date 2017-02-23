@@ -195,7 +195,7 @@ CAResult_t CAQueueingThreadStart(CAQueueingThread_t *thread)
     return res;
 }
 
-CAResult_t CAQueueingThreadAddData(CAQueueingThread_t *thread, void *data, size_t size)
+CAResult_t CAQueueingThreadAddData(CAQueueingThread_t *thread, void *data, uint32_t size)
 {
     if (NULL == thread)
     {

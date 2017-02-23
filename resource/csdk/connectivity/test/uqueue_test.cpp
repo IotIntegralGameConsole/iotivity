@@ -47,7 +47,7 @@ protected:
     u_queue_t *queue;
 };
 
-u_queue_message_t *CreateQueueMessage(void *data, size_t size)
+u_queue_message_t *CreateQueueMessage(void *data, uint32_t size)
 {
     u_queue_message_t *message = (u_queue_message_t *) OICMalloc(sizeof(u_queue_message_t));
     if (NULL == message)
@@ -87,13 +87,13 @@ TEST(UQueue, FreeNull)
 
 TEST_F(UQueueF, Length)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 
     int dummy = 0;
     u_queue_message_t *message = CreateQueueMessage(&dummy, sizeof(dummy));
     EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
 
-    ASSERT_EQ(static_cast<size_t>(1), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(1), u_queue_get_size(queue));
 
     // Add a few times without checking, just in case checking has side-effects
     dummy++;
@@ -108,12 +108,12 @@ TEST_F(UQueueF, Length)
     message = CreateQueueMessage(&dummy, sizeof(dummy));
     EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
 
-    ASSERT_EQ(static_cast<size_t>(4), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(4), u_queue_get_size(queue));
 }
 
 TEST_F(UQueueF, LengthMulti)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 
     for (int i = 0; i < 1000; ++i)
     {
@@ -121,19 +121,19 @@ TEST_F(UQueueF, LengthMulti)
         EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
     }
 
-    ASSERT_EQ(static_cast<size_t>(1000), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_queue_get_size(queue));
 }
 
 TEST_F(UQueueF, GetHead)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
         u_queue_message_t *message = CreateQueueMessage(&i, sizeof(i));
         EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
@@ -144,14 +144,14 @@ TEST_F(UQueueF, GetHead)
 
 TEST_F(UQueueF, Get)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
         u_queue_message_t *message = CreateQueueMessage(&i, sizeof(i));
         EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
@@ -162,14 +162,14 @@ TEST_F(UQueueF, Get)
 
 TEST_F(UQueueF, Remove)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
         u_queue_message_t *message = CreateQueueMessage(&i, sizeof(i));
         EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
@@ -179,16 +179,16 @@ TEST_F(UQueueF, Remove)
 
 TEST_F(UQueueF, Reset)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 
     for (size_t i = 0; i < 1000; ++i)
     {
         u_queue_message_t *message = CreateQueueMessage(&i, sizeof(i));
         EXPECT_EQ(CA_STATUS_OK, u_queue_add_element(queue, message));
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_queue_get_size(queue));
 
     EXPECT_EQ(CA_STATUS_OK, u_queue_reset(queue));
 
-    ASSERT_EQ(static_cast<size_t>(0), u_queue_get_size(queue));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_queue_get_size(queue));
 }

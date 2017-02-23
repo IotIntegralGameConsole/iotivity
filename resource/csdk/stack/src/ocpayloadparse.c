@@ -854,7 +854,7 @@ static CborError OCParseSingleRepPayload(OCRepPayload **outPayload, CborValue *o
                  */
                 if (arrayIndex <= UINT32_MAX)
                 {
-                    snprintf(name, UINT64_MAX_STRLEN + 1, "%" PRIu32, (size_t)arrayIndex);
+                    snprintf(name, UINT64_MAX_STRLEN + 1, "%" PRIu32, (uint32_t)arrayIndex);
                 }
                 else
                 {
@@ -1085,7 +1085,7 @@ static OCStackResult OCParsePresencePayload(OCPayload **outPayload, CborValue *r
         CborError err = cbor_value_map_find_value(rootValue, OC_RSRVD_NONCE, &curVal);
         VERIFY_CBOR_SUCCESS(TAG, err, "Failed finding nonce tag");
         err = cbor_value_get_uint64(&curVal, &temp);
-        payload->sequenceNumber = (size_t)temp;
+        payload->sequenceNumber = (uint32_t)temp;
         VERIFY_CBOR_SUCCESS(TAG, err, "Failed finding nonce value");
 
         // Max Age
@@ -1093,7 +1093,7 @@ static OCStackResult OCParsePresencePayload(OCPayload **outPayload, CborValue *r
         VERIFY_CBOR_SUCCESS(TAG, err, "Failed finding ttl tag");
         temp = 0;
         err = cbor_value_get_uint64(&curVal, &temp);
-        payload->maxAge = (size_t)temp;
+        payload->maxAge = (uint32_t)temp;
         VERIFY_CBOR_SUCCESS(TAG, err, "Failed finding ttl value");
 
         // Trigger

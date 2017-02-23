@@ -83,7 +83,7 @@ OCStackResult RMGetGatewayPayload(OCRepPayload **payload);
  * API to get the gateway UUID of its own.
  * @return  Gateway UUID.
  */
-size_t RMGetGatewayId();
+uint32_t RMGetGatewayId();
 
 /**
  * API to get the multicast sequence number..

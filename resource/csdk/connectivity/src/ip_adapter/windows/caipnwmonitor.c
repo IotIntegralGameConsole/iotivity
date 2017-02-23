@@ -148,10 +148,10 @@ static void CAIPDestroyNetworkMonitorList()
  * @param[in] addr     Address to look for.
  * @return true if already in the list, false if not.
  */
-static bool CACmpNetworkList(size_t ifIndex, int family, const char *addr, u_arraylist_t *iflist)
+static bool CACmpNetworkList(uint32_t ifIndex, int family, const char *addr, u_arraylist_t *iflist)
 {
-    size_t list_length = u_arraylist_length(iflist);
-    for (size_t list_index = 0; list_index < list_length; list_index++)
+    uint32_t list_length = u_arraylist_length(iflist);
+    for (uint32_t list_index = 0; list_index < list_length; list_index++)
     {
         CAInterface_t *currItem = (CAInterface_t *) u_arraylist_get(iflist, list_index);
         if ((currItem->index == ifIndex) && (currItem->family == family) &&
@@ -180,15 +180,15 @@ static void CALLBACK IpAddressChangeCallback(void *context,
 
     // Fetch new network address info.
     u_arraylist_t *newList = GetInterfaceInformation(0);
-    size_t newLen = u_arraylist_length(newList);
+    uint32_t newLen = u_arraylist_length(newList);
 
     u_arraylist_t *oldList = g_CAIPNetworkMonitorAddressList;
-    size_t oldLen = u_arraylist_length(oldList);
+    uint32_t oldLen = u_arraylist_length(oldList);
 
     if (caglobals.ip.addressChangeEvent)
     {
         // Check whether any addresses went away.
-        for (size_t i = 0; i < oldLen; i++)
+        for (uint32_t i = 0; i < oldLen; i++)
         {
             CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(oldList, i);
             if (!CACmpNetworkList(ifitem->index, ifitem->family, ifitem->addr, newList))
@@ -199,7 +199,7 @@ static void CALLBACK IpAddressChangeCallback(void *context,
         }
 
         // Check whether any new addresses are available.
-        for (size_t i = 0; i < newLen; i++)
+        for (uint32_t i = 0; i < newLen; i++)
         {
             CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(newList, i);
             if (!CACmpNetworkList(ifitem->index, ifitem->family, ifitem->addr, oldList))
@@ -695,7 +695,7 @@ static bool IsValidNetworkAdapter(PIP_ADAPTER_ADDRESSES pAdapterAddr, int desire
  * @param[in]     addr    Address.
  * @return Pointer to entry added, or NULL on failure.
  */
-CAInterface_t *AddCAInterface(u_arraylist_t *iflist, const char *name, size_t index,
+CAInterface_t *AddCAInterface(u_arraylist_t *iflist, const char *name, uint32_t index,
                               uint16_t family, const char *addr)
 {
     CAInterface_t *ifitem = AllocateCAInterface(index, name, family, addr, IFF_UP);
@@ -898,8 +898,8 @@ u_arraylist_t *CAIPGetInterfaceInformation(int desiredIndex)
     // Avoid extra kernel calls by just duplicating what's in our cache.
     oc_mutex_lock(g_CAIPNetworkMonitorMutex);
 
-    size_t list_length = u_arraylist_length(g_CAIPNetworkMonitorAddressList);
-    for (size_t list_index = 0; list_index < list_length; list_index++)
+    uint32_t list_length = u_arraylist_length(g_CAIPNetworkMonitorAddressList);
+    for (uint32_t list_index = 0; list_index < list_length; list_index++)
     {
         CAInterface_t *currItem = (CAInterface_t *)u_arraylist_get(g_CAIPNetworkMonitorAddressList,
                                                                    list_index);
@@ -918,7 +918,7 @@ u_arraylist_t *CAIPGetInterfaceInformation(int desiredIndex)
     return iflist;
 }
 
-CAResult_t CAGetLinkLocalZoneIdInternal(size_t ifindex, char **zoneId)
+CAResult_t CAGetLinkLocalZoneIdInternal(uint32_t ifindex, char **zoneId)
 {
     if (!zoneId || (*zoneId != NULL))
     {

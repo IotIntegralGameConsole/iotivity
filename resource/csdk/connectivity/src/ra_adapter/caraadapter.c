@@ -134,7 +134,7 @@ static bool CARAFindSessID(obs_item_t *item, char *key)
     }
 }
 
-static bool CARAPDUIsRequest(size_t x)
+static bool CARAPDUIsRequest(uint32_t x)
 {
     return (x == CA_GET || x == CA_POST || x == CA_PUT || x == CA_DELETE);
 }
@@ -160,7 +160,7 @@ static void CARAUpdateObsList(int option, char *sid)
 
 static int CARAGetReqObsOption(coap_pdu_t *pdu, const CAEndpoint_t *endPoint)
 {
-    size_t obsopt = -1;
+    uint32_t obsopt = -1;
 
     CARequestInfo_t *reqInfo = (CARequestInfo_t *) OICMalloc(sizeof(*reqInfo));
     VERIFY_NON_NULL_RET(reqInfo, RA_ADAPTER_TAG, "Memory alloc of CARequestInfo_t failed!", -1);
@@ -271,7 +271,7 @@ static int CARARecvCB(xmpp_ibb_session_t *sess, xmppdata_t *xdata)
             OIC_LOG(ERROR, RA_ADAPTER_TAG, "EndPoint creation failed!");
             return -1;
         }
-        size_t code = CA_NOT_FOUND;
+        uint32_t code = CA_NOT_FOUND;
         coap_pdu_t *pdu = (coap_pdu_t *) CAParsePDU(xdata->data, xdata->size, &code,
             endPoint);
         char *sid = CARAGetSIDFromPDU(pdu);
@@ -493,7 +493,7 @@ CAResult_t CAStopRA()
 }
 
 int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                            size_t dataLength, CADataType_t dataType)
+                            uint32_t dataLength, CADataType_t dataType)
 {
     SET_BUT_NOT_USED(dataType);
 
@@ -510,7 +510,7 @@ int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data
     }
     OIC_LOG_V(DEBUG, RA_ADAPTER_TAG, "Sending unicast data to %s", remoteEndpoint->addr);
 
-    size_t code = CA_NOT_FOUND;
+    uint32_t code = CA_NOT_FOUND;
     coap_pdu_t *pdu = (coap_pdu_t *) CAParsePDU(data, dataLength, &code, remoteEndpoint);
     char *sid = CARAGetSIDFromPDU(pdu);
     int obsopt = CARAGetReqObsOption(pdu, remoteEndpoint);
@@ -557,7 +557,7 @@ int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data
     return dataLength;
 }
 
-CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, size_t *size)
+CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
 {
     VERIFY_NON_NULL(info, RA_ADAPTER_TAG, "info is NULL");
     VERIFY_NON_NULL(size, RA_ADAPTER_TAG, "size is NULL");
@@ -565,7 +565,7 @@ CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, size_t *size)
 }
 
 int32_t CASendRAMulticastData(const CAEndpoint_t *endpoint,
-                              const void *data, size_t dataLength,
+                              const void *data, uint32_t dataLength,
                               CADataType_t dataType)
 {
     OIC_LOG(INFO, RA_ADAPTER_TAG, "RA adapter does not support sending multicast data");
@@ -883,7 +883,7 @@ CAResult_t CAStopRA()
 }
 
 int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                            size_t dataLength, CADataType_t dataType)
+                            uint32_t dataLength, CADataType_t dataType)
 {
     (void)dataType;
     if (!remoteEndpoint || !data)
@@ -925,7 +925,7 @@ int32_t CASendRAUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data
     return dataLength;
 }
 
-CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, size_t *size)
+CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
 {
     VERIFY_NON_NULL(info, RA_ADAPTER_TAG, "info is NULL");
     VERIFY_NON_NULL(size, RA_ADAPTER_TAG, "size is NULL");
@@ -952,7 +952,7 @@ CAResult_t CAGetRAInterfaceInformation(CAEndpoint_t **info, size_t *size)
 }
 
 int32_t CASendRAMulticastData(const CAEndpoint_t *endpoint,
-                              const void *data, size_t dataLength,
+                              const void *data, uint32_t dataLength,
                               CADataType_t dataType)
 {
     OIC_LOG(INFO, RA_ADAPTER_TAG, "RA adapter does not support sending multicast data");

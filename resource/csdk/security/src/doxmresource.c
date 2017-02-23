@@ -2067,7 +2067,7 @@ static bool AreDoxmBinMOTPropertyValuesEqual(OicSecDoxm_t* doxm1, OicSecDoxm_t* 
             if (subOwner1->status != subOwner2->status)
             {
                 OIC_LOG_V(ERROR, TAG, "%s: subOwner status mismatch: (%u, %u)", 
-                    __func__, (size_t)subOwner1->status, (size_t)subOwner2->status);
+                    __func__, (uint32_t)subOwner1->status, (uint32_t)subOwner2->status);
                 return false;
             }
 
@@ -2102,7 +2102,7 @@ static bool AreDoxmBinMOTPropertyValuesEqual(OicSecDoxm_t* doxm1, OicSecDoxm_t* 
     if (doxm1->mom->mode != doxm2->mom->mode)
     {
         OIC_LOG_V(ERROR, TAG, "%s: mom->mode mismatch: (%u, %u)", 
-            __func__, (size_t)doxm1->mom->mode, (size_t)doxm2->mom->mode);
+            __func__, (uint32_t)doxm1->mom->mode, (uint32_t)doxm2->mom->mode);
         return false;
     }
 
@@ -2160,7 +2160,7 @@ bool AreDoxmBinPropertyValuesEqual(OicSecDoxm_t* doxm1, OicSecDoxm_t* doxm2)
         if (doxm1->oxm[i] != doxm2->oxm[i])
         {
             OIC_LOG_V(ERROR, TAG, "%s: oxmType mismatch: (%u, %u)", 
-                __func__, (size_t)doxm1->oxm[i], (size_t)doxm2->oxm[i]);
+                __func__, (uint32_t)doxm1->oxm[i], (uint32_t)doxm2->oxm[i]);
             return false;
         }
     }
@@ -2169,21 +2169,21 @@ bool AreDoxmBinPropertyValuesEqual(OicSecDoxm_t* doxm1, OicSecDoxm_t* doxm2)
     if (doxm1->oxmSel != doxm2->oxmSel)
     {
         OIC_LOG_V(ERROR, TAG, "%s: oxmSel mismatch: (%u, %u)", 
-            __func__, (size_t)doxm1->oxmSel, (size_t)doxm2->oxmSel);
+            __func__, (uint32_t)doxm1->oxmSel, (uint32_t)doxm2->oxmSel);
         return false;
     }
 
     if (doxm1->sct != doxm2->sct)
     {
         OIC_LOG_V(ERROR, TAG, "%s: sct mismatch: (%u, %u)", 
-            __func__, (size_t)doxm1->sct, (size_t)doxm2->sct);
+            __func__, (uint32_t)doxm1->sct, (uint32_t)doxm2->sct);
         return false;
     }
 
     if (doxm1->owned != doxm2->owned)
     {
         OIC_LOG_V(ERROR, TAG, "%s: owned mismatch: (%u, %u)", 
-            __func__, (size_t)doxm1->owned, (size_t)doxm2->owned);
+            __func__, (uint32_t)doxm1->owned, (uint32_t)doxm2->owned);
         return false;
     }
 
@@ -2196,7 +2196,7 @@ bool AreDoxmBinPropertyValuesEqual(OicSecDoxm_t* doxm1, OicSecDoxm_t* doxm2)
     if (doxm1->dpc != doxm2->dpc)
     {
         OIC_LOG_V(ERROR, TAG, "%s: dpc mismatch: (%u, %u)", 
-            __func__, (size_t)doxm1->dpc, (size_t)doxm2->dpc);
+            __func__, (uint32_t)doxm1->dpc, (uint32_t)doxm2->dpc);
         return false;
     }
 

@@ -109,7 +109,7 @@ CAResult_t CALEClientSendNegotiationMessage(const char* address);
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CALEClientSendUnicastMessage(const char *address, const uint8_t *data,
-                                        const size_t dataLen);
+                                        const uint32_t dataLen);
 
 /**
  * send data for multicast (interface).
@@ -117,7 +117,7 @@ CAResult_t CALEClientSendUnicastMessage(const char *address, const uint8_t *data
  * @param[in]   dataLen               data length.
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CALEClientSendMulticastMessage(const uint8_t *data, const size_t dataLen);
+CAResult_t CALEClientSendMulticastMessage(const uint8_t *data, const uint32_t dataLen);
 
 /**
  * start unicast server.
@@ -166,7 +166,7 @@ CAResult_t CALEClientIsThereScannedDevices(JNIEnv *env, const char* address);
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CALEClientSendUnicastMessageImpl(const char *address, const uint8_t *data,
-                                            const size_t dataLen);
+                                            const uint32_t dataLen);
 
 /**
  * send data for multicast (implement).
@@ -176,7 +176,7 @@ CAResult_t CALEClientSendUnicastMessageImpl(const char *address, const uint8_t *
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CALEClientSendMulticastMessageImpl(JNIEnv *env, const uint8_t *data,
-                                              const size_t dataLen);
+                                              const uint32_t dataLen);
 
 /**
  * send data to remote device.

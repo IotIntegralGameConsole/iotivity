@@ -74,13 +74,13 @@ TEST(UArrayList, FreeNull)
 
 TEST_F(UArrayListF, Length)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_arraylist_length(list));
 
     int dummy = 0;
     bool rc = u_arraylist_add(list, &dummy);
     ASSERT_TRUE(rc);
 
-    ASSERT_EQ(static_cast<size_t>(1), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(1), u_arraylist_length(list));
 
     // Add a few times without checking, just in case checking has side-effects
     rc = u_arraylist_add(list, &dummy);
@@ -90,12 +90,12 @@ TEST_F(UArrayListF, Length)
     rc = u_arraylist_add(list, &dummy);
     ASSERT_TRUE(rc);
 
-    ASSERT_EQ(static_cast<size_t>(4), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(4), u_arraylist_length(list));
 }
 
 TEST_F(UArrayListF, LengthMulti)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_arraylist_length(list));
 
     int dummy = 0;
     for (int i = 0; i < 1000; ++i)
@@ -104,7 +104,7 @@ TEST_F(UArrayListF, LengthMulti)
         ASSERT_TRUE(rc);
     }
 
-    ASSERT_EQ(static_cast<size_t>(1000), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_arraylist_length(list));
 }
 
 TEST_F(UArrayListF, NoReserve)
@@ -164,7 +164,7 @@ TEST_F(UArrayListF, ShrinkToFit)
 
 TEST_F(UArrayListF, Get)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_arraylist_length(list));
 
     int dummy[1000] = {0};
     size_t cap = sizeof(dummy) / sizeof(dummy[0]);
@@ -174,7 +174,7 @@ TEST_F(UArrayListF, Get)
         bool rc = u_arraylist_add(list, &dummy[i]);
         ASSERT_TRUE(rc);
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_arraylist_length(list));
 
     for (size_t i = 0; i < cap; ++i)
     {
@@ -186,7 +186,7 @@ TEST_F(UArrayListF, Get)
 
 TEST_F(UArrayListF, Remove)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_arraylist_length(list));
 
     int dummy[1000] = {0};
     size_t cap = sizeof(dummy) / sizeof(dummy[0]);
@@ -196,10 +196,10 @@ TEST_F(UArrayListF, Remove)
         bool rc = u_arraylist_add(list, &dummy[i]);
         ASSERT_TRUE(rc);
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_arraylist_length(list));
 
     // Remove walking forward so as to have a non-trivial case.
-    for (size_t idx = 0, old = 0;
+    for (uint32_t idx = 0, old = 0;
          idx < u_arraylist_length(list);
          ++idx, old += 2)
     {
@@ -207,12 +207,12 @@ TEST_F(UArrayListF, Remove)
         ASSERT_TRUE(value != NULL);
         ASSERT_EQ(value, &dummy[old]);
     }
-    ASSERT_EQ(static_cast<size_t>(500), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(500), u_arraylist_length(list));
 }
 
 TEST_F(UArrayListF, Contains)
 {
-    ASSERT_EQ(static_cast<size_t>(0), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_arraylist_length(list));
 
     int dummy[1000] = {0};
     size_t cap = sizeof(dummy) / sizeof(dummy[0]);
@@ -222,10 +222,10 @@ TEST_F(UArrayListF, Contains)
         bool rc = u_arraylist_add(list, &dummy[i]);
         ASSERT_TRUE(rc);
     }
-    ASSERT_EQ(static_cast<size_t>(1000), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(1000), u_arraylist_length(list));
 
     // Remove walking forward so as to have a non-trivial case.
-    for (size_t idx = 0, old = 0;
+    for (uint32_t idx = 0, old = 0;
          idx < u_arraylist_length(list);
          ++idx, old += 2)
     {
@@ -233,7 +233,7 @@ TEST_F(UArrayListF, Contains)
         ASSERT_TRUE(value != NULL);
         ASSERT_EQ(value, &dummy[old]);
     }
-    ASSERT_EQ(static_cast<size_t>(500), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(500), u_arraylist_length(list));
 
     // Finally, check that the ones we expect are present, and others are not.
     for (size_t i = 0; i < cap; ++i)
@@ -250,7 +250,7 @@ TEST_F(UArrayListF, Thrash)
 {
     static const int PAD_SIZE = 1000;
     static const int THRASH_COUNT = 1500;
-    ASSERT_EQ(static_cast<size_t>(0), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(0), u_arraylist_length(list));
 
     int dummy2 = 0;
     int dummy[PAD_SIZE] = {0};
@@ -261,19 +261,19 @@ TEST_F(UArrayListF, Thrash)
         bool rc = u_arraylist_add(list, &dummy[i]);
         ASSERT_TRUE(rc);
     }
-    ASSERT_EQ(static_cast<size_t>(PAD_SIZE), u_arraylist_length(list));
+    ASSERT_EQ(static_cast<uint32_t>(PAD_SIZE), u_arraylist_length(list));
 
     // Finally add and remove a lot.
     for (int i = 0; i < THRASH_COUNT; ++i)
     {
         bool rc = u_arraylist_add(list, &dummy2);
         ASSERT_TRUE(rc);
-        ASSERT_EQ(static_cast<size_t>(PAD_SIZE + 1),
+        ASSERT_EQ(static_cast<uint32_t>(PAD_SIZE + 1),
                   u_arraylist_length(list));
 
         ASSERT_EQ(&dummy2,
                   u_arraylist_remove(list, u_arraylist_length(list) - 1));
 
-        ASSERT_EQ(static_cast<size_t>(PAD_SIZE), u_arraylist_length(list));
+        ASSERT_EQ(static_cast<uint32_t>(PAD_SIZE), u_arraylist_length(list));
     }
 }

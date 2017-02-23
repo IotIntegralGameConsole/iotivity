@@ -676,7 +676,7 @@ void CALEGattRemoteCharacteristicWriteCb(char *remoteAddress, bt_gatt_server_h s
     }
 
     OIC_LOG(DEBUG, TAG, "Sending data up !");
-    size_t sentLength = 0;
+    uint32_t sentLength = 0;
     g_leServerDataReceivedCallback(remoteAddress, data, charValueLen,
                                     &sentLength);
     oc_mutex_unlock(g_leReqRespCbMutex);
@@ -810,7 +810,7 @@ CAResult_t CAAddNewCharacteristicsToGattServer(const bt_gatt_h svcPath, const ch
 }
 
 CAResult_t CAUpdateCharacteristicsToGattClient(const char *address, const uint8_t *charValue,
-                                               size_t charValueLen)
+                                               uint32_t charValueLen)
 {
     OIC_LOG(DEBUG, TAG, "IN");
 
@@ -853,7 +853,7 @@ CAResult_t CAUpdateCharacteristicsToGattClient(const char *address, const uint8_
     return CA_STATUS_OK;
 }
 
-CAResult_t CAUpdateCharacteristicsToAllGattClients(const uint8_t *charValue, size_t charValueLen)
+CAResult_t CAUpdateCharacteristicsToAllGattClients(const uint8_t *charValue, uint32_t charValueLen)
 {
     OIC_LOG(DEBUG, TAG, "IN");
 

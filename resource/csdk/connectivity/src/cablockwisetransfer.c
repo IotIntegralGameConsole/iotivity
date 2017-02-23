@@ -392,7 +392,7 @@ CAResult_t CAReceiveBlockWiseData(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     // if there is no block option in pdu, check if there is error code.
     if (!isBlock1 && !isBlock2)
     {
-        size_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
+        uint32_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
         if (CA_REQUEST_ENTITY_INCOMPLETE == code)
         {
             CABlockDataID_t* blockDataID = CACreateBlockDatablockId(
@@ -631,7 +631,7 @@ CAResult_t CASendBlockMessage(const coap_pdu_t *pdu, CAMessageType_t msgType,
             break;
     }
 
-    size_t code = pdu->transport_hdr->udp.code;
+    uint32_t code = pdu->transport_hdr->udp.code;
     if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
     {
         if (data->responseInfo)
@@ -896,7 +896,7 @@ CAResult_t CASetNextBlockOption1(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     }
 
     uint8_t blockWiseStatus = CA_BLOCK_UNKNOWN;
-    size_t code = pdu->transport_hdr->udp.code;
+    uint32_t code = pdu->transport_hdr->udp.code;
     if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
     {
         // received message type is request
@@ -949,7 +949,7 @@ CAResult_t CASetNextBlockOption1(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     else
     {
         // received message type is response
-        size_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
+        uint32_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
         if (0 == block.m && (CA_REQUEST_ENTITY_INCOMPLETE != code
                 && CA_REQUEST_ENTITY_TOO_LARGE != code))
         {
@@ -1061,7 +1061,7 @@ CAResult_t CASetNextBlockOption2(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     }
     else
     {
-        size_t code = pdu->transport_hdr->udp.code;
+        uint32_t code = pdu->transport_hdr->udp.code;
         if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
         {
             // received message type is request
@@ -1093,7 +1093,7 @@ CAResult_t CASetNextBlockOption2(coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
                                                                           COAP_OPTION_SIZE2,
                                                                           &(data->payloadLength));
 
-            size_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
+            uint32_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
             if (CA_REQUEST_ENTITY_INCOMPLETE != code && CA_REQUEST_ENTITY_TOO_LARGE != code)
             {
                 // check if received payload is exact
@@ -1163,7 +1163,7 @@ exit:
 
 CAResult_t CAUpdateBlockOptionItems(CABlockData_t *currData, const coap_pdu_t *pdu,
                                     coap_block_t *block, uint16_t blockType,
-                                    size_t status)
+                                    uint32_t status)
 {
     VERIFY_NON_NULL(currData, TAG, "currData");
     VERIFY_NON_NULL(pdu, TAG, "pdu");
@@ -1171,7 +1171,7 @@ CAResult_t CAUpdateBlockOptionItems(CABlockData_t *currData, const coap_pdu_t *p
 
     // update block data
     CAResult_t res = CA_STATUS_OK;
-    size_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
+    uint32_t code = CA_RESPONSE_CODE(pdu->transport_hdr->udp.code);
 
     if (CA_REQUEST_ENTITY_INCOMPLETE == code || CA_REQUEST_ENTITY_TOO_LARGE == code)
     {
@@ -1269,7 +1269,7 @@ CAResult_t CANegotiateBlockSize(CABlockData_t *currData, coap_block_t *block,
     VERIFY_NON_NULL(pdu->transport_hdr, TAG, "pdu->transport_hdr");
 
     bool isReqMsg = false;
-    size_t code = pdu->transport_hdr->udp.code;
+    uint32_t code = pdu->transport_hdr->udp.code;
     if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
     {
         isReqMsg = true;
@@ -1415,7 +1415,7 @@ CAResult_t CAAddBlockOption(coap_pdu_t **pdu, const CAInfo_t *info,
         goto exit;
     }
 
-    size_t repCode = CA_RESPONSE_CODE((*pdu)->transport_hdr->udp.code);
+    uint32_t repCode = CA_RESPONSE_CODE((*pdu)->transport_hdr->udp.code);
     if (CA_REQUEST_ENTITY_INCOMPLETE == repCode)
     {
         OIC_LOG(INFO, TAG, "don't use option");
@@ -1480,7 +1480,7 @@ CAResult_t CAAddBlockOption(coap_pdu_t **pdu, const CAInfo_t *info,
         }
     }
 
-    size_t code = (*pdu)->transport_hdr->udp.code;
+    uint32_t code = (*pdu)->transport_hdr->udp.code;
     if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
     {
         // if received message type is RESET from remote device,
@@ -1524,7 +1524,7 @@ CAResult_t CAAddBlockOption2(coap_pdu_t **pdu, const CAInfo_t *info, size_t data
     }
 
     CAResult_t res = CA_STATUS_OK;
-    size_t code = (*pdu)->transport_hdr->udp.code;
+    uint32_t code = (*pdu)->transport_hdr->udp.code;
     if (CA_GET != code && CA_POST != code && CA_PUT != code && CA_DELETE != code)
     {
         CASetMoreBitFromBlock(dataLength, block2);
@@ -1629,7 +1629,7 @@ CAResult_t CAAddBlockOption1(coap_pdu_t **pdu, const CAInfo_t *info, size_t data
     bool blockRemoved = false;
 
     CAResult_t res = CA_STATUS_OK;
-    size_t code = (*pdu)->transport_hdr->udp.code;
+    uint32_t code = (*pdu)->transport_hdr->udp.code;
     if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
     {
         CASetMoreBitFromBlock(dataLength, block1);
@@ -2032,7 +2032,7 @@ CAData_t* CACreateNewDataSet(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint
     CARequestInfo_t* requestInfo = NULL;
     CAResponseInfo_t* responseInfo = NULL;
 
-    size_t code = pdu->transport_hdr->udp.code;
+    uint32_t code = pdu->transport_hdr->udp.code;
     if (CA_GET == code || CA_POST == code || CA_PUT == code || CA_DELETE == code)
     {
         CAInfo_t responseData = { .tokenLength = pdu->transport_hdr->udp.token_length };
@@ -2222,7 +2222,7 @@ CAPayload_t CAGetPayloadInfo(const CAData_t *data, size_t *payloadLen)
 }
 
 CAResult_t CAHandleBlockErrorResponse(coap_block_t *block, uint16_t blockType,
-                                      size_t responseResult)
+                                      uint32_t responseResult)
 {
     OIC_LOG(DEBUG, TAG, "IN-HandleBlockErrorRes");
     VERIFY_NON_NULL(block, TAG, "block is NULL");

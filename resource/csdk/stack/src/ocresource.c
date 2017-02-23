@@ -78,7 +78,7 @@ static OCStackResult BuildVirtualResourceResponse(const OCResource *resourcePtr,
                                                   OCDiscoveryPayload *payload,
                                                   OCDevAddr *endpoint,
                                                   CAEndpoint_t *networkInfo,
-                                                  size_t infoSize);
+                                                  uint32_t infoSize);
 
 //-----------------------------------------------------------------------------
 // Default resource entity handler function
@@ -886,7 +886,7 @@ OCStackResult BuildVirtualResourceResponse(const OCResource *resourcePtr,
                                            OCDiscoveryPayload *payload,
                                            OCDevAddr *devAddr,
                                            CAEndpoint_t *networkInfo,
-                                           size_t infoSize)
+                                           uint32_t infoSize)
 {
     if (!resourcePtr || !payload)
     {
@@ -1428,7 +1428,7 @@ static OCStackResult HandleVirtualResource (OCServerRequest *request, OCResource
         char *resourceTypeQuery = NULL;
 
         CAEndpoint_t *networkInfo = NULL;
-        size_t infoSize = 0;
+        uint32_t infoSize = 0;
 
         CAResult_t caResult = CAGetNetworkInformation(&networkInfo, &infoSize);
         if (CA_STATUS_FAILED == caResult)

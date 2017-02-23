@@ -2569,11 +2569,11 @@ TEST_F(OCDiscoverTests, DISABLED_DiscoverResourceWithInvalidQueries)
 
 TEST(StackZoneId, getZoneId)
 {
-    size_t tempSize = 0;
+    uint32_t tempSize = 0;
     CAEndpoint_t *tempInfo = NULL;
     CAGetNetworkInformation(&tempInfo, &tempSize);
 
-    for (size_t i = 0; i < tempSize; i++)
+    for (uint32_t i = 0; i < tempSize; i++)
     {
         char *zoneId = NULL;
         EXPECT_EQ(OC_STACK_OK, OCGetLinkLocalZoneId(tempInfo[i].ifindex, &zoneId));

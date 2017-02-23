@@ -54,7 +54,7 @@ typedef enum
  * @param[in]  dataLength  Length of data in bytes.
  */
 typedef void (*CANFCPacketReceivedCallback)(const CASecureEndpoint_t *endpoint, const void *data,
-                                            size_t dataLength);
+                                            uint32_t dataLength);
 
 /**
   * Callback to notify error in the NFC adapter.
@@ -65,7 +65,7 @@ typedef void (*CANFCPacketReceivedCallback)(const CASecureEndpoint_t *endpoint, 
   * @param[in]  result       result of request.
   */
 typedef void (*CANFCErrorHandleCallback)(const CAEndpoint_t *endpoint, const void *data,
-                                         size_t dataLength, CAResult_t result);
+                                         uint32_t dataLength, CAResult_t result);
 
 /**
  * Callback to be notified when exception occures on multicast/unicast server.
@@ -113,7 +113,7 @@ void CANFCSetExceptionCallback(CANFCExceptionCallback callback);
  * @param[in]  data        Data to be send.
  * @param[in]  dataLength  Length of data in bytes.
  */
-void CANFCSendData(const CAEndpoint_t *endpoint, const void *data, size_t dataLength);
+void CANFCSendData(const CAEndpoint_t *endpoint, const void *data, uint32_t dataLength);
 
 /**
  * Get a list of CAInterface_t items.

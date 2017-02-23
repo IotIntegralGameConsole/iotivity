@@ -1296,7 +1296,7 @@ ssize_t CATCPSendData(CAEndpoint_t *endpoint, const void *data, size_t datalen)
     return -1;
 }
 
-CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, size_t *size)
+CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
 {
     VERIFY_NON_NULL(info, TAG, "info is NULL");
     VERIFY_NON_NULL(size, TAG, "size is NULL");
@@ -1308,7 +1308,7 @@ CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, size_t *size)
         return CA_STATUS_FAILED;
     }
 
-    size_t len = u_arraylist_length(iflist);
+    uint32_t len = u_arraylist_length(iflist);
 
     CAEndpoint_t *ep = (CAEndpoint_t *)OICCalloc(len, sizeof (CAEndpoint_t));
     if (!ep)
@@ -1318,7 +1318,7 @@ CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, size_t *size)
         return CA_MEMORY_ALLOC_FAILED;
     }
 
-    for (size_t i = 0, j = 0; i < len; i++)
+    for (uint32_t i = 0, j = 0; i < len; i++)
     {
         CAInterface_t *ifitem = (CAInterface_t *)u_arraylist_get(iflist, i);
         if (!ifitem)

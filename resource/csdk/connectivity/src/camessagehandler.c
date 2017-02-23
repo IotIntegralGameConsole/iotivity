@@ -90,7 +90,7 @@ static void CASendErrorInfo(const CAEndpoint_t *endpoint, const CAInfo_t *info,
 #ifdef SINGLE_THREAD
 static void CAProcessReceivedData(CAData_t *data);
 #endif
-static void CADestroyData(void *data, size_t size);
+static void CADestroyData(void *data, uint32_t size);
 static void CALogPayloadInfo(CAInfo_t *info);
 static bool CADropSecondMessage(CAHistory_t *history, const CAEndpoint_t *endpoint, uint16_t id,
                                 CAToken_t token, uint8_t tokenLength);
@@ -257,7 +257,7 @@ exit:
     return NULL;
 }
 
-static void CATimeoutCallback(const CAEndpoint_t *endpoint, const void *pdu, size_t size)
+static void CATimeoutCallback(const CAEndpoint_t *endpoint, const void *pdu, uint32_t size)
 {
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint");
     VERIFY_NON_NULL_VOID(pdu, TAG, "pdu");
@@ -334,7 +334,7 @@ static void CATimeoutCallback(const CAEndpoint_t *endpoint, const void *pdu, siz
 #endif
 }
 
-static void CADestroyData(void *data, size_t size)
+static void CADestroyData(void *data, uint32_t size)
 {
     OIC_LOG(DEBUG, TAG, "CADestroyData IN");
     if ((size_t)size < sizeof(CAData_t))
@@ -755,7 +755,7 @@ static void CAReceivedPacketCallback(const CASecureEndpoint_t *sep,
         return;
     }
 
-    size_t code = CA_NOT_FOUND;
+    uint32_t code = CA_NOT_FOUND;
     CAData_t *cadata = NULL;
 
     coap_pdu_t *pdu = (coap_pdu_t *) CAParsePDU((const char *) data, dataLen, &code,
@@ -1174,9 +1174,9 @@ void CATerminateMessageHandler()
 #ifndef SINGLE_THREAD
     CATransportAdapter_t connType;
     u_arraylist_t *list = CAGetSelectedNetworkList();
-    size_t length = u_arraylist_length(list);
+    uint32_t length = u_arraylist_length(list);
 
-    size_t i = 0;
+    uint32_t i = 0;
     for (i = 0; i < length; i++)
     {
         void* ptrType = u_arraylist_get(list, i);
@@ -1244,7 +1244,7 @@ static void CALogPayloadInfo(CAInfo_t *info)
     {
         if (info->options)
         {
-            for (size_t i = 0; i < info->numOptions; i++)
+            for (uint32_t i = 0; i < info->numOptions; i++)
             {
                 OIC_LOG_V(DEBUG, TAG, "optionID: %u", info->options[i].optionID);
 
@@ -1287,7 +1287,7 @@ void CAErrorHandler(const CAEndpoint_t *endpoint,
     }
 
 #ifndef SINGLE_THREAD
-    size_t code = CA_NOT_FOUND;
+    uint32_t code = CA_NOT_FOUND;
     //Do not free remoteEndpoint and data. Currently they will be freed in data thread
     //Get PDU data
     coap_pdu_t *pdu = (coap_pdu_t *)CAParsePDU((const char *)data, dataLen, &code, endpoint);

@@ -49,7 +49,7 @@
 
 #define TAG "oc_zb_client"
 
-static size_t countDiscoveredResources = 0;
+static uint32_t countDiscoveredResources = 0;
 static bool promptUser = false;
 
 static OCDevAddr destinationAddress = {
@@ -80,7 +80,7 @@ static void PrintTestCases()
 static void PrintResources()
 {
     printf("\nResources: \n");
-    for(size_t i = 0; i < countDiscoveredResources; ++i)
+    for(uint32_t i = 0; i < countDiscoveredResources; ++i)
     {
         printf("\t# : %u \t URI: %s \t Type:%s\n", i, g_discoveredResources[i].uri,
             g_discoveredResources[i].resourceType);
@@ -185,7 +185,7 @@ OCPayload * getSwitchStatePayload(bool state)
     return (OCPayload*) payload;
 }
 
-OCPayload* getChangeBulbTempLevelPayload(size_t level)
+OCPayload* getChangeBulbTempLevelPayload(uint32_t level)
 {
     OCRepPayload* payload = OCRepPayloadCreate();
     if (!payload)
@@ -209,7 +209,7 @@ OCPayload* getChangeBulbTempLevelPayload(size_t level)
     return (OCPayload*) payload;
 }
 
-OCPayload* getChangeDimLevelPayload(size_t level)
+OCPayload* getChangeDimLevelPayload(uint32_t level)
 {
     OCRepPayload* payload = OCRepPayloadCreate();
     if (!payload)
@@ -418,7 +418,7 @@ void getTestCaseFromUser()
     printf("\nUsage:<resource number> <test case> :");
 
     char input[10] = {0};
-    size_t resourceNo = 0;
+    uint32_t resourceNo = 0;
     int testCase = 0;
 
     char * ret = fgets(input, sizeof(input), stdin);

@@ -43,13 +43,13 @@
 typedef struct OCPresence
 {
     /** Time to Live. */
-    size_t TTL;
+    uint32_t TTL;
 
     /** Time out. */
-    size_t * timeOut;
+    uint32_t * timeOut;
 
     /** TTL Level. */
-    size_t TTLlevel;
+    uint32_t TTLlevel;
 } OCPresence;
 
 /**
@@ -87,7 +87,7 @@ typedef struct ClientCB {
     OCMethod method;
 
     /** This is the sequence identifier the server applies to the invocation tied to 'handle'.*/
-    size_t sequenceNumber;
+    uint32_t sequenceNumber;
 
     /** The canonical form of the request uri associated with the call back.*/
     char * requestUri;
@@ -109,7 +109,7 @@ typedef struct ClientCB {
      * still be used. TTL is set to 0 when the callback is for presence and observe.
      * Presence has ttl mechanism in the "presence" member of this struct and observes
      * can be explicitly cancelled.*/
-    size_t TTL;
+    uint32_t TTL;
 
     /** next node in this list.*/
     struct ClientCB    *next;
@@ -144,7 +144,7 @@ OCStackResult AddClientCB(ClientCB** clientCB, OCCallbackData* cbData,
                           CAToken_t token, uint8_t tokenLength,
                           OCDoHandle *handle, OCMethod method,
                           OCDevAddr *devAddr, char * requestUri,
-                          char * resourceTypeName, size_t ttl);
+                          char * resourceTypeName, uint32_t ttl);
 
 /** @ingroup ocstack
  *

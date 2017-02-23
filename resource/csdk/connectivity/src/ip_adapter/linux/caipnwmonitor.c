@@ -77,7 +77,7 @@ static void CAIPDestroyNetworkMonitorList();
 /**
  * Compare the interface with the already added interface in list.
  */
-static bool CACmpNetworkList(size_t ifiindex);
+static bool CACmpNetworkList(uint32_t ifiindex);
 
 /**
  * Add new network interface in list.
@@ -140,7 +140,7 @@ static void CAIPDestroyNetworkMonitorList()
     }
 }
 
-static bool CACmpNetworkList(size_t ifiindex)
+static bool CACmpNetworkList(uint32_t ifiindex)
 {
     if (!g_netInterfaceList)
     {
@@ -150,8 +150,8 @@ static bool CACmpNetworkList(size_t ifiindex)
 
     oc_mutex_lock(g_networkMonitorContextMutex);
 
-    size_t list_length = u_arraylist_length(g_netInterfaceList);
-    for (size_t list_index = 0; list_index < list_length; list_index++)
+    uint32_t list_length = u_arraylist_length(g_netInterfaceList);
+    for (uint32_t list_index = 0; list_index < list_length; list_index++)
     {
         CAInterface_t *currItem = (CAInterface_t *) u_arraylist_get(g_netInterfaceList,
                                                                     list_index);
@@ -188,8 +188,8 @@ static void CARemoveNetworkMonitorList(int ifiindex)
 
     oc_mutex_lock(g_networkMonitorContextMutex);
 
-    size_t list_length = u_arraylist_length(g_netInterfaceList);
-    for (size_t list_index = 0; list_index < list_length; list_index++)
+    uint32_t list_length = u_arraylist_length(g_netInterfaceList);
+    for (uint32_t list_index = 0; list_index < list_length; list_index++)
     {
         CAInterface_t *removedifitem = (CAInterface_t *) u_arraylist_get(
                 g_netInterfaceList, list_index);
@@ -485,7 +485,7 @@ exit:
     return NULL;
 }
 
-CAResult_t CAGetLinkLocalZoneIdInternal(size_t ifindex, char **zoneId)
+CAResult_t CAGetLinkLocalZoneIdInternal(uint32_t ifindex, char **zoneId)
 {
     if (!zoneId || (*zoneId != NULL))
     {

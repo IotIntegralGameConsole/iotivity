@@ -81,7 +81,7 @@ static uint8_t CAGetBits(uint8_t x, unsigned p, unsigned n)
 }
 
 CAResult_t CAGenerateVariableForFragmentation(size_t dataLength,
-                                              size_t *midPacketCount,
+                                              uint32_t *midPacketCount,
                                               size_t *remainingLen,
                                               size_t *totalLength,
                                               uint16_t mtuSize)
@@ -107,9 +107,9 @@ CAResult_t CAGenerateVariableForFragmentation(size_t dataLength,
         return CA_STATUS_FAILED;
     }
 
-    *midPacketCount = (size_t)remainDataSize / (mtuSize - CA_BLE_HEADER_SIZE);
-    *remainingLen = (size_t)remainDataSize % (mtuSize - CA_BLE_HEADER_SIZE);
-    size_t remainHeaderSize = CA_BLE_HEADER_SIZE * (*midPacketCount + (*remainingLen == 0 ? 0:1));
+    *midPacketCount = (uint32_t)remainDataSize / (mtuSize - CA_BLE_HEADER_SIZE);
+    *remainingLen = (uint32_t)remainDataSize % (mtuSize - CA_BLE_HEADER_SIZE);
+    uint32_t remainHeaderSize = CA_BLE_HEADER_SIZE * (*midPacketCount + (*remainingLen == 0 ? 0:1));
     *totalLength = dataLength + (CA_BLE_HEADER_SIZE + CA_BLE_LENGTH_HEADER_SIZE) + remainHeaderSize;
 
     OIC_LOG(DEBUG, TAG, "OUT");
@@ -165,7 +165,7 @@ CAResult_t CAGenerateHeaderPayloadLength(uint8_t *header,
 
 CAResult_t CAMakeFirstDataSegment(uint8_t *dataSegment,
                                   const uint8_t *data,
-                                  const size_t dataLength,
+                                  const uint32_t dataLength,
                                   const uint8_t *dataHeader,
                                   const uint8_t *lengthHeader)
 {
@@ -180,17 +180,17 @@ CAResult_t CAMakeFirstDataSegment(uint8_t *dataSegment,
 }
 
 CAResult_t CAMakeRemainDataSegment(uint8_t *dataSegment,
-                                   const size_t segmentPayloadLength,
+                                   const uint32_t segmentPayloadLength,
                                    const uint8_t *sourceData,
-                                   const size_t sourceDataLength,
-                                   const size_t segmentNum,
+                                   const uint32_t sourceDataLength,
+                                   const uint32_t segmentNum,
                                    const uint8_t *dataHeader,
                                    uint16_t mtuSize)
 {
     VERIFY_NON_NULL(dataSegment, TAG, "dataSegment is NULL");
     VERIFY_NON_NULL(dataHeader, TAG, "dataHeader is NULL");
 
-    size_t index = (mtuSize - CA_BLE_HEADER_SIZE - CA_BLE_LENGTH_HEADER_SIZE) +
+    uint32_t index = (mtuSize - CA_BLE_HEADER_SIZE - CA_BLE_LENGTH_HEADER_SIZE) +
             (segmentNum * (mtuSize - CA_BLE_HEADER_SIZE));
     if (sourceDataLength < index + segmentPayloadLength)
     {
@@ -221,7 +221,7 @@ CAResult_t CAParseHeader(const uint8_t *header,
 
 CAResult_t CAParseHeaderPayloadLength(uint8_t *header,
                                       size_t headerLength,
-                                      size_t *dataLength)
+                                      uint32_t *dataLength)
 {
     VERIFY_NON_NULL(header, TAG, "header is NULL");
 

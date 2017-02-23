@@ -1135,7 +1135,7 @@ void CASetLEReqRespServerCallback(CABLEDataReceivedCallback callback)
 
 CAResult_t CAUpdateCharacteristicsToGattClient(char const * address,
                                                uint8_t const * value,
-                                               size_t valueLen)
+                                               uint32_t valueLen)
 {
     return CAGattServerSendResponseNotification(address,
                                                 value,
@@ -1143,7 +1143,7 @@ CAResult_t CAUpdateCharacteristicsToGattClient(char const * address,
 }
 
 CAResult_t CAUpdateCharacteristicsToAllGattClients(uint8_t const * value,
-                                                   size_t valueLen)
+                                                   uint32_t valueLen)
 {
     return CAGattServerSendResponseNotificationToAll(value, valueLen);
 }
@@ -1225,7 +1225,7 @@ void CATerminateLEGattClient()
 CAResult_t CAUpdateCharacteristicsToGattServer(
     char const * remoteAddress,
     uint8_t const * data,
-    size_t dataLen,
+    uint32_t dataLen,
     CALETransferType_t type,
     int32_t position)
 {
@@ -1250,7 +1250,7 @@ CAResult_t CAUpdateCharacteristicsToGattServer(
 }
 
 CAResult_t CAUpdateCharacteristicsToAllGattServers(uint8_t const * data,
-                                                   size_t length)
+                                                   uint32_t length)
 {
     /*
       Now send the request through all BLE connections through the

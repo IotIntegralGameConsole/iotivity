@@ -79,7 +79,7 @@ static gboolean CAGattCharacteristicHandleWriteValue(
 
     CAGattCharacteristic * const c = user_data;
 
-    if (CAGattRecv(&c->recv_info, data, (size_t) len))
+    if (CAGattRecv(&c->recv_info, data, (uint32_t) len))
     {
         gatt_characteristic1_complete_write_value(object, invocation);
     }

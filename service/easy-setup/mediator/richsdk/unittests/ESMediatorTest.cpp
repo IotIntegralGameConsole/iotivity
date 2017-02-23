@@ -144,7 +144,7 @@ private:
         }
 
         CAEndpoint_t *tempInfo = NULL;
-        size_t tempSize = 0;
+        uint32_t tempSize = 0;
 
         CAResult_t res = CAGetNetworkInformation(&tempInfo, &tempSize);
         if (CA_STATUS_OK != res || NULL == tempInfo || 0 >= tempSize)
@@ -153,7 +153,7 @@ private:
             return false;
         }
 
-        for (size_t index = 0; index  < tempSize; index++)
+        for (uint32_t index = 0; index  < tempSize; index++)
         {
             if (CA_ADAPTER_IP == tempInfo[index].adapter)
             {

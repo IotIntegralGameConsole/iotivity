@@ -261,7 +261,7 @@ void OCDiscoveryResourceDestroy(OCResourcePayload* payload);
 void OCDiscoveryPayloadDestroy(OCDiscoveryPayload* payload);
 
 // Presence Payload
-OCPresencePayload* OCPresencePayloadCreate(size_t seqNum, size_t maxAge,
+OCPresencePayload* OCPresencePayloadCreate(uint32_t seqNum, uint32_t maxAge,
         OCPresenceTrigger trigger, const char* resourceType);
 void OCPresencePayloadDestroy(OCPresencePayload* payload);
 

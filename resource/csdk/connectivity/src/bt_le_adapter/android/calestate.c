@@ -122,8 +122,8 @@ bool CALEIsDeviceInList(const char* remoteAddress,
     VERIFY_NON_NULL_RET(remoteAddress, TAG, "remoteAddress is null", false);
     VERIFY_NON_NULL_RET(deviceList, TAG, "deviceList is null", false);
 
-    size_t length = u_arraylist_length(deviceList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(deviceList);
+    for (uint32_t index = 0; index < length; index++)
     {
         CALEState_t* state = (CALEState_t*) u_arraylist_get(deviceList, index);
         if (!state)
@@ -153,8 +153,8 @@ CAResult_t CALERemoveAllDeviceState(u_arraylist_t *deviceList,
     VERIFY_NON_NULL(deviceList, TAG, "deviceList is null");
 
     oc_mutex_lock(deviceListMutex);
-    size_t length = u_arraylist_length(deviceList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(deviceList);
+    for (uint32_t index = 0; index < length; index++)
     {
         CALEState_t* state = (CALEState_t*) u_arraylist_get(deviceList, index);
         if (!state)
@@ -204,8 +204,8 @@ CAResult_t CALERemoveDeviceState(const char* remoteAddress,
     VERIFY_NON_NULL(remoteAddress, TAG, "remoteAddress is null");
     VERIFY_NON_NULL(deviceList, TAG, "deviceList is null");
 
-    size_t length = u_arraylist_length(deviceList);
-    for (size_t index = 0; index < length; index++)
+    uint32_t length = u_arraylist_length(deviceList);
+    for (uint32_t index = 0; index < length; index++)
     {
         CALEState_t* state = (CALEState_t*) u_arraylist_get(deviceList, index);
         if (!state)
@@ -239,9 +239,9 @@ CALEState_t* CALEGetStateInfo(const char* remoteAddress,
     VERIFY_NON_NULL_RET(remoteAddress, TAG, "remoteAddress is null", NULL);
     VERIFY_NON_NULL_RET(deviceList, TAG, "deviceList is null", NULL);
 
-    size_t length = u_arraylist_length(deviceList);
+    uint32_t length = u_arraylist_length(deviceList);
 
-    for (size_t index = 0; index < length; index++)
+    for (uint32_t index = 0; index < length; index++)
     {
         CALEState_t* state = (CALEState_t*) u_arraylist_get(deviceList, index);
         if (!state)

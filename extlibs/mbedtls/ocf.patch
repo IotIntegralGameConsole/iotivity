@@ -240,7 +240,7 @@ index 668c0f5..e1035f9 100644
                            int cert_endpoint,
 +                          const char *client_oid, size_t client_oid_len,
 +                          const char *server_oid, size_t server_oid_len,
-                           size_t *flags );
+                           uint32_t *flags );
  #endif /* MBEDTLS_X509_CRT_PARSE_C */
  
 diff --git a/include/mbedtls/x509.h b/include/mbedtls/x509.h
@@ -878,7 +878,7 @@ index 84a04ae..2f23a3e 100644
                            int cert_endpoint,
 +                          const char *client_oid, size_t client_oid_len,
 +                          const char *server_oid, size_t server_oid_len,
-                           size_t *flags )
+                           uint32_t *flags )
  {
      int ret = 0;
 @@ -7509,6 +7551,10 @@ int mbedtls_ssl_check_cert_usage( const mbedtls_x509_crt *cert,
@@ -947,7 +947,7 @@ index fad390d..0bc5367 100644
 --- a/library/x509.c
 +++ b/library/x509.c
 @@ -1005,6 +1005,10 @@ int mbedtls_x509_self_test( int verbose )
-     size_t flags;
+     uint32_t flags;
      mbedtls_x509_crt cacert;
      mbedtls_x509_crt clicert;
 +#if defined(MBEDTLS_ECDSA_C) && defined(MBEDTLS_SHA256_C) && defined(MBEDTLS_X509_EXPANDED_SUBJECT_ALT_NAME_SUPPORT) && defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED)
@@ -1619,8 +1619,8 @@ index 18bda59..e65576b 100644
      "    arc4=%%d             default: (library default: 0)\n" \
      "    min_version=%%s      default: (library default: tls1)\n"       \
 @@ -400,6 +412,10 @@ struct options
-     size_t hs_to_min;         /* Initial value of DTLS handshake timer    */
-     size_t hs_to_max;         /* Max value of DTLS handshake timer        */
+     uint32_t hs_to_min;         /* Initial value of DTLS handshake timer    */
+     uint32_t hs_to_max;         /* Max value of DTLS handshake timer        */
      int badmac_limit;           /* Limit of records with bad MAC            */
 +    const char *eku_cli;        /* EKU to check for in client cert          */
 +    size_t eku_cli_len;         /* length of eku_cli                        */

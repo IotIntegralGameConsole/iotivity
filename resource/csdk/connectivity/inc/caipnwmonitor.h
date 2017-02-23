@@ -55,8 +55,8 @@ typedef void (*CAIPAdapterStateChangeCallback)(CATransportAdapter_t adapter,
 typedef struct
 {
     char name[INTERFACE_NAME_MAX];
-    size_t index;
-    size_t flags;
+    uint32_t index;
+    uint32_t flags;
     uint16_t family;
     char addr[MAX_ADDR_STR_SIZE_CA];
 } CAInterface_t;
@@ -134,7 +134,7 @@ void CAProcessNewInterface(CAInterface_t *ifchanged);
  *                        zoneId using OICFree() when it returned CA_STATUS_OK.
  * @return  ::CA_STATUS_OK or ::CA_STATUS_INVALID_PARAM
  */
-CAResult_t CAGetLinkLocalZoneIdInternal(size_t ifindex, char **zoneId);
+CAResult_t CAGetLinkLocalZoneIdInternal(uint32_t ifindex, char **zoneId);
 
 #ifdef __cplusplus
 }

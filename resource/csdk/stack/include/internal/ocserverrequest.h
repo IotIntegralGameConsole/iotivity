@@ -64,7 +64,7 @@ typedef struct OCServerRequest
 
     /** Observe option field.*/
 
-    size_t observationOption;
+    uint32_t observationOption;
 
     /** Observe Result field.*/
     OCStackResult observeResult;
@@ -219,7 +219,7 @@ OCServerResponse * GetServerResponseUsingHandle (const OCServerRequest * handle)
  */
 OCStackResult AddServerRequest (OCServerRequest ** request, uint16_t coapID,
         uint8_t delayedResNeeded, uint8_t notificationFlag, OCMethod method,
-        uint8_t numRcvdVendorSpecificHeaderOptions, size_t observationOption,
+        uint8_t numRcvdVendorSpecificHeaderOptions, uint32_t observationOption,
         OCQualityOfService qos, char * query,
         OCHeaderOption * rcvdVendorSpecificHeaderOptions,
         uint8_t * payload, CAToken_t requestToken,
