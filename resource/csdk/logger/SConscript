@@ -28,7 +28,8 @@ local_env = env.Clone()
 
 if env.get('TARGET_OS') in ['arduino']:
 	Command("./src/logger.cpp", "./src/logger.c", Copy("$TARGET", "$SOURCE"))
-	logger_src = ['./src/logger.cpp']
+#	logger_src = ['./src/logger.cpp']
+	logger_src = ['./src/logger.cpp', './include/MemoryFree.cpp']
 else:
 	logger_src = ['./src/logger.c', './src/trace.c']
 
