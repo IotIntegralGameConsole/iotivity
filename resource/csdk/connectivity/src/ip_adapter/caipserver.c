@@ -153,7 +153,7 @@ static void CAEventReturned(CASocketFd_t socket);
 static CAResult_t CAReceiveMessage(CASocketFd_t fd, CATransportFlags_t flags);
 
 static void CAReceiveHandler(void *data)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     (void)data;
 
     while (!caglobals.ip.terminate)
@@ -186,7 +186,7 @@ static void CAReceiveHandler(void *data)
 
 
 static void CAFindReadyMessage()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     fd_set readFds;
     struct timeval timeout;
 
@@ -237,7 +237,7 @@ static void CAFindReadyMessage()
 }
 
 static void CASelectReturned(fd_set *readFds, int ret)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     (void)ret;
     CASocketFd_t fd = OC_INVALID_SOCKET;
     CATransportFlags_t flags = CA_DEFAULT_FLAGS;
@@ -293,7 +293,7 @@ static void CASelectReturned(fd_set *readFds, int ret)
 #else // if defined(WSA_WAIT_EVENT_0)
 
 #define PUSH_HANDLE(HANDLE, ARRAY, INDEX) \
-{ \
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO \
     ARRAY[INDEX] = HANDLE; \
     INDEX++; \
 }
@@ -355,7 +355,7 @@ static void CASelectReturned(fd_set *readFds, int ret)
 #define EVENT_ARRAY_SIZE  10
 
 static void CAFindReadyMessage()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CASocketFd_t socketArray[EVENT_ARRAY_SIZE];
     HANDLE eventArray[EVENT_ARRAY_SIZE];
     int arraySize = 0;
@@ -478,7 +478,7 @@ static void CAFindReadyMessage()
 }
 
 static void CAEventReturned(CASocketFd_t socket)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CASocketFd_t fd = OC_INVALID_SOCKET;
     CATransportFlags_t flags = CA_DEFAULT_FLAGS;
 
@@ -505,7 +505,7 @@ static void CAEventReturned(CASocketFd_t socket)
 #endif
 
 void CAUnregisterForAddressChanges()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
 #ifdef _WIN32
     if (caglobals.ip.addressChangeEvent != WSA_INVALID_EVENT)
     {
@@ -522,7 +522,7 @@ void CAUnregisterForAddressChanges()
 }
 
 void CADeInitializeIPGlobals()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CLOSE_SOCKET(u6);
     CLOSE_SOCKET(u6s);
     CLOSE_SOCKET(u4);
@@ -536,7 +536,8 @@ void CADeInitializeIPGlobals()
 }
 
 static CAResult_t CAReceiveMessage(CASocketFd_t fd, CATransportFlags_t flags)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
+    
     char recvBuffer[COAP_MAX_PDU_SIZE] = {0};
 
     size_t len = 0;
@@ -576,7 +577,10 @@ static CAResult_t CAReceiveMessage(CASocketFd_t fd, CATransportFlags_t flags)
                           .msg_control = &cmsg,
                           .msg_controllen = CMSG_SPACE(len) };
 
-    ssize_t recvLen = recvmsg(fd, &msg, flags);
+//  typedef int ssize_t;
+//    ssize_t
+#error "TODO"
+    int recvLen = recvmsg(fd, &msg, flags, xdsadas,ewqewq,w,ewq,ewq,eqw,e,qw);
     if (OC_SOCKET_ERROR == recvLen)
     {
         OIC_LOG_V(ERROR, TAG, "Recvfrom failed %s", strerror(errno));
@@ -697,13 +701,13 @@ static CAResult_t CAReceiveMessage(CASocketFd_t fd, CATransportFlags_t flags)
 }
 
 void CAIPPullData()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
 static CASocketFd_t CACreateSocket(int family, uint16_t *port, bool isMulticast)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     int socktype = SOCK_DGRAM;
 #ifdef SOCK_CLOEXEC
     socktype |= SOCK_CLOEXEC;
@@ -812,7 +816,7 @@ static CASocketFd_t CACreateSocket(int family, uint16_t *port, bool isMulticast)
     CHECKFD(caglobals.ip.NAME.fd)
 
 static void CARegisterForAddressChanges()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
 #ifdef _WIN32
     caglobals.ip.addressChangeEvent = WSACreateEvent();
     if (WSA_INVALID_EVENT != caglobals.ip.addressChangeEvent)
@@ -850,7 +854,7 @@ static void CARegisterForAddressChanges()
 }
 
 static void CAInitializeFastShutdownMechanism()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     caglobals.ip.selectTimeout = -1; // don't poll for shutdown
     int ret = -1;
 #if defined(WSA_WAIT_EVENT_0)
@@ -899,7 +903,7 @@ static void CAInitializeFastShutdownMechanism()
 }
 
 CAResult_t CAIPStartServer(const ca_thread_pool_t threadPool)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CAResult_t res = CA_STATUS_OK;
 
     if (caglobals.ip.started)
@@ -1002,7 +1006,7 @@ CAResult_t CAIPStartServer(const ca_thread_pool_t threadPool)
 }
 
 void CAIPStopServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     caglobals.ip.started = false;
     caglobals.ip.terminate = true;
 
@@ -1026,7 +1030,7 @@ void CAIPStopServer()
 }
 
 void CAWakeUpForChange()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
 #if !defined(WSA_WAIT_EVENT_0)
     if (caglobals.ip.shutdownFds[1] != -1)
     {
@@ -1049,7 +1053,7 @@ void CAWakeUpForChange()
 }
 
 static void applyMulticastToInterface4(uint32_t ifindex)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!caglobals.ip.ipv4enabled)
     {
         return;
@@ -1102,7 +1106,7 @@ static void applyMulticastToInterface4(uint32_t ifindex)
 }
 
 static void applyMulticast6(int fd, struct in6_addr *addr, uint32_t ifindex)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     struct ipv6_mreq mreq = { .ipv6mr_interface = ifindex };
 
     // VS2013 has problems with struct copies inside struct initializers, so copy separately.
@@ -1132,7 +1136,7 @@ static void applyMulticast6(int fd, struct in6_addr *addr, uint32_t ifindex)
 }
 
 static void applyMulticastToInterface6(uint32_t ifindex)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!caglobals.ip.ipv6enabled)
     {
         return;
@@ -1155,7 +1159,7 @@ static void applyMulticastToInterface6(uint32_t ifindex)
 }
 
 CAResult_t CAIPStartListenServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     u_arraylist_t *iflist = CAIPGetInterfaceInformation(0);
     if (!iflist)
     {
@@ -1195,7 +1199,7 @@ CAResult_t CAIPStartListenServer()
 }
 
 CAResult_t CAIPStopListenServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     u_arraylist_t *iflist = CAIPGetInterfaceInformation(0);
     if (!iflist)
     {
@@ -1236,7 +1240,7 @@ CAResult_t CAIPStopListenServer()
 }
 
 void CAProcessNewInterface(CAInterface_t *ifitem)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!ifitem)
     {
         OIC_LOG(DEBUG, TAG, "ifitem is null");
@@ -1256,14 +1260,14 @@ void CAProcessNewInterface(CAInterface_t *ifitem)
 }
 
 void CAIPSetPacketReceiveCallback(CAIPPacketReceivedCallback callback)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     g_packetReceivedCallback = callback;
 }
 
 static void sendData(int fd, const CAEndpoint_t *endpoint,
                      const void *data, size_t dlen,
                      const char *cast, const char *fam)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
 
     if (!endpoint)
@@ -1358,7 +1362,7 @@ static void sendData(int fd, const CAEndpoint_t *endpoint,
 static void sendMulticastData6(const u_arraylist_t *iflist,
                                CAEndpoint_t *endpoint,
                                const void *data, size_t datalen)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!endpoint)
     {
         OIC_LOG(DEBUG, TAG, "endpoint is null");
@@ -1405,7 +1409,7 @@ static void sendMulticastData6(const u_arraylist_t *iflist,
 static void sendMulticastData4(const u_arraylist_t *iflist,
                                CAEndpoint_t *endpoint,
                                const void *data, size_t datalen)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");
 
 #if defined(USE_IP_MREQN)
@@ -1452,7 +1456,7 @@ static void sendMulticastData4(const u_arraylist_t *iflist,
 
 void CAIPSendData(CAEndpoint_t *endpoint, const void *data, size_t datalen,
                   bool isMulticast)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");
     VERIFY_NON_NULL_VOID(data, TAG, "data is NULL");
 
@@ -1508,7 +1512,7 @@ void CAIPSendData(CAEndpoint_t *endpoint, const void *data, size_t datalen,
 }
 
 CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(info, TAG, "info is NULL");
     VERIFY_NON_NULL(size, TAG, "size is NULL");
 
@@ -1588,11 +1592,11 @@ CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
 }
 
 void CAIPSetErrorHandler(CAIPErrorHandleCallback errorHandleCallback)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     g_ipErrorHandler = errorHandleCallback;
 }
 
 CAResult_t CAGetLinkLocalZoneId(uint32_t ifindex, char **zoneId)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return CAGetLinkLocalZoneIdInternal(ifindex, zoneId);
 }
