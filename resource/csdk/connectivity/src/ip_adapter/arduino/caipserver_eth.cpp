@@ -39,8 +39,9 @@
 #include "oic_string.h"
 
 #define TAG "IPS"
-#undef OIC_LOG_V
-#define OIC_LOG_V OIC_LOG_V_
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
+
 // Length of the IP address decimal notation string
 #define IPNAMESIZE (16)
 
@@ -188,7 +189,7 @@ CAResult_t CAIPStartListenServer()
     CAResult_t ret = CAIPStartMulticastServer("0.0.0.0", IPv4_MULTICAST, IPv4_MULTICAST_PORT);
     if (CA_STATUS_OK != ret)
     {
-        OIC_LOG_V_(ERROR, TAG, "Start multicast failed[%d]", ret);
+        OIC_LOG_V(ERROR, TAG, "Start multicast failed[%d]", ret);
     }
     OIC_LOG(DEBUG, TAG, "OUT");
     return CA_STATUS_OK;
