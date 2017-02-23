@@ -45,8 +45,8 @@
 #include "cacommonutil.h"
 
 #define TAG "OIC_CA_PRTCL_MSG"
-#undef OIC_LOG_V
-#define OIC_LOG_V OIC_LOG_V_
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
 
 #define CA_PDU_MIN_SIZE (4)
 #define CA_ENCODE_BUFFER_SIZE (4)
@@ -200,23 +200,26 @@ coap_pdu_t *CAParsePDU(const char *data, size_t length, uint32_t *outCode,
         transport = coap_get_tcp_header_type_from_initbyte(((unsigned char *)data)[0] >> 4);
     }
 #endif
-    OIC_LOG_V_(DEBUG, TAG, "l=%d", length);
+    OIC_LOG_V(DEBUG, TAG, "l=%d+%d/%d", length, sizeof(coap_pdu_t), freeMemory());
 
     coap_pdu_t *outpdu =
-        coap_pdu_init2(0, 0, ntohs(COAP_INVALID_TID), length, transport);
+        malloc(26)
+        // coap_pdu_init2(0, 0, ntohs(COAP_INVALID_TID), length, transport)
+        ;
+    //coap_pdu_t *outpdu = coap_new_pdu2(transport, (unsigned int) length);
     if (NULL == outpdu)
     {
         OIC_LOG(ERROR, TAG, "outpdu is null");
         return NULL;
     }
 
-    //OIC_LOG_V_(DEBUG, TAG, "max=%d", outpdu->max_size);
+    //OIC_LOG_V(DEBUG, TAG, "max=%d", outpdu->max_size);
     
 
-    OIC_LOG_V_(DEBUG, TAG, "pdu parse-transport type : %d", transport);
+    OIC_LOG_V(DEBUG, TAG, "pdu parse-transport type : %d", transport);
     size_t alength = (size_t) length;
     int ret = coap_pdu_parse2((unsigned char *) data, (size_t) alength, outpdu, transport);
-    OIC_LOG_V_(DEBUG, TAG, "pdu parse ret: %d", ret);
+    OIC_LOG_V(DEBUG, TAG, "pdu parse ret: %d", ret);
     if (0 >= ret)
     {
         OIC_LOG(ERROR, TAG, "pdu parse failed");
@@ -254,7 +257,7 @@ coap_pdu_t *CAParsePDU(const char *data, size_t length, uint32_t *outCode,
 
 exit:
     OIC_LOG(DEBUG, TAG, "data :");
-    OIC_LOG_V_(DEBUG, TAG, "todo: %d", length);
+    OIC_LOG_V(DEBUG, TAG, "todo: %d", length);
     //OIC_LOG_BUFFER(DEBUG, TAG,  data, length);
     coap_delete_pdu(outpdu);
     return NULL;
