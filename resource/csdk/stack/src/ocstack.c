@@ -103,16 +103,14 @@
 //-----------------------------------------------------------------------------
 // Typedefs
 //-----------------------------------------------------------------------------
-typedef enum
-{
+typedef enum {
     OC_STACK_UNINITIALIZED = 0,
     OC_STACK_INITIALIZED,
     OC_STACK_UNINIT_IN_PROGRESS
 } OCStackState;
 
 #ifdef WITH_PRESENCE
-typedef enum
-{
+typedef enum {
     OC_PRESENCE_UNINITIALIZED = 0,
     OC_PRESENCE_INITIALIZED
 } OCPresenceState;
@@ -438,7 +436,7 @@ static void OCSetNetworkMonitorHandler(CAAdapterStateChangedCB adapterHandler,
 //-----------------------------------------------------------------------------
 
 bool checkProxyUri(OCHeaderOption *options, uint8_t numOptions)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!options || 0 == numOptions)
     {
         OIC_LOG (INFO, TAG, "No options present");
@@ -457,7 +455,7 @@ bool checkProxyUri(OCHeaderOption *options, uint8_t numOptions)
 }
 
 uint32_t GetTicks(uint32_t milliSeconds)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     coap_tick_t now;
     coap_ticks(&now);
 
@@ -474,7 +472,7 @@ uint32_t GetTicks(uint32_t milliSeconds)
 }
 
 void CopyEndpointToDevAddr(const CAEndpoint_t *in, OCDevAddr *out)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_NR(in, FATAL);
     VERIFY_NON_NULL_NR(out, FATAL);
 
@@ -493,7 +491,7 @@ void CopyEndpointToDevAddr(const CAEndpoint_t *in, OCDevAddr *out)
 }
 
 void CopyDevAddrToEndpoint(const OCDevAddr *in, CAEndpoint_t *out)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_NR(in, FATAL);
     VERIFY_NON_NULL_NR(out, FATAL);
 
@@ -513,7 +511,7 @@ void CopyDevAddrToEndpoint(const OCDevAddr *in, CAEndpoint_t *out)
 }
 
 void FixUpClientResponse(OCClientResponse *cr)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_NR(cr, FATAL);
 
     cr->addr = &cr->devAddr;
@@ -522,7 +520,7 @@ void FixUpClientResponse(OCClientResponse *cr)
 }
 
 static OCStackResult OCSendRequest(const CAEndpoint_t *object, CARequestInfo_t *requestInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(object, FATAL, OC_STACK_INVALID_PARAM);
     VERIFY_NON_NULL(requestInfo, FATAL, OC_STACK_INVALID_PARAM);
 
@@ -582,7 +580,7 @@ static OCStackResult OCSendRequest(const CAEndpoint_t *object, CARequestInfo_t *
 // This internal function is called to update the stack with the status of
 // observers and communication failures
 OCStackResult OCStackFeedBack(CAToken_t token, uint8_t tokenLength, uint8_t status)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCStackResult result = OC_STACK_ERROR;
     ResourceObserver * observer = NULL;
     OCEntityHandlerRequest ehRequest = {0};
@@ -701,7 +699,7 @@ OCStackResult OCStackFeedBack(CAToken_t token, uint8_t tokenLength, uint8_t stat
 }
 
 OCStackResult CAResponseToOCStackResult(CAResponseResult_t caCode)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCStackResult ret = OC_STACK_ERROR;
     switch(caCode)
     {
@@ -752,7 +750,7 @@ OCStackResult CAResponseToOCStackResult(CAResponseResult_t caCode)
 }
 
 CAResponseResult_t OCToCAStackResult(OCStackResult ocCode, OCMethod method)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CAResponseResult_t ret = CA_INTERNAL_SERVER_ERROR;
 
     switch(ocCode)
@@ -821,7 +819,7 @@ CAResponseResult_t OCToCAStackResult(OCStackResult ocCode, OCMethod method)
 }
 
 CATransportFlags_t OCToCATransportFlags(OCTransportFlags ocFlags)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CATransportFlags_t caFlags = (CATransportFlags_t)ocFlags;
 
     // supply default behavior.
@@ -837,12 +835,12 @@ CATransportFlags_t OCToCATransportFlags(OCTransportFlags ocFlags)
 }
 
 OCTransportFlags CAToOCTransportFlags(CATransportFlags_t caFlags)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return (OCTransportFlags)caFlags;
 }
 
 static OCStackResult ResetPresenceTTL(ClientCB *cbNode, uint32_t maxAgeSeconds)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     uint32_t lowerBound  = 0;
     uint32_t higherBound = 0;
 
@@ -896,7 +894,7 @@ static OCStackResult ResetPresenceTTL(ClientCB *cbNode, uint32_t maxAgeSeconds)
 }
 
 const char *convertTriggerEnumToString(OCPresenceTrigger trigger)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (trigger == OC_PRESENCE_TRIGGER_CREATE)
     {
         return OC_RSRVD_TRIGGER_CREATE;
@@ -912,7 +910,7 @@ const char *convertTriggerEnumToString(OCPresenceTrigger trigger)
 }
 
 OCPresenceTrigger convertTriggerStringToEnum(const char * triggerStr)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if(!triggerStr)
     {
         return OC_PRESENCE_TRIGGER_CREATE;
@@ -934,7 +932,7 @@ OCPresenceTrigger convertTriggerStringToEnum(const char * triggerStr)
 OCStackResult OCEncodeAddressForRFC6874(char *outputAddress,
                                         size_t outputSize,
                                         const char *inputAddress)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(inputAddress,  FATAL, OC_STACK_INVALID_PARAM);
     VERIFY_NON_NULL(outputAddress, FATAL, OC_STACK_INVALID_PARAM);
 
@@ -1004,7 +1002,7 @@ OCStackResult OCDecodeAddressForRFC6874(char *outputAddress,
                                         size_t outputSize,
                                         const char *inputAddress,
                                         const char *end)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(inputAddress,  FATAL, OC_STACK_INVALID_PARAM);
     VERIFY_NON_NULL(outputAddress, FATAL, OC_STACK_INVALID_PARAM);
 
@@ -1042,7 +1040,7 @@ OCStackResult OCDecodeAddressForRFC6874(char *outputAddress,
  */
 static int FormCanonicalPresenceUri(const CAEndpoint_t *endpoint,
                                     char *presenceUri, bool isMulticast)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(endpoint   , FATAL, OC_STACK_INVALID_PARAM);
     VERIFY_NON_NULL(presenceUri, FATAL, OC_STACK_INVALID_PARAM);
 
@@ -1098,7 +1096,7 @@ static int FormCanonicalPresenceUri(const CAEndpoint_t *endpoint,
 
 OCStackResult HandlePresenceResponse(const CAEndpoint_t *endpoint,
                             const CAResponseInfo_t *responseInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(endpoint, FATAL, OC_STACK_INVALID_PARAM);
     VERIFY_NON_NULL(responseInfo, FATAL, OC_STACK_INVALID_PARAM);
 
@@ -1278,7 +1276,7 @@ exit:
 }
 
 void OCHandleResponse(const CAEndpoint_t* endPoint, const CAResponseInfo_t* responseInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "Enter OCHandleResponse");
 
     if(responseInfo->info.resourceUri &&
@@ -1708,7 +1706,7 @@ void OCHandleResponse(const CAEndpoint_t* endPoint, const CAResponseInfo_t* resp
 }
 
 void HandleCAResponses(const CAEndpoint_t* endPoint, const CAResponseInfo_t* responseInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_NR(endPoint, FATAL);
     VERIFY_NON_NULL_NR(responseInfo, FATAL);
 
@@ -1754,7 +1752,7 @@ void HandleCAResponses(const CAEndpoint_t* endPoint, const CAResponseInfo_t* res
  * code shall be added to handle the errors
  */
 void HandleCAErrorResponse(const CAEndpoint_t *endPoint, const CAErrorInfo_t *errorInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL_NR(endPoint, FATAL);
     VERIFY_NON_NULL_NR(errorInfo, FATAL);
 
@@ -1814,7 +1812,7 @@ OCStackResult SendDirectStackResponse(const CAEndpoint_t* endPoint, const uint16
         const uint8_t numOptions, const CAHeaderOption_t *options,
         CAToken_t token, uint8_t tokenLength, const char *resourceUri,
         CADataType_t dataType)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "Entering SendDirectStackResponse");
     CAResponseInfo_t respInfo = {
         .result = responseResult
@@ -1912,7 +1910,7 @@ OCStackResult SendDirectStackResponse(const CAEndpoint_t* endPoint, const uint16
 }
 
 OCStackResult HandleStackRequests(OCServerProtocolRequest * protocolRequest)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Entering HandleStackRequests (OCStack Layer)");
     OCStackResult result = OC_STACK_ERROR;
     if (!protocolRequest)
@@ -1977,7 +1975,7 @@ OCStackResult HandleStackRequests(OCServerProtocolRequest * protocolRequest)
 }
 
 void OCHandleRequests(const CAEndpoint_t* endPoint, const CARequestInfo_t* requestInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "Enter OCHandleRequests");
     OIC_LOG_V(INFO, TAG, "Endpoint URI : %s", requestInfo->info.resourceUri);
 
@@ -2199,7 +2197,7 @@ void OCHandleRequests(const CAEndpoint_t* endPoint, const CARequestInfo_t* reque
 
 //This function will be called back by CA layer when a request is received
 void HandleCARequests(const CAEndpoint_t* endPoint, const CARequestInfo_t* requestInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Enter HandleCARequests");
     OIC_TRACE_BEGIN(%s:HandleCARequests, TAG);
     if (!endPoint)
@@ -2276,7 +2274,7 @@ void HandleCARequests(const CAEndpoint_t* endPoint, const CARequestInfo_t* reque
 //-----------------------------------------------------------------------------
 #ifdef RA_ADAPTER
 OCStackResult OCSetRAInfo(const OCRAInfo_t *raInfo)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!raInfo           ||
         !raInfo->username ||
         !raInfo->hostname ||
@@ -2293,14 +2291,14 @@ OCStackResult OCSetRAInfo(const OCRAInfo_t *raInfo)
 #endif
 
 OCStackResult OCInit(const char *ipAddr, uint16_t port, OCMode mode)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     (void) ipAddr;
     (void) port;
     return OCInit1(mode, OC_DEFAULT_FLAGS, OC_DEFAULT_FLAGS);
 }
 
 OCStackResult OCInit1(OCMode mode, OCTransportFlags serverFlags, OCTransportFlags clientFlags)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG_INIT();
     OIC_LOG(DEBUG, TAG, "call OCInit1");
     return OCInit2(mode, OC_DEFAULT_FLAGS, OC_DEFAULT_FLAGS, OC_DEFAULT_ADAPTER);
@@ -2308,7 +2306,7 @@ OCStackResult OCInit1(OCMode mode, OCTransportFlags serverFlags, OCTransportFlag
 
 OCStackResult OCInit2(OCMode mode, OCTransportFlags serverFlags, OCTransportFlags clientFlags,
                       OCTransportAdapter transportType)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if(stackState == OC_STACK_INITIALIZED)
     {
         OIC_LOG(INFO, TAG, "Subsequent calls to OCInit() without calling \
@@ -2459,7 +2457,7 @@ exit:
 }
 
 OCStackResult OCStop()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Entering OCStop");
 
     if (stackState == OC_STACK_UNINIT_IN_PROGRESS)
@@ -2524,7 +2522,7 @@ OCStackResult OCStop()
 }
 
 OCStackResult OCStartMulticastServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if(stackState != OC_STACK_INITIALIZED)
     {
         OIC_LOG(ERROR, TAG, "OCStack is not initalized. Cannot start multicast server.");
@@ -2540,7 +2538,7 @@ OCStackResult OCStartMulticastServer()
 }
 
 OCStackResult OCStopMulticastServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CAResult_t ret = CAStopListeningServer();
     if (CA_STATUS_OK != ret)
     {
@@ -2551,7 +2549,7 @@ OCStackResult OCStopMulticastServer()
 }
 
 CAMessageType_t qualityOfServiceToMessageType(OCQualityOfService qos)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     switch (qos)
     {
         case OC_HIGH_QOS:
@@ -2586,7 +2584,7 @@ static OCStackResult ParseRequestUri(const char *fullUri,
                                         OCDevAddr **devAddr,
                                         char **resourceUri,
                                         char **resourceType)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(fullUri, FATAL, OC_STACK_INVALID_CALLBACK);
 
     OCStackResult result = OC_STACK_OK;
@@ -2798,7 +2796,7 @@ error:
 static OCStackResult OCPreparePresence(CAEndpoint_t *endpoint,
                                        char **requestUri,
                                        bool isMulticast)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     char uri[CA_MAX_URI_LENGTH];
 
     FormCanonicalPresenceUri(endpoint, uri, isMulticast);
@@ -2825,7 +2823,7 @@ OCStackResult OCDoResource(OCDoHandle *handle,
                             OCCallbackData *cbData,
                             OCHeaderOption *options,
                             uint8_t numOptions)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCStackResult ret = OCDoRequest(handle, method, requestUri,destination, payload,
                 connectivityType, qos, cbData, options, numOptions);
 
@@ -2847,7 +2845,7 @@ OCStackResult OCDoRequest(OCDoHandle *handle,
                             OCCallbackData *cbData,
                             OCHeaderOption *options,
                             uint8_t numOptions)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Entering OCDoResource");
 
     // Validate input parameters
@@ -3138,7 +3136,7 @@ exit:
 
 OCStackResult OCCancel(OCDoHandle handle, OCQualityOfService qos, OCHeaderOption * options,
         uint8_t numOptions)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     /*
      * This ftn is implemented one of two ways in the case of observation:
      *
@@ -3243,7 +3241,7 @@ OCStackResult OCCancel(OCDoHandle handle, OCQualityOfService qos, OCHeaderOption
  *     OC_STACK_INVALID_PARAM - Invalid parameter
  */
 OCStackResult OCRegisterPersistentStorageHandler(OCPersistentStorage* persistentStorageHandler)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "RegisterPersistentStorageHandler !!");
     if(!persistentStorageHandler)
     {
@@ -3267,14 +3265,14 @@ OCStackResult OCRegisterPersistentStorageHandler(OCPersistentStorage* persistent
 }
 
 OCPersistentStorage *OCGetPersistentStorageHandler()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return g_PersistentStorageHandler;
 }
 
 #ifdef WITH_PRESENCE
 
 OCStackResult OCProcessPresence()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCStackResult result = OC_STACK_OK;
 
     // the following line floods the log with messages that are irrelevant
@@ -3370,7 +3368,7 @@ exit:
 #endif // WITH_PRESENCE
 
 OCStackResult OCProcess()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (stackState == OC_STACK_UNINITIALIZED)
     {
         return OC_STACK_ERROR;
@@ -3392,7 +3390,7 @@ OCStackResult OCProcess()
 
 #ifdef WITH_PRESENCE
 OCStackResult OCStartPresence(const uint32_t ttl)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Entering OCStartPresence");
     uint8_t tokenLength = CA_MAX_TOKEN_LEN;
     OCChangeResourceProperty(
@@ -3445,7 +3443,7 @@ OCStackResult OCStartPresence(const uint32_t ttl)
 }
 
 OCStackResult OCStopPresence()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Entering OCStopPresence");
     OCStackResult result = OC_STACK_ERROR;
 
@@ -3472,7 +3470,7 @@ OCStackResult OCStopPresence()
 
 OCStackResult OCSetDefaultDeviceEntityHandler(OCDeviceEntityHandler entityHandler,
                                             void* callbackParameter)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     defaultDeviceHandler = entityHandler;
     defaultDeviceHandlerCallbackParameter = callbackParameter;
 
@@ -3480,7 +3478,7 @@ OCStackResult OCSetDefaultDeviceEntityHandler(OCDeviceEntityHandler entityHandle
 }
 
 OCTpsSchemeFlags OCGetSupportedEndpointTpsFlags()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return OCGetSupportedTpsFlags();
 }
 
@@ -3490,7 +3488,7 @@ OCStackResult OCCreateResource(OCResourceHandle *handle,
         const char *uri, OCEntityHandler entityHandler,
         void *callbackParam,
         uint8_t resourceProperties)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return OCCreateResourceWithEp(handle,
                                   resourceTypeName,
                                   resourceInterfaceName,
@@ -3507,7 +3505,7 @@ OCStackResult OCCreateResourceWithEp(OCResourceHandle *handle,
         void *callbackParam,
         uint8_t resourceProperties,
         OCTpsSchemeFlags resourceTpsTypes)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
 
     OCResource *pointer = NULL;
     OCStackResult result = OC_STACK_ERROR;
@@ -3683,7 +3681,7 @@ exit:
 
 OCStackResult OCBindResource(
         OCResourceHandle collectionHandle, OCResourceHandle resourceHandle)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
     OCChildResource *tempChildResource = NULL;
     OCChildResource *newChildResource = NULL;
@@ -3754,7 +3752,7 @@ OCStackResult OCBindResource(
 
 OCStackResult OCUnBindResource(
         OCResourceHandle collectionHandle, OCResourceHandle resourceHandle)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
     OCChildResource *tempChildResource = NULL;
     OCChildResource *tempLastChildResource = NULL;
@@ -3847,7 +3845,7 @@ OCStackResult OCUnBindResource(
 }
 
 static bool ValidateResourceTypeInterface(const char *resourceItemName)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!resourceItemName)
     {
         return false;
@@ -3888,7 +3886,7 @@ static bool ValidateResourceTypeInterface(const char *resourceItemName)
 
 OCStackResult BindResourceTypeToResource(OCResource* resource,
                                             const char *resourceTypeName)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceType *pointer = NULL;
     char *str = NULL;
     OCStackResult result = OC_STACK_ERROR;
@@ -3932,7 +3930,7 @@ exit:
 
 OCStackResult BindResourceInterfaceToResource(OCResource* resource,
         const char *resourceInterfaceName)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceInterface *pointer = NULL;
     char *str = NULL;
     OCStackResult result = OC_STACK_ERROR;
@@ -3979,7 +3977,7 @@ OCStackResult BindResourceInterfaceToResource(OCResource* resource,
 
 OCStackResult BindTpsTypeToResource(OCResource* resource,
                                     OCTpsSchemeFlags resourceTpsTypes)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!resource)
     {
         OIC_LOG(ERROR, TAG, "Resource pointer is NULL!!!");
@@ -4010,7 +4008,7 @@ OCStackResult BindTpsTypeToResource(OCResource* resource,
 
 OCStackResult OCBindResourceTypeToResource(OCResourceHandle handle,
         const char *resourceTypeName)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
 
     OCStackResult result = OC_STACK_ERROR;
     OCResource *resource = NULL;
@@ -4037,7 +4035,7 @@ OCStackResult OCBindResourceTypeToResource(OCResourceHandle handle,
 
 OCStackResult OCBindResourceInterfaceToResource(OCResourceHandle handle,
         const char *resourceInterfaceName)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
 
     OCStackResult result = OC_STACK_ERROR;
     OCResource *resource = NULL;
@@ -4063,7 +4061,7 @@ OCStackResult OCBindResourceInterfaceToResource(OCResourceHandle handle,
 }
 
 OCStackResult OCGetNumberOfResources(uint8_t *numResources)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *pointer = headResource;
 
     VERIFY_NON_NULL(numResources, ERROR, OC_STACK_INVALID_PARAM);
@@ -4077,7 +4075,7 @@ OCStackResult OCGetNumberOfResources(uint8_t *numResources)
 }
 
 OCResourceHandle OCGetResourceHandle(uint8_t index)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *pointer = headResource;
 
     for( uint8_t i = 0; i < index && pointer; ++i)
@@ -4088,7 +4086,7 @@ OCResourceHandle OCGetResourceHandle(uint8_t index)
 }
 
 OCStackResult OCDeleteResource(OCResourceHandle handle)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!handle)
     {
         OIC_LOG(ERROR, TAG, "Invalid handle for deletion");
@@ -4112,7 +4110,7 @@ OCStackResult OCDeleteResource(OCResourceHandle handle)
 }
 
 const char *OCGetResourceUri(OCResourceHandle handle)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     resource = findResource((OCResource *) handle);
@@ -4124,7 +4122,7 @@ const char *OCGetResourceUri(OCResourceHandle handle)
 }
 
 OCResourceProperty OCGetResourceProperties(OCResourceHandle handle)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     resource = findResource((OCResource *) handle);
@@ -4136,7 +4134,7 @@ OCResourceProperty OCGetResourceProperties(OCResourceHandle handle)
 }
 
 OCStackResult OCSetResourceProperties(OCResourceHandle handle, uint8_t resourceProperties)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     resource = findResource((OCResource *) handle);
@@ -4150,7 +4148,7 @@ OCStackResult OCSetResourceProperties(OCResourceHandle handle, uint8_t resourceP
 }
 
 OCStackResult OCClearResourceProperties(OCResourceHandle handle, uint8_t resourceProperties)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     resource = findResource((OCResource *) handle);
@@ -4165,7 +4163,7 @@ OCStackResult OCClearResourceProperties(OCResourceHandle handle, uint8_t resourc
 
 OCStackResult OCGetNumberOfResourceTypes(OCResourceHandle handle,
         uint8_t *numResourceTypes)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
     OCResourceType *pointer = NULL;
 
@@ -4188,7 +4186,7 @@ OCStackResult OCGetNumberOfResourceTypes(OCResourceHandle handle,
 }
 
 const char *OCGetResourceTypeName(OCResourceHandle handle, uint8_t index)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceType *resourceType = NULL;
 
     resourceType = findResourceTypeAtIndex(handle, index);
@@ -4201,7 +4199,7 @@ const char *OCGetResourceTypeName(OCResourceHandle handle, uint8_t index)
 
 OCStackResult OCGetNumberOfResourceInterfaces(OCResourceHandle handle,
         uint8_t *numResourceInterfaces)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceInterface *pointer = NULL;
     OCResource *resource = NULL;
 
@@ -4223,7 +4221,7 @@ OCStackResult OCGetNumberOfResourceInterfaces(OCResourceHandle handle,
 }
 
 const char *OCGetResourceInterfaceName(OCResourceHandle handle, uint8_t index)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceInterface *resourceInterface = NULL;
 
     resourceInterface = findResourceInterfaceAtIndex(handle, index);
@@ -4236,7 +4234,7 @@ const char *OCGetResourceInterfaceName(OCResourceHandle handle, uint8_t index)
 
 OCResourceHandle OCGetResourceHandleFromCollection(OCResourceHandle collectionHandle,
         uint8_t index)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
     OCChildResource *tempChildResource = NULL;
     uint8_t num = 0;
@@ -4267,7 +4265,7 @@ OCResourceHandle OCGetResourceHandleFromCollection(OCResourceHandle collectionHa
 OCStackResult OCBindResourceHandler(OCResourceHandle handle,
         OCEntityHandler entityHandler,
         void* callbackParam)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     // Validate parameters
@@ -4297,7 +4295,7 @@ OCStackResult OCBindResourceHandler(OCResourceHandle handle,
 }
 
 OCEntityHandler OCGetResourceHandler(OCResourceHandle handle)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     resource = findResource((OCResource *)handle);
@@ -4312,7 +4310,7 @@ OCEntityHandler OCGetResourceHandler(OCResourceHandle handle)
 }
 
 void incrementSequenceNumber(OCResource * resPtr)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     // Increment the sequence number
     resPtr->sequenceNum += 1;
     if (resPtr->sequenceNum == MAX_SEQUENCE_NUMBER)
@@ -4325,7 +4323,7 @@ void incrementSequenceNumber(OCResource * resPtr)
 #ifdef WITH_PRESENCE
 OCStackResult SendPresenceNotification(OCResourceType *resourceType,
         OCPresenceTrigger trigger)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "SendPresenceNotification");
     OCResource *resPtr = NULL;
     OCStackResult result = OC_STACK_ERROR;
@@ -4349,7 +4347,7 @@ OCStackResult SendPresenceNotification(OCResourceType *resourceType,
 }
 
 OCStackResult SendStopNotification()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "SendStopNotification");
     OCResource *resPtr = NULL;
     OCStackResult result = OC_STACK_ERROR;
@@ -4369,7 +4367,7 @@ OCStackResult SendStopNotification()
 
 #endif // WITH_PRESENCE
 OCStackResult OCNotifyAllObservers(OCResourceHandle handle, OCQualityOfService qos)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resPtr = NULL;
     OCStackResult result = OC_STACK_ERROR;
     OCMethod method = OC_REST_NOMETHOD;
@@ -4412,7 +4410,7 @@ OCNotifyListOfObservers (OCResourceHandle handle,
                          uint8_t          numberOfIds,
                          const OCRepPayload       *payload,
                          OCQualityOfService qos)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Entering OCNotifyListOfObservers");
 
     OCResource *resPtr = NULL;
@@ -4437,7 +4435,7 @@ OCNotifyListOfObservers (OCResourceHandle handle,
 }
 
 OCStackResult OCDoResponse(OCEntityHandlerResponse *ehResponse)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCStackResult result = OC_STACK_ERROR;
     OCServerRequest *serverRequest = NULL;
 
@@ -4461,7 +4459,7 @@ OCStackResult OCDoResponse(OCEntityHandlerResponse *ehResponse)
 
 //#ifdef DIRECT_PAIRING
 const OCDPDev_t* OCDiscoverDirectPairingDevices(unsigned short waittime)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Start OCDiscoverDirectPairingDevices");
     if(OC_STACK_OK != DPDeviceDiscovery(waittime))
     {
@@ -4473,13 +4471,13 @@ const OCDPDev_t* OCDiscoverDirectPairingDevices(unsigned short waittime)
 }
 
 const OCDPDev_t* OCGetDirectPairedDevices()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return (const OCDPDev_t*)DPGetPairedDevices();
 }
 
 OCStackResult OCDoDirectPairing(void *ctx, OCDPDev_t* peer, OCPrm_t pmSel, char *pinNumber,
                                                      OCDirectPairingCB resultCallback)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(INFO, TAG, "Start OCDoDirectPairing");
     if(NULL ==  peer || NULL == pinNumber)
     {
@@ -4501,7 +4499,7 @@ OCStackResult OCDoDirectPairing(void *ctx, OCDPDev_t* peer, OCPrm_t pmSel, char 
 // Private internal function definitions
 //-----------------------------------------------------------------------------
 static OCDoHandle GenerateInvocationHandle()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCDoHandle handle = NULL;
     // Generate token here, it will be deleted when the transaction is deleted
     handle = (OCDoHandle) OICMalloc(sizeof(uint8_t[CA_MAX_TOKEN_LEN]));
@@ -4520,7 +4518,7 @@ static OCDoHandle GenerateInvocationHandle()
 #ifdef WITH_PRESENCE
 OCStackResult OCChangeResourceProperty(OCResourceProperty * inputProperty,
         OCResourceProperty resourceProperties, uint8_t enable)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!inputProperty)
     {
         return OC_STACK_INVALID_PARAM;
@@ -4544,7 +4542,7 @@ OCStackResult OCChangeResourceProperty(OCResourceProperty * inputProperty,
 #endif
 
 OCStackResult initResources()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCStackResult result = OC_STACK_OK;
 
     headResource = NULL;
@@ -4657,7 +4655,7 @@ OCStackResult initResources()
 }
 
 void insertResource(OCResource *resource)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!headResource)
     {
         headResource = resource;
@@ -4672,7 +4670,7 @@ void insertResource(OCResource *resource)
 }
 
 OCResource *findResource(OCResource *resource)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *pointer = headResource;
 
     while (pointer)
@@ -4687,7 +4685,7 @@ OCResource *findResource(OCResource *resource)
 }
 
 void deleteAllResources()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *pointer = headResource;
     OCResource *temp = NULL;
 
@@ -4722,7 +4720,7 @@ void deleteAllResources()
 }
 
 OCStackResult deleteResource(OCResource *resource)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *prev = NULL;
     OCResource *temp = NULL;
     if(!resource)
@@ -4792,7 +4790,7 @@ OCStackResult deleteResource(OCResource *resource)
 }
 
 void deleteResourceElements(OCResource *resource)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!resource)
     {
         return;
@@ -4821,7 +4819,7 @@ void deleteResourceElements(OCResource *resource)
 }
 
 void deleteResourceType(OCResourceType *resourceType)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceType *next = NULL;
 
     for (OCResourceType *pointer = resourceType; pointer; pointer = next)
@@ -4836,7 +4834,7 @@ void deleteResourceType(OCResourceType *resourceType)
 }
 
 void deleteResourceInterface(OCResourceInterface *resourceInterface)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceInterface *next = NULL;
     for (OCResourceInterface *pointer = resourceInterface; pointer; pointer = next)
     {
@@ -4850,7 +4848,7 @@ void deleteResourceInterface(OCResourceInterface *resourceInterface)
 }
 
 void OCDeleteResourceAttributes(OCAttribute *rsrcAttributes)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCAttribute *next = NULL;
     for (OCAttribute *pointer = rsrcAttributes; pointer; pointer = next)
     {
@@ -4872,7 +4870,7 @@ void OCDeleteResourceAttributes(OCAttribute *rsrcAttributes)
 }
 
 void insertResourceType(OCResource *resource, OCResourceType *resourceType)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceType *pointer = NULL;
     OCResourceType *previous = NULL;
     if (!resource || !resourceType)
@@ -4912,7 +4910,7 @@ void insertResourceType(OCResource *resource, OCResourceType *resourceType)
 }
 
 OCResourceType *findResourceTypeAtIndex(OCResourceHandle handle, uint8_t index)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
     OCResourceType *pointer = NULL;
 
@@ -4939,7 +4937,7 @@ OCResourceType *findResourceTypeAtIndex(OCResourceHandle handle, uint8_t index)
 }
 
 OCResourceType *findResourceType(OCResourceType * resourceTypeList, const char * resourceTypeName)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if(resourceTypeList && resourceTypeName)
     {
         OCResourceType * rtPointer = resourceTypeList;
@@ -4965,7 +4963,7 @@ OCResourceType *findResourceType(OCResourceType * resourceTypeList, const char *
  * Default interface will always be first if present.
  */
 void insertResourceInterface(OCResource *resource, OCResourceInterface *newInterface)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResourceInterface *pointer = NULL;
     OCResourceInterface *previous = NULL;
 
@@ -5036,7 +5034,7 @@ void insertResourceInterface(OCResource *resource, OCResourceInterface *newInter
 
 OCResourceInterface *findResourceInterfaceAtIndex(OCResourceHandle handle,
         uint8_t index)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
     OCResourceInterface *pointer = NULL;
 
@@ -5077,7 +5075,7 @@ OCResourceInterface *findResourceInterfaceAtIndex(OCResourceHandle handle,
  *       part of the query.
  */
 OCStackResult getQueryFromUri(const char * uri, char** query, char ** uriWithoutQuery)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if(!uri)
     {
         return OC_STACK_INVALID_URI;
@@ -5127,7 +5125,7 @@ OCStackResult getQueryFromUri(const char * uri, char** query, char ** uriWithout
 }
 
 static const OicUuid_t* OCGetServerInstanceID(void)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     static bool generated = false;
     static OicUuid_t sid;
     if (generated)
@@ -5145,7 +5143,7 @@ static const OicUuid_t* OCGetServerInstanceID(void)
 }
 
 const char* OCGetServerInstanceIDString(void)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     static bool generated = false;
     static char sidStr[UUID_STRING_SIZE];
 
@@ -5166,7 +5164,7 @@ const char* OCGetServerInstanceIDString(void)
 }
 
 CAResult_t OCSelectNetwork(OCTransportAdapter transportType)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG_V(DEBUG, TAG, "OCSelectNetwork [%d]", transportType);
     CAResult_t retResult = CA_STATUS_FAILED;
     CAResult_t caResult = CA_STATUS_OK;
@@ -5216,7 +5214,7 @@ CAResult_t OCSelectNetwork(OCTransportAdapter transportType)
 }
 
 OCStackResult CAResultToOCResult(CAResult_t caResult)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     switch (caResult)
     {
         case CA_STATUS_OK:
@@ -5253,7 +5251,7 @@ OCStackResult CAResultToOCResult(CAResult_t caResult)
 }
 
 bool OCResultToSuccess(OCStackResult ocResult)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     switch (ocResult)
     {
         case OC_STACK_OK:
@@ -5269,13 +5267,13 @@ bool OCResultToSuccess(OCStackResult ocResult)
 }
 
 OCStackResult OCSetProxyURI(const char *uri)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return CAResultToOCResult(CASetProxyUri(uri));
 }
 
 #if defined(RD_CLIENT) || defined(RD_SERVER)
 OCStackResult OCBindResourceInsToResource(OCResourceHandle handle, int64_t ins)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     VERIFY_NON_NULL(handle, ERROR, OC_STACK_INVALID_PARAM);
 
     OCResource *resource = NULL;
@@ -5294,7 +5292,7 @@ OCStackResult OCBindResourceInsToResource(OCResourceHandle handle, int64_t ins)
 
 OCStackResult OCUpdateResourceInsWithResponse(const char *requestUri,
                                               const OCClientResponse *response)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     // Validate input parameters
     VERIFY_NON_NULL(requestUri, ERROR, OC_STACK_INVALID_PARAM);
     VERIFY_NON_NULL(response, ERROR, OC_STACK_INVALID_PARAM);
@@ -5412,7 +5410,7 @@ OCStackResult OCUpdateResourceInsWithResponse(const char *requestUri,
 }
 
 OCStackResult OCGetResourceIns(OCResourceHandle handle, int64_t* ins)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OCResource *resource = NULL;
 
     VERIFY_NON_NULL(handle, ERROR, OC_STACK_INVALID_PARAM);
@@ -5429,7 +5427,7 @@ OCStackResult OCGetResourceIns(OCResourceHandle handle, int64_t* ins)
 #endif // RD_CLIENT || RD_SERVER
 
 OCResourceHandle OCGetResourceHandleAtUri(const char *uri)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!uri)
     {
         OIC_LOG(ERROR, TAG, "Resource uri is NULL");
@@ -5452,7 +5450,7 @@ OCResourceHandle OCGetResourceHandleAtUri(const char *uri)
 
 OCStackResult OCSetHeaderOption(OCHeaderOption* ocHdrOpt, size_t* numOptions, uint16_t optionID,
                                 void* optionData, size_t optionDataLength)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!ocHdrOpt)
     {
         OIC_LOG (INFO, TAG, "Header options are NULL");
@@ -5492,7 +5490,7 @@ OCStackResult OCSetHeaderOption(OCHeaderOption* ocHdrOpt, size_t* numOptions, ui
 OCStackResult OCGetHeaderOption(OCHeaderOption* ocHdrOpt, size_t numOptions,
                                 uint16_t optionID, void* optionData, size_t optionDataLength,
                                 uint16_t* receivedDataLength)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (!ocHdrOpt || !numOptions)
     {
         OIC_LOG (INFO, TAG, "No options present");
@@ -5532,7 +5530,7 @@ OCStackResult OCGetHeaderOption(OCHeaderOption* ocHdrOpt, size_t numOptions,
 }
 
 void OCDefaultAdapterStateChangedHandler(CATransportAdapter_t adapter, bool enabled)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "OCDefaultAdapterStateChangedHandler");
     if (g_adapterHandler)
     {
@@ -5541,7 +5539,7 @@ void OCDefaultAdapterStateChangedHandler(CATransportAdapter_t adapter, bool enab
 }
 
 void OCDefaultConnectionStateChangedHandler(const CAEndpoint_t *info, bool isConnected)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "OCDefaultConnectionStateChangedHandler");
     if (g_connectionHandler)
     {
@@ -5566,14 +5564,14 @@ void OCDefaultConnectionStateChangedHandler(const CAEndpoint_t *info, bool isCon
 
 void OCSetNetworkMonitorHandler(CAAdapterStateChangedCB adapterHandler,
                                 CAConnectionStateChangedCB connectionHandler)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "OCSetNetworkMonitorHandler");
     g_adapterHandler = adapterHandler;
     g_connectionHandler = connectionHandler;
 }
 
 OCStackResult OCGetDeviceId(OCUUIdentity *deviceId)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OicUuid_t oicUuid;
     OCStackResult ret = OC_STACK_ERROR;
 
@@ -5590,7 +5588,7 @@ OCStackResult OCGetDeviceId(OCUUIdentity *deviceId)
 }
 
 OCStackResult OCSetDeviceId(const OCUUIdentity *deviceId)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OicUuid_t oicUuid;
     OCStackResult ret = OC_STACK_ERROR;
 
@@ -5604,7 +5602,7 @@ OCStackResult OCSetDeviceId(const OCUUIdentity *deviceId)
 }
 
 OCStackResult OCGetDeviceOwnedState(bool *isOwned)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     bool isDeviceOwned = true;
     OCStackResult ret = OC_STACK_ERROR;
 
@@ -5621,6 +5619,6 @@ OCStackResult OCGetDeviceOwnedState(bool *isOwned)
 }
 
 OCStackResult OCGetLinkLocalZoneId(uint32_t ifindex, char **zoneId)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return CAResultToOCResult(CAGetLinkLocalZoneId(ifindex, zoneId));
 }
