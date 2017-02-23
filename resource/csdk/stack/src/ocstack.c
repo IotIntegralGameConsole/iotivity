@@ -2301,12 +2301,13 @@ OCStackResult OCInit1(OCMode mode, OCTransportFlags serverFlags, OCTransportFlag
 { OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG_INIT();
     OIC_LOG(DEBUG, TAG, "call OCInit1");
+    void* p = OICMalloc(1);
     return OCInit2(mode, OC_DEFAULT_FLAGS, OC_DEFAULT_FLAGS, OC_DEFAULT_ADAPTER);
 }
 
 OCStackResult OCInit2(OCMode mode, OCTransportFlags serverFlags, OCTransportFlags clientFlags,
                       OCTransportAdapter transportType)
-{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
+{  OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if(stackState == OC_STACK_INITIALIZED)
     {
         OIC_LOG(INFO, TAG, "Subsequent calls to OCInit() without calling \
