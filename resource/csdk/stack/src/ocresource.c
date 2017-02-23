@@ -62,7 +62,8 @@
 
 /// Module Name
 #define TAG "OIC_RI_RESOURCE"
-
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 // using 1k as block size since most persistent storage implementations use a power of 2.
 #define INTROSPECTION_FILE_SIZE_BLOCK 1024
 

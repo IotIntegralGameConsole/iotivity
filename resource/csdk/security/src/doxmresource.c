@@ -56,6 +56,9 @@
 #endif
 
 #define TAG  "OIC_SRM_DOXM"
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
+
 #define CHAR_ZERO ('0')
 
 /** Default cbor payload size. This value is increased in case of CborErrorOutOfMemory.
@@ -79,14 +82,14 @@ static size_t gUuidSeedSize = 0;
 static OicSecDoxm_t        *gDoxm = NULL;
 static OCResourceHandle    gDoxmHandle = NULL;
 
-static OicSecOxm_t gDoxmDefaultOxm = OIC_RANDOM_DEVICE_PIN;
+static OicSecOxm_t gDoxmDefaultOxm = OIC_JUST_WORKS;
 static OicSecDoxm_t gDefaultDoxm =
 {
     NULL,                   /* OicUrn_t *oxmType */
     0,                      /* size_t oxmTypeLen */
-    &gDoxmDefaultOxm,       /* uint16_t *oxm */
+    &gDoxmDefaultOxm,  /* uint16_t *oxm */
     1,                      /* size_t oxmLen */
-    OIC_RANDOM_DEVICE_PIN,  /* uint16_t oxmSel */
+    OIC_JUST_WORKS,         /* uint16_t oxmSel */
     SYMMETRIC_PAIR_WISE_KEY,/* OicSecCredType_t sct */
     false,                  /* bool owned */
     {.id = {0}},            /* OicUuid_t deviceID */
@@ -1745,6 +1748,7 @@ OCStackResult InitDoxmResource()
        // Read DOXM resource from PS
        ret = CBORPayloadToDoxm(data, size, &gDoxm);
     }
+    OIC_LOG_HERE(); 
     /*
      * If SVR database in persistent storage got corrupted or
      * is not available for some reason, a default doxm is created
@@ -1807,6 +1811,8 @@ OCStackResult DeInitDoxmResource()
 
 OCStackResult GetDoxmDeviceID(OicUuid_t *deviceID)
 {
+    OIC_LOG_V(INFO, TAG, "In %s", __func__);
+    
     if (deviceID && gDoxm)
     {
        *deviceID = gDoxm->deviceID;

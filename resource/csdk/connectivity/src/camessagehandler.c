@@ -66,8 +66,8 @@ static CAQueueingThread_t g_receiveThread;
 #endif  // SINGLE_THREAD
 
 #define TAG "OIC_CA_MSG_HANDLE"
-//#undef OIC_LOG_V
-//#define OIC_LOG_V OIC_LOG_V_
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 
 static CARetransmission_t g_retransmissionContext;
 
@@ -137,6 +137,7 @@ static CAData_t* CAGenerateHandlerData(const CAEndpoint_t *endpoint,
                                        const CARemoteId_t *identity,
                                        const void *data, CADataType_t dataType)
 {
+    OIC_LOG_HERE();
     OIC_LOG(DEBUG, TAG, "CAGenerateHandlerData IN");
     CAInfo_t *info = NULL;
     CAData_t *cadata = (CAData_t *) OICCalloc(1, sizeof(CAData_t));
@@ -157,9 +158,10 @@ static CAData_t* CAGenerateHandlerData(const CAEndpoint_t *endpoint,
 #endif
 
     OIC_LOG_V(DEBUG, TAG, "address : %s", ep->addr);
-
     if (CA_RESPONSE_DATA == dataType)
     {
+        OIC_LOG_HERE();
+
         CAResponseInfo_t* resInfo = (CAResponseInfo_t*)OICCalloc(1, sizeof(CAResponseInfo_t));
         if (!resInfo)
         {
@@ -185,16 +187,18 @@ static CAData_t* CAGenerateHandlerData(const CAEndpoint_t *endpoint,
     }
     else if (CA_REQUEST_DATA == dataType)
     {
+        OIC_LOG_HERE();
         CARequestInfo_t* reqInfo = (CARequestInfo_t*)OICCalloc(1, sizeof(CARequestInfo_t));
         if (!reqInfo)
         {
             OIC_LOG(ERROR, TAG, "memory allocation failed");
             goto exit;
         }
-
+        OIC_LOG_HERE();
         CAResult_t result = CAGetRequestInfoFromPDU(data, endpoint, reqInfo);
         if (CA_STATUS_OK != result)
         {
+            OIC_LOG_HERE();
             OIC_LOG(ERROR, TAG, "CAGetRequestInfoFromPDU failed");
             CADestroyRequestInfoInternal(reqInfo);
             goto exit;
@@ -219,6 +223,7 @@ static CAData_t* CAGenerateHandlerData(const CAEndpoint_t *endpoint,
    }
     else if (CA_ERROR_DATA == dataType)
     {
+        OIC_LOG_HERE();
         CAErrorInfo_t *errorInfo = (CAErrorInfo_t *)OICCalloc(1, sizeof (CAErrorInfo_t));
         if (!errorInfo)
         {
@@ -255,6 +260,7 @@ exit:
 #ifndef SINGLE_THREAD
     CAFreeEndpoint(ep);
 #endif
+    OIC_LOG_HERE();
     return NULL;
 }
 

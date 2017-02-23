@@ -71,6 +71,7 @@ OCStackResult SendSRMResponse(const OCEntityHandlerRequest *ehRequest,
 
 OCStackResult InitSecureResources( )
 {
+    OIC_LOG_HERE();
     OCStackResult ret;
 
     /*

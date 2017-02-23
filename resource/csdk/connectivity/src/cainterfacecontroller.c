@@ -471,7 +471,7 @@ CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, size_t *size)
         }
     }
 
-    OIC_LOG_V(DEBUG, TAG, "network info total size is %zu!", resSize);
+    OIC_LOG_V(DEBUG, TAG, "network info total size is %d!", resSize);
 
     if (resSize == 0)
     {

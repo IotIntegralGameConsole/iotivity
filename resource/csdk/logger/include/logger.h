@@ -268,6 +268,12 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 #define OIC_LOG_INIT()
 #endif
 
+#define OIC_LOG_HERE()                           \
+    {                                             \
+        OIC_LOG_V(DEBUG, TAG, "{%s %s:%d",        \
+                  __func__, __FILE__, __LINE__);  \
+        OIC_LOG_V(DEBUG, TAG, "mem: free=%d", freeMemory() );     \
+    }
 
 #ifdef __cplusplus
 }

@@ -39,7 +39,8 @@
 #include "ocendpoint.h"
 
 #define TAG "OIC_RI_PAYLOADPARSE"
-
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
 /*
  * The length of UINT64_MAX as a decimal string.
  */

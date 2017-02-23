@@ -160,6 +160,7 @@ static void CARAUpdateObsList(int option, char *sid)
 
 static int CARAGetReqObsOption(coap_pdu_t *pdu, const CAEndpoint_t *endPoint)
 {
+    OIC_LOG_HERE();
     uint32_t obsopt = -1;
 
     CARequestInfo_t *reqInfo = (CARequestInfo_t *) OICMalloc(sizeof(*reqInfo));

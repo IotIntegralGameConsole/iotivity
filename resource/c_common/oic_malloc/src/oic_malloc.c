@@ -67,7 +67,7 @@ static uint32_t count;
 #endif
 
 void *OICMalloc(size_t size)
-{   OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
+{ 
     if (0 == size)
     {
         return NULL;
@@ -79,7 +79,10 @@ void *OICMalloc(size_t size)
     {
         count++;
     }
-    OIC_LOG_V(INFO, TAG, "malloc: ptr=%p, size=%u, count=%u", ptr, size, count);
+int mem = freeMemory();
+OIC_LOG_V(INFO, TAG, "malloc: ptr=%p, size=%u, count=%u, free=%d", ptr, size, count, mem);
+OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
+
     return ptr;
 #else
     return malloc(size);
@@ -99,7 +102,8 @@ void *OICCalloc(size_t num, size_t size)
     {
         count++;
     }
-    OIC_LOG_V(INFO, TAG, "calloc: ptr=%p, num=%u, size=%u, count=%u", ptr, num, size, count);
+int mem =  freeMemory();
+OIC_LOG_V(INFO, TAG, "calloc: ptr=%p, size=%u,  free=%d", ptr, num * size, mem);
     return ptr;
 #else
     return calloc(num, size);
@@ -107,7 +111,7 @@ void *OICCalloc(size_t num, size_t size)
 }
 
 void *OICRealloc(void* ptr, size_t size)
-{  OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
+{
     // Override realloc() behavior for NULL pointer which normally would
     // work as per malloc(), however we suppress the behavior of possibly
     // returning a non-null unique pointer.
@@ -120,7 +124,8 @@ void *OICRealloc(void* ptr, size_t size)
 
 #ifdef ENABLE_MALLOC_DEBUG
     void* newptr = realloc(ptr, size);
-    OIC_LOG_V(INFO, TAG, "realloc: ptr=%p, newptr=%p, size=%u", ptr, newptr, size);
+int mem =  freeMemory();
+OIC_LOG_V(INFO, TAG, "realloc: ptr=%p, newptr=%p, size=%u free=%d", ptr, newptr, size, mem);
     // Very important to return the correct pointer here, as it only *somtimes*
     // differs and thus can be hard to notice/test:
     return newptr;

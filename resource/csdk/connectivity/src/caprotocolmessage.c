@@ -66,13 +66,17 @@ CAResult_t CASetProxyUri(const char *uri)
 CAResult_t CAGetRequestInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
                                    CARequestInfo_t *outReqInfo)
 {
+    OIC_LOG_HERE();
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(outReqInfo, TAG, "outReqInfo");
 
     uint32_t code = CA_NOT_FOUND;
-    CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outReqInfo->info));
+    OIC_LOG_HERE();
+    //CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outReqInfo->info));
+    CAResult_t ret = CAGetInfoFromPDU(0,0,0,0);
+    OIC_LOG_HERE();
     outReqInfo->method = code;
-
+    OIC_LOG_HERE();
     return ret;
 }
 
@@ -81,6 +85,7 @@ CAResult_t CAGetResponseInfoFromPDU(const coap_pdu_t *pdu, CAResponseInfo_t *out
 {
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(outResInfo, TAG, "outResInfo");
+    OIC_LOG_HERE();
 
     uint32_t code = CA_NOT_FOUND;
     CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outResInfo->info));
@@ -93,6 +98,7 @@ CAResult_t CAGetErrorInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endp
                                  CAErrorInfo_t *errorInfo)
 {
     VERIFY_NON_NULL(pdu, TAG, "pdu");
+    OIC_LOG_HERE();
 
     uint32_t code = 0;
     CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &errorInfo->info);
@@ -729,10 +735,13 @@ uint32_t CAGetOptionCount(coap_opt_iterator_t opt_iter)
 CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
                             uint32_t *outCode, CAInfo_t *outInfo)
 {
+    OIC_LOG_HERE();
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(endpoint, TAG, "endpoint");
     VERIFY_NON_NULL(outCode, TAG, "outCode");
     VERIFY_NON_NULL(outInfo, TAG, "outInfo");
+
+    OIC_LOG_HERE();
 
     coap_transport_t transport;
 #ifdef WITH_TCP
@@ -745,6 +754,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     {
         transport = COAP_UDP;
     }
+    OIC_LOG_HERE();
 
     coap_opt_iterator_t opt_iter;
     coap_option_iterator_init2((coap_pdu_t *) pdu, &opt_iter, COAP_OPT_ALL, transport);
@@ -753,6 +763,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     {
         (*outCode) = (uint32_t) CA_RESPONSE_CODE(coap_get_code(pdu, transport));
     }
+    OIC_LOG_HERE();
 
     // init HeaderOption list
     uint32_t count = CAGetOptionCount(opt_iter);
@@ -780,7 +791,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
         outInfo->payloadFormat = CA_FORMAT_UNDEFINED;
         outInfo->acceptFormat = CA_FORMAT_UNDEFINED;
     }
-
+    OIC_LOG_HERE();
     if (count > 0)
     {
         outInfo->options = (CAHeaderOption_t *) OICCalloc(count, sizeof(CAHeaderOption_t));
@@ -790,6 +801,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
             return CA_MEMORY_ALLOC_FAILED;
         }
     }
+    OIC_LOG_HERE();
 
     coap_opt_t *option = NULL;
     char optionResult[CA_MAX_URI_LENGTH] = {0};
@@ -1014,7 +1026,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
         memcpy(outInfo->payload, pdu->data, dataSize);
         outInfo->payloadSize = dataSize;
     }
-
+    OIC_LOG_HERE();
     if (optionResult[0] != '\0')
     {
         OIC_LOG_V(DEBUG, TAG, "URL length:%zu", strlen(optionResult));
@@ -1046,6 +1058,7 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
     return CA_STATUS_OK;
 
 exit:
+    OIC_LOG_HERE();
     OIC_LOG(ERROR, TAG, "buffer too small");
     OICFree(outInfo->options);
     return CA_STATUS_FAILED;
