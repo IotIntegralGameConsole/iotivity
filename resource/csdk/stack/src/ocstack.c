@@ -2291,14 +2291,14 @@ OCStackResult OCSetRAInfo(const OCRAInfo_t *raInfo)
 #endif
 
 OCStackResult OCInit(const char *ipAddr, uint16_t port, OCMode mode)
-{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
+{
     (void) ipAddr;
     (void) port;
     return OCInit1(mode, OC_DEFAULT_FLAGS, OC_DEFAULT_FLAGS);
 }
 
 OCStackResult OCInit1(OCMode mode, OCTransportFlags serverFlags, OCTransportFlags clientFlags)
-{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
+{
     OIC_LOG_INIT();
     OIC_LOG(DEBUG, TAG, "call OCInit1");
     void* p = OICMalloc(1);

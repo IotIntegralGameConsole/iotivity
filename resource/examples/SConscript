@@ -47,9 +47,9 @@ examples_env.AppendUnique(LIBPATH = [examples_env.get('BUILD_DIR')])
 examples_env.AppendUnique(RPATH = [examples_env.get('BUILD_DIR')])
 examples_env.PrependUnique(LIBS = ['coap'])
 examples_env.AppendUnique(LIBS = ['connectivity_abstraction'])
-examples_env.AppendUnique(LIBS = ['oc_logger'])
 examples_env.AppendUnique(LIBS = ['octbstack'])
 examples_env.AppendUnique(LIBS = ['oc'])
+examples_env.AppendUnique(LIBS = ['oc_logger'])
 
 compiler = examples_env.get('CXX')
 if 'g++' in compiler:

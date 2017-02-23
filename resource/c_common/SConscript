@@ -180,7 +180,9 @@ elif target_os  in ['windows']:
 else:
 	common_src.append('octhread/src/noop/octhread.c')
 
+SConscript('../csdk/logger/SConscript')
 common_env.AppendUnique(LIBS = ['logger'])
+
 common_env.AppendUnique(CPPPATH = ['#resource/csdk/logger/include'])
 commonlib = common_env.StaticLibrary('c_common', common_src)
 common_env.InstallTarget(commonlib, 'c_common')
@@ -188,3 +190,4 @@ common_env.UserInstallTargetLib(commonlib, 'c_common')
 common_env.UserInstallTargetHeader('platform_features.h', 'c_common', 'platform_features.h')
 
 env.PrependUnique(LIBS = ['c_common'])
+

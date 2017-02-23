@@ -254,6 +254,7 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 #define OIC_LOG_V(level, tag, ...)  OCLogv((level), (tag), __VA_ARGS__)
 
 #define OIC_LOG_INIT()    OCLogInit()
+#include "MemoryFree.h"
 #endif //ARDUINO
 #endif //__TIZEN__
 
@@ -267,7 +268,6 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
 #define OIC_LOG_INIT()
 #endif
 
-#include "MemoryFree.h"
 
 #ifdef __cplusplus
 }

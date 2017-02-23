@@ -67,7 +67,7 @@ static uint32_t count;
 #endif
 
 void *OICMalloc(size_t size)
-{OIC_LOG(DEBUG, TAG, __FILE__);//TODO
+{   OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
     if (0 == size)
     {
         return NULL;
@@ -87,7 +87,7 @@ void *OICMalloc(size_t size)
 }
 
 void *OICCalloc(size_t num, size_t size)
-{
+{  OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
     if (0 == size || 0 == num)
     {
         return NULL;
@@ -107,7 +107,7 @@ void *OICCalloc(size_t num, size_t size)
 }
 
 void *OICRealloc(void* ptr, size_t size)
-{
+{  OIC_LOG_V(INFO,TAG,"free=%d", freeMemory());
     // Override realloc() behavior for NULL pointer which normally would
     // work as per malloc(), however we suppress the behavior of possibly
     // returning a non-null unique pointer.
