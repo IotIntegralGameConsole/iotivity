@@ -283,7 +283,7 @@ CATransportAdapter_t CAGetSelectedNetwork()
     return CASelectedNetwork;
 }
 
-CAResult_t CAGetNetworkInformationInternal(CAEndpoint_t **info, uint32_t *size)
+CAResult_t CAGetNetworkInformationInternal(CAEndpoint_t **info, size_t *size)
 {
     OIC_LOG(DEBUG, TAG, "get network information.");
 
