@@ -86,7 +86,7 @@ void CAStopAdapter(CATransportAdapter_t transportType);
  * @param   size            [OUT]    number of connectivity information structures
  * @return   CA_STATUS_OK or ERROR CODES ( CAResult_t error codes in cacommon.h)
  */
-CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, uint32_t *size);
+CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, size_t *size);
 
 /**
  * @brief   Sends unicast data to the remote endpoint
@@ -95,7 +95,7 @@ CAResult_t CAGetNetworkInfo(CAEndpoint_t **info, uint32_t *size);
  * @param   length          [IN]    length of the data that needs to be sent
  * @return   CA_STATUS_OK or ERROR CODES ( CAResult_t error codes in cacommon.h)
  */
-CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data, uint32_t length);
+CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data, size_t length);
 
 /**
  * @brief   Sends multicast data to all endpoints in the network.
@@ -104,7 +104,7 @@ CAResult_t CASendUnicastData(const CAEndpoint_t *endpoint, const void *data, uin
  * @param   length          [IN]    length of the data that needs to be sent
  * @return   CA_STATUS_OK or ERROR CODES ( CAResult_t error codes in cacommon.h)
  */
-CAResult_t CASendMulticastData(const CAEndpoint_t *endpoint, const void *data, uint32_t length);
+CAResult_t CASendMulticastData(const CAEndpoint_t *endpoint, const void *data, size_t length);
 
 /**
  * @brief   Start listening servers to receive search requests from clients
