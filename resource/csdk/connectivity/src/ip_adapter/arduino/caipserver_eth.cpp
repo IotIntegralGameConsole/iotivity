@@ -74,23 +74,23 @@ static bool g_isMulticastServerStarted = false;
 static uint16_t g_unicastPort = 0;
 
 CAResult_t CAIPInitializeServer(const ca_thread_pool_t threadPool)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return CA_STATUS_OK;
 }
 
 void CAIPTerminateServer(void)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return;
 }
 
 uint16_t CAGetServerPortNum(const char *ipAddress, bool isSecured)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     return g_unicastPort;
 }
 
 CAResult_t CAIPStartUnicastServer(const char *localAddress, uint16_t *port,
                                   bool secured)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     VERIFY_NON_NULL(port, TAG, "port");
 
@@ -121,7 +121,7 @@ CAResult_t CAIPStartUnicastServer(const char *localAddress, uint16_t *port,
 
 CAResult_t CAIPStartMulticastServer(const char *localAddress, const char *multicastAddress,
                                     uint16_t multicastPort)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     if (g_isMulticastServerStarted == true)
     {
@@ -146,7 +146,7 @@ CAResult_t CAIPStartMulticastServer(const char *localAddress, const char *multic
 }
 
 CAResult_t CAIPStartServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     uint16_t unicastPort = 55555;
 
     CAResult_t ret = CAIPStartUnicastServer("0.0.0.0", &unicastPort, false);
@@ -164,7 +164,7 @@ CAResult_t CAIPStartServer()
 }
 
 CAResult_t CAIPStopUnicastServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     close(g_unicastSocket);
     g_unicastSocket = 0;
@@ -174,7 +174,7 @@ CAResult_t CAIPStopUnicastServer()
 }
 
 CAResult_t CAIPStopMulticastServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     close(g_multicastSocket);
     g_multicastSocket = 0;
@@ -183,7 +183,7 @@ CAResult_t CAIPStopMulticastServer()
 }
 
 CAResult_t CAIPStartListenServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     CAResult_t ret = CAIPStartMulticastServer("0.0.0.0", IPv4_MULTICAST, IPv4_MULTICAST_PORT);
     if (CA_STATUS_OK != ret)
@@ -195,7 +195,7 @@ CAResult_t CAIPStartListenServer()
 }
 
 CAResult_t CAIPStopListenServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     CAResult_t ret = CAIPStopMulticastServer();
     if (CA_STATUS_OK != ret)
@@ -207,7 +207,7 @@ CAResult_t CAIPStopListenServer()
 }
 
 void CAIPStopServer()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     CAResult_t result = CAIPStopUnicastServer();
     if (CA_STATUS_OK != result)
@@ -228,7 +228,8 @@ void CAIPStopServer()
 
 void CAPacketReceivedCallback(const char *ipAddress, const uint16_t port,
                               const void *data, const size_t dataLength)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
+    OIC_LOG_V(DEBUG, TAG, "data recvd %d", dataLength);
     OIC_LOG(DEBUG, TAG, "IN");
     if (g_packetReceivedCallback)
     {
@@ -241,7 +242,7 @@ void CAPacketReceivedCallback(const char *ipAddress, const uint16_t port,
 }
 
 void CAArduinoCheckData()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     if (g_unicastSocket)
     {
         if (CAArduinoRecvData(g_unicastSocket) != CA_STATUS_OK)
@@ -265,7 +266,7 @@ void CAArduinoCheckData()
  *  This is a non-blocking call.
  */
 CAResult_t CAArduinoRecvData(int32_t sockFd)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     /**Bug : When there are multiple UDP packets in Wiznet buffer, W5100.getRXReceivedSize
      * will not return correct length of the first packet.
      * Fix : Use the patch provided for arduino/libraries/Ethernet/utility/socket.cpp
@@ -279,7 +280,7 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
     uint16_t recvLen = W5100.getRXReceivedSize(sockFd);
     if (recvLen == 0)
     {
-        // No data available on socket
+        //OIC_LOG(DEBUG, TAG, "No data available on socket");
         return CA_STATUS_OK;
     }
 
@@ -294,8 +295,8 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
     }
 
     // Read available data.
-    ssize_t ret = recvfrom(sockFd, (uint8_t *)data, recvLen + 1, senderAddr, &senderPort);
-    if (ret < 0)
+    uint16_t ret = recvfrom(sockFd, (uint8_t *)data, recvLen + 1, senderAddr, &senderPort);
+    if (ret <= 0)
     {
         OIC_LOG(ERROR, TAG, "rcv fail");
         OICFree(data);
@@ -303,7 +304,8 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
     }
     else if (ret > 0)
     {
-        OIC_LOG(DEBUG, TAG, "data recvd");
+        OIC_LOG_V(DEBUG, TAG, "data recvd %d", ret);
+        size_t dataLen = (size_t) ret;
         snprintf(addr, sizeof(addr), "%d.%d.%d.%d", senderAddr[0], senderAddr[1], senderAddr[2],
                  senderAddr[3]);
         CAPacketReceivedCallback(addr, senderPort, data, (size_t) ret);
@@ -316,25 +318,25 @@ CAResult_t CAArduinoRecvData(int32_t sockFd)
 }
 
 void CAIPSetPacketReceiveCallback(CAIPPacketReceivedCallback callback)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     g_packetReceivedCallback = callback;
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
 void CAIPSetErrorHandler(CAIPErrorHandleCallback errorHandleCallback)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
 void CAIPPullData()
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     CAArduinoCheckData();
 }
 
 CAResult_t CAGetIPInterfaceInformation(CAEndpoint_t **info, size_t *size)
-{
+{ OIC_LOG(DEBUG, TAG, __FILE__);//TODO
     OIC_LOG(DEBUG, TAG, "IN");
 
     VERIFY_NON_NULL(info, TAG, "info is NULL");
