@@ -75,6 +75,8 @@
  * Logging tag for module name.
  */
 #define TAG "OIC_CA_TCP_SERVER"
+//#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
 
 /**
  * Maximum CoAP over TCP header length
@@ -154,8 +156,6 @@ static CAResult_t CATCPCreateSocket(int family, CATCPSessionInfo_t *svritem);
         FD_SET(caglobals.tcp.TYPE.fd, FDS); \
     }
 
-#undef OIC_LOG_V
-#define OIC_LOG_V OIC_LOG_V_
 
 static void CATCPDestroyMutex()
 {
