@@ -804,7 +804,7 @@ typedef struct
     char                    addr[MAX_ADDR_STR_SIZE];
 
     /** usually zero for default interface.*/
-    uint32_t                ifindex;
+    size_t                ifindex;
 
     /** destination GatewayID:ClientId.*/
     char                    routeData[MAX_ADDR_STR_SIZE];
@@ -1580,8 +1580,8 @@ typedef struct
 typedef struct
 {
     OCPayload base;
-    uint32_t sequenceNumber;
-    uint32_t maxAge;
+    size_t sequenceNumber;
+    size_t maxAge;
     OCPresenceTrigger trigger;
     char* resourceType;
 } OCPresencePayload;
@@ -1650,7 +1650,7 @@ typedef struct
     OCStackResult result;
 
     /** If associated with observe, this will represent the sequence of notifications from server.*/
-    uint32_t sequenceNumber;
+    size_t sequenceNumber;
 
     /** resourceURI.*/
     const char * resourceUri;

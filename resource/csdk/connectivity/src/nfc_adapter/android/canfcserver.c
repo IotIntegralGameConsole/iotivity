@@ -41,7 +41,7 @@ static jmethodID g_sendMethod = NULL;
 static void CANfcJniInit();
 static void CANfcJNISetContext();
 static CAResult_t CANfcCreateJniInterfaceObject();
-static CAResult_t CANfcSendDataImpl(const CAEndpoint_t * ep, const char* data, uint32_t dataLen);
+static CAResult_t CANfcSendDataImpl(const CAEndpoint_t * ep, const char* data, size_t dataLen);
 
 static const char CLASS_NFCINTERFACE[] = "org/iotivity/ca/CaNfcInterface";
 
@@ -523,7 +523,7 @@ Java_org_iotivity_ca_CaNfcInterface_caNativeNfcPacketReceived(JNIEnv *env, jobje
     OIC_LOG(DEBUG, TAG, "caNfcPacketReceived : OUT");
 }
 
-CAResult_t CANfcSendDataImpl(const CAEndpoint_t * ep, const char* data, uint32_t dataLen)
+CAResult_t CANfcSendDataImpl(const CAEndpoint_t * ep, const char* data, size_t dataLen)
 {
     VERIFY_NON_NULL(ep, TAG, "CANfcSendDataImpl : endpoint is null");
     VERIFY_NON_NULL(data, TAG, "CANfcSendDataImpl : data is null");
@@ -575,7 +575,7 @@ CAResult_t CANfcSendDataImpl(const CAEndpoint_t * ep, const char* data, uint32_t
     return CA_STATUS_OK;
 }
 
-void CANFCSendData(const CAEndpoint_t *endpoint, const void *data, uint32_t dataLength)
+void CANFCSendData(const CAEndpoint_t *endpoint, const void *data, size_t dataLength)
 {
     VERIFY_NON_NULL_VOID(endpoint, TAG, "endpoint is NULL");
     VERIFY_NON_NULL_VOID(data, TAG, "data is NULL");

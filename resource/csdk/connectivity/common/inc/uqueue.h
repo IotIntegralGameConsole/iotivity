@@ -42,7 +42,7 @@ typedef struct u_queue_message_t
     /** Pointer to message. */
     void *msg;
     /** message size. */
-    uint32_t size;
+    size_t size;
 } u_queue_message_t;
 
 typedef struct u_queue_element_t u_queue_element;
@@ -66,7 +66,7 @@ typedef struct u_queue_t
     /** Head of the queue. */
     u_queue_element *element;
     /** Number of messages in Queue. */
-    uint32_t count;
+    size_t count;
 } u_queue_t;
 
 /**
@@ -109,7 +109,7 @@ CAResult_t u_queue_remove_element(u_queue_t *queue);
  * @param queue pointer to queue.
  * @return number of elements in queue.
  */
-uint32_t u_queue_get_size(u_queue_t *queue);
+size_t u_queue_get_size(u_queue_t *queue);
 
 /**
  * Removes all the messages from Queue and reset message count.

@@ -138,10 +138,10 @@ static OCStackResult SendObserveNotification(ResourceObserver *observer,
 }
 
 #ifdef WITH_PRESENCE
-OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, uint32_t maxAge,
+OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, size_t maxAge,
         OCPresenceTrigger trigger, OCResourceType *resourceType, OCQualityOfService qos)
 #else
-OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, uint32_t maxAge,
+OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, size_t maxAge,
         OCQualityOfService qos)
 #endif
 {
@@ -237,7 +237,7 @@ OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, 
 OCStackResult SendListObserverNotification (OCResource * resource,
         OCObservationId  *obsIdList, uint8_t numberOfIds,
         const OCRepPayload *payload,
-        uint32_t maxAge,
+        size_t maxAge,
         OCQualityOfService qos)
 {
     (void)maxAge;
@@ -632,7 +632,7 @@ CreateObserveHeaderOption (CAHeaderOption_t **caHdrOpt,
  * front of the header options list and the number of options is adjusted accordingly.
  */
 OCStackResult
-GetObserveHeaderOption (uint32_t * observationOption,
+GetObserveHeaderOption (size_t * observationOption,
                         CAHeaderOption_t *options,
                         uint8_t * numOptions)
 {

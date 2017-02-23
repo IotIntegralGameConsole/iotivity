@@ -55,7 +55,7 @@ typedef ssize_t (*CAPacketSendCallback)(CAEndpoint_t *endpoint,
  *
  * @retval  ::CA_STATUS_OK for success, otherwise some error value
  */
-CAResult_t CAsetTlsCipherSuite(const uint32_t cipher);
+CAResult_t CAsetTlsCipherSuite(const size_t cipher);
 
 /**
  * Used set send and recv callbacks for different adapters(WIFI,EtherNet).
@@ -123,7 +123,7 @@ void CAdeinitSslAdapter();
  *
  */
 
-CAResult_t CAencryptSsl(const CAEndpoint_t *endpoint, void *data, uint32_t dataLen);
+CAResult_t CAencryptSsl(const CAEndpoint_t *endpoint, void *data, size_t dataLen);
 
 /**
  * Performs TLS decryption of the data.
@@ -138,7 +138,7 @@ CAResult_t CAencryptSsl(const CAEndpoint_t *endpoint, void *data, uint32_t dataL
  * @retval  ::CA_STATUS_FAILED Operation failed.
  *
  */
-CAResult_t CAdecryptSsl(const CASecureEndpoint_t *sep, uint8_t *data, uint32_t dataLen);
+CAResult_t CAdecryptSsl(const CASecureEndpoint_t *sep, uint8_t *data, size_t dataLen);
 
 /**
  * Initiate TLS handshake with selected cipher suite.
@@ -198,7 +198,7 @@ const CASecureEndpoint_t *GetCASecureEndpointData(const CAEndpoint_t* peer);
  *
  * @return  true if the secure endpoint has been found, false otherwise.
  */
-bool SetCASecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t newAttribute);
+bool SetCASecureEndpointAttribute(const CAEndpoint_t* peer, size_t newAttribute);
 
 /**
  * Gets the attributes field of a secure endpoint.
@@ -208,7 +208,7 @@ bool SetCASecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t newAttribut
  *
  * @return  true if the secure endpoint has been found, false otherwise.
  */
-bool GetCASecureEndpointAttributes(const CAEndpoint_t* peer, uint32_t* allAttributes);
+bool GetCASecureEndpointAttributes(const CAEndpoint_t* peer, size_t* allAttributes);
 
 #ifdef __cplusplus
 }

@@ -258,7 +258,7 @@ OCServerResponse * GetServerResponseUsingHandle (const OCServerRequest * handle)
 
 OCStackResult AddServerRequest (OCServerRequest ** request, uint16_t coapID,
         uint8_t delayedResNeeded, uint8_t notificationFlag, OCMethod method,
-        uint8_t numRcvdVendorSpecificHeaderOptions, uint32_t observationOption,
+        uint8_t numRcvdVendorSpecificHeaderOptions, size_t observationOption,
         OCQualityOfService qos, char * query,
         OCHeaderOption * rcvdVendorSpecificHeaderOptions,
         uint8_t * payload, CAToken_t requestToken, uint8_t tokenLength,
@@ -584,11 +584,11 @@ OCStackResult HandleSingleResponse(OCEntityHandlerResponse * ehResponse)
         {
             responseInfo.info.options[0].protocolID = CA_COAP_ID;
             responseInfo.info.options[0].optionID = COAP_OPTION_OBSERVE;
-            responseInfo.info.options[0].optionLength = sizeof(uint32_t);
+            responseInfo.info.options[0].optionLength = sizeof(size_t);
             uint8_t* observationData = (uint8_t*)responseInfo.info.options[0].optionData;
-            uint32_t observationOption= serverRequest->observationOption;
+            size_t observationOption= serverRequest->observationOption;
 
-            for (size_t i=sizeof(uint32_t); i; --i)
+            for (size_t i=sizeof(size_t); i; --i)
             {
                 observationData[i-1] = observationOption & 0xFF;
                 observationOption >>=8;

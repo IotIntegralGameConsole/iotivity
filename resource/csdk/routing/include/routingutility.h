@@ -47,7 +47,7 @@ extern "C"
 /**
  * Gateway ID length.
  */
-#define GATEWAY_ID_LENGTH sizeof(uint32_t)
+#define GATEWAY_ID_LENGTH sizeof(size_t)
 
 /**
  * Endpoint ID length.
@@ -100,8 +100,8 @@ typedef enum
  */
 typedef struct
 {
-    uint32_t srcGw;               /**< Source gateway for this packet. */
-    uint32_t destGw;              /**< Destination gateway for this packet. */
+    size_t srcGw;               /**< Source gateway for this packet. */
+    size_t destGw;              /**< Destination gateway for this packet. */
     uint16_t mSeqNum;             /**< Multicast sequence Number. */
     uint16_t srcEp;               /**< Source endpoint for this packet. */
     uint16_t destEp;              /**< Destination endpoint for this packet. */

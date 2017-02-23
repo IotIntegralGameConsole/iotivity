@@ -47,9 +47,9 @@ void CAGattRecvInfoDestroy(CAGattRecvInfo * info)
 
 bool CAGattRecv(CAGattRecvInfo * info,
                 uint8_t const * data,
-                uint32_t length)
+                size_t length)
 {
-    uint32_t sent_length = 0;
+    size_t sent_length = 0;
 
     oc_mutex_lock(info->context->lock);
 

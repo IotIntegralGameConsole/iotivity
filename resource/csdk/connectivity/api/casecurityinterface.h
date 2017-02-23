@@ -86,7 +86,7 @@ const CASecureEndpoint_t *CAGetSecureEndpointData(const CAEndpoint_t *peer);
  *
  * @return  true if the secure endpoint has been found, false otherwise.
  */
-bool CASetSecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t newAttribute);
+bool CASetSecureEndpointAttribute(const CAEndpoint_t* peer, size_t newAttribute);
 
 /**
  * Gets the attributes field of a secure endpoint.
@@ -96,7 +96,7 @@ bool CASetSecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t newAttribut
  *
  * @return  true if the secure endpoint has been found, false otherwise.
  */
-bool CAGetSecureEndpointAttributes(const CAEndpoint_t* peer, uint32_t* allAttributes);
+bool CAGetSecureEndpointAttributes(const CAEndpoint_t* peer, size_t* allAttributes);
 #endif // #if defined(__WITH_DTLS__) || defined(__WITH_TLS__)
 
 /**

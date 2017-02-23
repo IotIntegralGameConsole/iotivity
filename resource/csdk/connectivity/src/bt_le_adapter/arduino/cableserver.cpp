@@ -100,7 +100,7 @@ void CACheckLEDataInternal()
             if (g_receivedDataLen > 0)
             {
                 OIC_LOG_V(DEBUG, TAG, "recv dataLen=%u", g_receivedDataLen);
-                uint32_t sentLength = 0;
+                size_t sentLength = 0;
                 g_bleServerDataReceivedCallback("", g_coapBuffer,
                                                 g_receivedDataLen, &sentLength);
             }
@@ -167,7 +167,7 @@ CAResult_t CALEDoEvents()
 }
 
 CAResult_t CAUpdateCharacteristicsToAllGattClients(const uint8_t *char_value,
-                                                   uint32_t valueLength)
+                                                   size_t valueLength)
 {
     // ble_write_bytes() api can send only max of 255 bytes at a time
     // This function shall never be called to send more than 255 bytes by the fragmentation logic.

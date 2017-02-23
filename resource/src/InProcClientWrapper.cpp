@@ -1235,7 +1235,7 @@ namespace OC
             static_cast<ClientCallbackContext::ObserveContext*>(ctx);
         OCRepresentation attrs;
         HeaderOptions serverHeaderOptions;
-        uint32_t sequenceNumber = clientResponse->sequenceNumber;
+        size_t sequenceNumber = clientResponse->sequenceNumber;
         OCStackResult result = clientResponse->result;
 
         parseServerHeaderOptions(clientResponse, serverHeaderOptions);

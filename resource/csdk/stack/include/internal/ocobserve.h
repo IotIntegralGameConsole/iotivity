@@ -88,7 +88,7 @@ typedef struct ResourceObserver
      * A server send a notification in a confirmable message every 24 hours.
      * This prevents a client that went away or is no logger interested
      * from remaining in the list of observers indefinitely.*/
-    uint32_t TTL;
+    size_t TTL;
 
     /** next node in this list.*/
     struct ResourceObserver *next;
@@ -113,7 +113,7 @@ typedef struct ResourceObserver
  *
  * @return ::OC_STACK_OK on success, some other value upon failure.
  */
-OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, uint32_t maxAge,
+OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, size_t maxAge,
         OCPresenceTrigger trigger, OCResourceType *resourceType, OCQualityOfService qos);
 #else
 /**
@@ -126,7 +126,7 @@ OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, 
  *
  * @return ::OC_STACK_OK on success, some other value upon failure.
  */
-OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, uint32_t maxAge,
+OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, size_t maxAge,
         OCQualityOfService qos);
 #endif
 
@@ -144,7 +144,7 @@ OCStackResult SendAllObserverNotification (OCMethod method, OCResource *resPtr, 
  */
 OCStackResult SendListObserverNotification (OCResource * resource,
         OCObservationId  *obsIdList, uint8_t numberOfIds,
-        const OCRepPayload *payload, uint32_t maxAge,
+        const OCRepPayload *payload, size_t maxAge,
         OCQualityOfService qos);
 
 /**
@@ -259,7 +259,7 @@ CreateObserveHeaderOption (CAHeaderOption_t **caHdrOpt,
  * @return ::OC_STACK_OK on success, some other value upon failure.
  */
 OCStackResult
-GetObserveHeaderOption (uint32_t * observationOption,
+GetObserveHeaderOption (size_t * observationOption,
                         CAHeaderOption_t *options,
                         uint8_t * numOptions);
 

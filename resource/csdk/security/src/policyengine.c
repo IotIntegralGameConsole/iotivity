@@ -65,7 +65,7 @@ uint16_t GetPermissionFromCAMethod_t(const CAMethod_t method)
     }
 
     OIC_LOG_V(INFO, TAG, "%s: CA method %d requires permission %#x",
-        __func__, method, (uint32_t)perm);
+        __func__, method, (size_t)perm);
     return perm;
 }
 
@@ -123,7 +123,7 @@ static bool IsRequestFromDevOwner(SRMRequestContext_t *context)
     //Device is not owned yet.
     if (!retVal && (NULL != context->endPoint))
     {
-        uint32_t allAttributes;
+        size_t allAttributes;
         if (CAGetSecureEndpointAttributes(context->endPoint, &allAttributes) &&
             (allAttributes & CA_SECURE_ENDPOINT_ATTRIBUTE_ADMINISTRATOR))
         {
@@ -291,7 +291,7 @@ INLINE_API bool IsPermissionAllowingRequest(const uint16_t permission,
 
     OIC_LOG_V(INFO, TAG, "%s: ACE allows permission %#x, "
         "requested permission %#x -> allowed = %u", __func__,
-        (uint32_t)permission, (uint32_t)request, (uint32_t)allowed);
+        (size_t)permission, (size_t)request, (size_t)allowed);
 
     return allowed;
 }

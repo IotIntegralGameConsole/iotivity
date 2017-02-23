@@ -218,7 +218,7 @@ static char GenerateRandomPinElement(OicSecPinType_t pinType)
 {
     const char defaultRetValue = '0';
     char allowedCharacters[NUMBER_OF_PINNUM + NUMBER_OF_ALPHABET * 2];
-    uint32_t curIndex = 0;
+    size_t curIndex = 0;
 
     if(NUM_PIN & pinType)
     {

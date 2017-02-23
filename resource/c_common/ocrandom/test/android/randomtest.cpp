@@ -28,7 +28,7 @@ extern "C" {
 
 
 TEST(RandomGeneration,OCGetRandom) {
-    uint32_t value = OCGetRandom();
+    size_t value = OCGetRandom();
     EXPECT_LE((uint8_t )0, value);
     EXPECT_GT(pow(2, 32), value);
 }

@@ -229,7 +229,7 @@ diff -rupN ./libraries/Time/Time/Time.cpp ./arduino-1.5.8/libraries/Time/Time/Ti
  static tmElements_t tm;          // a cache of time elements
  static time_t       cacheTime;   // the time the cache was updated
 -static time_t       syncInterval = 300;  // time sync will be attempted after this many seconds
-+static uint32_t     syncInterval = 300;  // time sync will be attempted after this many seconds
++static size_t     syncInterval = 300;  // time sync will be attempted after this many seconds
  
  void refreshCache( time_t t){
    if( t != cacheTime)
@@ -245,11 +245,11 @@ diff -rupN ./libraries/Time/Time/Time.cpp ./arduino-1.5.8/libraries/Time/Time/Ti
  
    uint8_t year;
    uint8_t month, monthLength;
-+  uint32_t time;
++  size_t time;
    unsigned long days;
 -  
 +
-+  time = (uint32_t)timeInput;
++  time = (size_t)timeInput;
    tm.Second = time % 60;
    time /= 60; // now it is minutes
    tm.Minute = time % 60;
@@ -258,7 +258,7 @@ diff -rupN ./libraries/Time/Time/Time.cpp ./arduino-1.5.8/libraries/Time/Time/Ti
    
    int i;
 -  time_t seconds;
-+  uint32_t seconds;
++  size_t seconds;
  
    // seconds from 1970 till 1 jan 00:00:00 of the given year
    seconds= tm.Year*(SECS_PER_DAY * 365);
@@ -275,9 +275,9 @@ diff -rupN ./libraries/Time/Time/Time.cpp ./arduino-1.5.8/libraries/Time/Time/Ti
 -static time_t sysTime = 0;
 -static time_t prevMillis = 0;
 -static time_t nextSyncTime = 0;
-+static uint32_t sysTime = 0;
-+static uint32_t prevMillis = 0;
-+static uint32_t nextSyncTime = 0;
++static size_t sysTime = 0;
++static size_t prevMillis = 0;
++static size_t nextSyncTime = 0;
  static timeStatus_t Status = timeNotSet;
  
  getExternalTime getTimePtr;  // pointer to external sync function
@@ -307,8 +307,8 @@ diff -rupN ./libraries/Time/Time/Time.cpp ./arduino-1.5.8/libraries/Time/Time/Ti
 -  sysTime = t;  
 -  nextSyncTime = t + syncInterval;
 -  Status = timeSet; 
-+  sysTime = (uint32_t)t;  
-+  nextSyncTime = (uint32_t)t + syncInterval;
++  sysTime = (size_t)t;  
++  nextSyncTime = (size_t)t + syncInterval;
 +  Status = timeSet;
    prevMillis = millis();  // restart counting from now (thanks to Korman for this fix)
  } 
@@ -326,7 +326,7 @@ diff -rupN ./libraries/Time/Time/Time.cpp ./arduino-1.5.8/libraries/Time/Time/Ti
  
  void setSyncInterval(time_t interval){ // set the number of seconds between re-sync
 -  syncInterval = interval;
-+  syncInterval = (uint32_t)interval;
++  syncInterval = (size_t)interval;
 +  nextSyncTime = sysTime + syncInterval;
  }
 \ No newline at end of file

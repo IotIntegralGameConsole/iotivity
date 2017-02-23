@@ -48,7 +48,7 @@ extern "C"
  * @retval ::CA_STATUS_INVALID_PARAM  Invalid input arguments.
  * @retval ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendData(int serverFD, const char *addr, const void *data, uint32_t dataLength);
+CAResult_t CAEDRSendData(int serverFD, const char *addr, const void *data, size_t dataLength);
 
 #ifdef __cplusplus
 } /* extern "C" */

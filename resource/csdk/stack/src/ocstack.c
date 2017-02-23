@@ -138,7 +138,7 @@ static OCResourceHandle brokerResource = {0};
 static OCPresenceState presenceState = OC_PRESENCE_UNINITIALIZED;
 static PresenceResource presenceResource = {0};
 static uint8_t PresenceTimeOutSize = 0;
-static uint32_t PresenceTimeOut[] = {50, 75, 85, 95, 100};
+static size_t PresenceTimeOut[] = {50, 75, 85, 95, 100};
 #endif
 
 static OCMode myStackMode;
@@ -395,7 +395,7 @@ static OCResourceType *findResourceType(OCResourceType * resourceTypeList,
 
  * @return ::OC_STACK_OK on success, some other value upon failure.
  */
-static OCStackResult ResetPresenceTTL(ClientCB *cbNode, uint32_t maxAgeSeconds);
+static OCStackResult ResetPresenceTTL(ClientCB *cbNode, size_t maxAgeSeconds);
 
 /**
  * Ensure the accept header option is set appropriatly before sending the requests and routing
@@ -456,13 +456,13 @@ bool checkProxyUri(OCHeaderOption *options, uint8_t numOptions)
     return false;
 }
 
-uint32_t GetTicks(uint32_t milliSeconds)
+size_t GetTicks(size_t milliSeconds)
 {
     coap_tick_t now;
     coap_ticks(&now);
 
-    // Guard against overflow of uint32_t
-    if (milliSeconds <= ((UINT32_MAX - (uint32_t)now) * MILLISECONDS_PER_SECOND) /
+    // Guard against overflow of size_t
+    if (milliSeconds <= ((UINT32_MAX - (size_t)now) * MILLISECONDS_PER_SECOND) /
                              COAP_TICKS_PER_SECOND)
     {
         return now + (milliSeconds * COAP_TICKS_PER_SECOND)/MILLISECONDS_PER_SECOND;
@@ -841,10 +841,10 @@ OCTransportFlags CAToOCTransportFlags(CATransportFlags_t caFlags)
     return (OCTransportFlags)caFlags;
 }
 
-static OCStackResult ResetPresenceTTL(ClientCB *cbNode, uint32_t maxAgeSeconds)
+static OCStackResult ResetPresenceTTL(ClientCB *cbNode, size_t maxAgeSeconds)
 {
-    uint32_t lowerBound  = 0;
-    uint32_t higherBound = 0;
+    size_t lowerBound  = 0;
+    size_t higherBound = 0;
 
     if (!cbNode || !cbNode->presence || !cbNode->presence->timeOut)
     {
@@ -1107,7 +1107,7 @@ OCStackResult HandlePresenceResponse(const CAEndpoint_t *endpoint,
     char *resourceTypeName = NULL;
     OCClientResponse *response = NULL;
     OCStackResult result = OC_STACK_ERROR;
-    uint32_t maxAge = 0;
+    size_t maxAge = 0;
     int uriLen;
     char presenceUri[CA_MAX_URI_LENGTH];
 
@@ -1225,8 +1225,8 @@ OCStackResult HandlePresenceResponse(const CAEndpoint_t *endpoint,
 
                 VERIFY_NON_NULL_V(cbNode->presence);
                 cbNode->presence->timeOut = NULL;
-                cbNode->presence->timeOut = (uint32_t *)
-                        OICMalloc(PresenceTimeOutSize * sizeof(uint32_t));
+                cbNode->presence->timeOut = (size_t *)
+                        OICMalloc(PresenceTimeOutSize * sizeof(size_t));
                 if(!(cbNode->presence->timeOut)){
                     OIC_LOG(ERROR, TAG,
                                   "Could not allocate memory for cbNode->presence->timeOut");
@@ -1539,10 +1539,10 @@ void OCHandleResponse(const CAEndpoint_t* endPoint, const CAResponseInfo_t* resp
                 if(responseInfo->info.options[0].optionID == COAP_OPTION_OBSERVE)
                 {
                     size_t i;
-                    uint32_t observationOption;
+                    size_t observationOption;
                     uint8_t* optionData = (uint8_t*)responseInfo->info.options[0].optionData;
                     for (observationOption=0, i=0;
-                            i<sizeof(uint32_t) && i<responseInfo->info.options[0].optionLength;
+                            i<sizeof(size_t) && i<responseInfo->info.options[0].optionLength;
                             i++)
                     {
                         observationOption =
@@ -2862,7 +2862,7 @@ OCStackResult OCDoRequest(OCDoHandle *handle,
     OCDoHandle resHandle = NULL;
     CAEndpoint_t endpoint = {.adapter = CA_DEFAULT_ADAPTER};
     OCDevAddr tmpDevAddr = { OC_DEFAULT_ADAPTER };
-    uint32_t ttl = 0;
+    size_t ttl = 0;
     OCTransportAdapter adapter;
     OCTransportFlags flags;
     // the request contents are put here
@@ -3292,7 +3292,7 @@ OCStackResult OCProcessPresence()
             continue;
         }
 
-        uint32_t now = GetTicks(0);
+        size_t now = GetTicks(0);
         OIC_LOG_V(DEBUG, TAG, "this TTL level %d",
                                                 cbNode->presence->TTLlevel);
         OIC_LOG_V(DEBUG, TAG, "current ticks %d", now);
@@ -3391,7 +3391,7 @@ OCStackResult OCProcess()
 }
 
 #ifdef WITH_PRESENCE
-OCStackResult OCStartPresence(const uint32_t ttl)
+OCStackResult OCStartPresence(const size_t ttl)
 {
     OIC_LOG(INFO, TAG, "Entering OCStartPresence");
     uint8_t tokenLength = CA_MAX_TOKEN_LEN;
@@ -4330,7 +4330,7 @@ OCStackResult SendPresenceNotification(OCResourceType *resourceType,
     OCResource *resPtr = NULL;
     OCStackResult result = OC_STACK_ERROR;
     OCMethod method = OC_REST_PRESENCE;
-    uint32_t maxAge = 0;
+    size_t maxAge = 0;
     resPtr = findResource((OCResource *) presenceResource.handle);
     if(NULL == resPtr)
     {
@@ -4373,7 +4373,7 @@ OCStackResult OCNotifyAllObservers(OCResourceHandle handle, OCQualityOfService q
     OCResource *resPtr = NULL;
     OCStackResult result = OC_STACK_ERROR;
     OCMethod method = OC_REST_NOMETHOD;
-    uint32_t maxAge = 0;
+    size_t maxAge = 0;
 
     OIC_LOG(INFO, TAG, "Notifying all observers");
 #ifdef WITH_PRESENCE
@@ -4417,7 +4417,7 @@ OCNotifyListOfObservers (OCResourceHandle handle,
 
     OCResource *resPtr = NULL;
     //TODO: we should allow the server to define this
-    uint32_t maxAge = MAX_OBSERVE_AGE;
+    size_t maxAge = MAX_OBSERVE_AGE;
 
     VERIFY_NON_NULL(handle, ERROR, OC_STACK_ERROR);
     VERIFY_NON_NULL(obsIdList, ERROR, OC_STACK_ERROR);
@@ -5620,7 +5620,7 @@ OCStackResult OCGetDeviceOwnedState(bool *isOwned)
     return ret;
 }
 
-OCStackResult OCGetLinkLocalZoneId(uint32_t ifindex, char **zoneId)
+OCStackResult OCGetLinkLocalZoneId(size_t ifindex, char **zoneId)
 {
     return CAResultToOCResult(CAGetLinkLocalZoneId(ifindex, zoneId));
 }

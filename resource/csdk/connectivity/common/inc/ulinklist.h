@@ -103,7 +103,7 @@ CAResult_t u_linklist_remove(u_linklist_t *list, u_linklist_iterator_t **iter);
  * @param[in] list               pointer of link list.
  * @return length of the link list.
  */
-uint32_t u_linklist_length(const u_linklist_t *list);
+size_t u_linklist_length(const u_linklist_t *list);
 
 /**
  * Initializes the iterator, need to be called before calling u_linklist_get_next.

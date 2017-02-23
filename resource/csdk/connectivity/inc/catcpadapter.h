@@ -139,7 +139,7 @@ CAResult_t CAStartTCPDiscoveryServer();
  * @return  The number of bytes sent on the network, or -1 upon error.
  */
 int32_t CASendTCPUnicastData(const CAEndpoint_t *endpoint,
-                             const void *data, uint32_t dataLen,
+                             const void *data, size_t dataLen,
                              CADataType_t dataType);
 
 /**
@@ -153,7 +153,7 @@ int32_t CASendTCPUnicastData(const CAEndpoint_t *endpoint,
  * @return  The number of bytes sent on the network, or -1 upon error.
  */
 int32_t CASendTCPMulticastData(const CAEndpoint_t *endpoint,
-                               const void *data, uint32_t dataLen,
+                               const void *data, size_t dataLen,
                                CADataType_t dataType);
 
 /**
@@ -163,7 +163,7 @@ int32_t CASendTCPMulticastData(const CAEndpoint_t *endpoint,
  * @param[out]   size        Number of local connectivity structures.
  * @return  ::CA_STATUS_OK or Appropriate error code.
  */
-CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, uint32_t *size);
+CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, size_t *size);
 
 /**
  * Read Synchronous API callback.

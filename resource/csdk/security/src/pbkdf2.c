@@ -67,7 +67,7 @@ int DeriveCryptoKeyFromPassword(const unsigned char *passwd, size_t pLen,
                                     passwd, pLen,
                                     salt, saltLen,
                                     (unsigned int)iterations,
-                                    (uint32_t)keyLen, derivedKey);
+                                    (size_t)keyLen, derivedKey);
     if (ret != 0)
     {
         OIC_LOG(ERROR, TAG, "Call to mbedtls PBKDF2 function failed");

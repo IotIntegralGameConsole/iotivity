@@ -171,7 +171,7 @@ const char *getResult(OCStackResult result) {
     }
 }
 
-OCDPDev_t* getDev(const OCDPDev_t* pList, const uint32_t dev_num)
+OCDPDev_t* getDev(const OCDPDev_t* pList, const size_t dev_num)
 {
     if(NULL == pList)
     {
@@ -496,7 +496,7 @@ void *CLInterface(void *data)
                 char *ptr;
                 peerIdx = strtol(input, &ptr, 10);
 
-                peer = getDev(discoveredDevs, (uint32_t)peerIdx);
+                peer = getDev(discoveredDevs, (size_t)peerIdx);
                 if (NULL == peer)
                 {
                     OIC_LOG(ERROR, TAG, "Not found the peer in discovered list");
@@ -562,7 +562,7 @@ void *CLInterface(void *data)
                 peerIdx = strtol(input, &ptr, 10);
 
                 //peer = getDev(pairedDevs, peerIdx);
-                peer = getDev(discoveredDevs, (uint32_t)peerIdx);
+                peer = getDev(discoveredDevs, (size_t)peerIdx);
                 if (NULL == peer)
                 {
                     OIC_LOG(ERROR, TAG, "Not found the peer in discovered list");

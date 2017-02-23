@@ -40,7 +40,7 @@ extern "C"
 typedef struct
 {
     void *data;             /**< Data to be sent to peer Bluetooth device. */
-    uint32_t dataLength;    /**< Length of the data. */
+    size_t dataLength;    /**< Length of the data. */
 } EDRData;
 
 /**
@@ -164,7 +164,7 @@ void CADestroyEDRDeviceList(EDRDeviceList **deviceList);
  * @retval ::CA_STATUS_INVALID_PARAM Invalid input parameters.
  * @retval ::CA_MEMORY_ALLOC_FAILED Memory allocation failed.
  */
-CAResult_t CAAddEDRDataToList(EDRDataList **dataList, const void *data, uint32_t dataLength);
+CAResult_t CAAddEDRDataToList(EDRDataList **dataList, const void *data, size_t dataLength);
 
 /**
  * Remove and delete data from front end of list.

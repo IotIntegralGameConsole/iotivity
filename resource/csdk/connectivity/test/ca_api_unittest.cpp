@@ -402,7 +402,7 @@ TEST_F(CATests, HandlerRequestResponseTest)
 // CAGetNetworkInformation TC
 TEST_F (CATests, GetNetworkInformationTest)
 {
-    uint32_t tempSize = 0;
+    size_t tempSize = 0;
     CAEndpoint_t *tempInfo = NULL;
 
     EXPECT_EQ(CA_STATUS_OK, CASelectNetwork(CA_ADAPTER_IP));
@@ -410,7 +410,7 @@ TEST_F (CATests, GetNetworkInformationTest)
 
 // @todo: if this api is supported on windows platform, it should be changed.
 #if !defined(_WIN32)
-    for (uint32_t index = 0; index < tempSize; index++)
+    for (size_t index = 0; index < tempSize; index++)
     {
         EXPECT_TRUE(tempInfo[index].adapter != 0);
         EXPECT_TRUE(strlen(tempInfo[index].addr) != 0);
@@ -557,7 +557,7 @@ TEST(CAfragmentationTest, FragmentTest)
     uint8_t *data = (uint8_t *) malloc(dataLen*sizeof(uint8_t));
     memset(data, 'a', dataLen);
 
-    uint32_t midPacketCount = 0;
+    size_t midPacketCount = 0;
     size_t remainingLen = 0;
     size_t totalLength = 0;
 
@@ -621,7 +621,7 @@ TEST(CAfragmentationTest, DefragmentTest)
     uint8_t *data = (uint8_t *) malloc(dataLen*sizeof(uint8_t));
     memset(data, 'a', dataLen);
 
-    uint32_t midPacketCount = 0;
+    size_t midPacketCount = 0;
     size_t remainingLen = 0;
     size_t totalLength = 0;
 
@@ -669,7 +669,7 @@ TEST(CAfragmentationTest, DefragmentTest)
                                           &secureFlag,
                                           &destPort));
 
-    uint32_t parseDataLength = 0;
+    size_t parseDataLength = 0;
 
     EXPECT_EQ(CA_STATUS_OK, CAParseHeaderPayloadLength(dataSegment,
                                                        CA_BLE_LENGTH_HEADER_SIZE,

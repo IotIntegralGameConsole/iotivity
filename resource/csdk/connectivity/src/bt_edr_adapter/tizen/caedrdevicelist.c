@@ -294,7 +294,7 @@ void CADestroyEDRDevice(EDRDevice *device)
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "OUT");
 }
 
-CAResult_t CAAddEDRDataToList(EDRDataList **dataList, const void *data, uint32_t dataLength)
+CAResult_t CAAddEDRDataToList(EDRDataList **dataList, const void *data, size_t dataLength)
 {
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "IN");
 

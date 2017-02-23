@@ -73,7 +73,7 @@ void CAIPSetUnicastPort(uint16_t port)
 }
 
 void CAIPSendData(CAEndpoint_t *endpoint, const void *buf,
-                  uint32_t bufLen, bool isMulticast)
+                  size_t bufLen, bool isMulticast)
 {
     if (!isMulticast && 0 == g_unicastPort)
     {
@@ -115,7 +115,7 @@ void CAIPSendData(CAEndpoint_t *endpoint, const void *buf,
         }
     }
 
-    uint32_t ret;
+    size_t ret;
     uint8_t ipAddr[4] = { 0 };
     uint16_t parsedPort = 0;
     if (CAParseIPv4AddressInternal(endpoint->addr, ipAddr, sizeof(ipAddr),

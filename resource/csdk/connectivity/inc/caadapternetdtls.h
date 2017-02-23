@@ -108,7 +108,7 @@ typedef struct
 typedef struct CACacheMessage
 {
     void *data;
-    uint32_t dataLen;
+    size_t dataLen;
     stCADtlsAddrInfo_t destSession;
 } stCACacheMessage_t;
 
@@ -230,7 +230,7 @@ void CAAdapterNetDtlsDeInit();
 
 CAResult_t CAAdapterNetDtlsEncrypt(const CAEndpoint_t *endpoint,
                                    void *data,
-                                   uint32_t dataLen);
+                                   size_t dataLen);
 
 /**
  * Performs DTLS decryption of the data received on
@@ -248,7 +248,7 @@ CAResult_t CAAdapterNetDtlsEncrypt(const CAEndpoint_t *endpoint,
  */
 CAResult_t CAAdapterNetDtlsDecrypt(const CASecureEndpoint_t *sep,
                                    uint8_t *data,
-                                   uint32_t dataLen);
+                                   size_t dataLen);
 
 
 /**

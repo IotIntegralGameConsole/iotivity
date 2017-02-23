@@ -95,7 +95,7 @@ static CAErrorHandleCallback g_errorCallback = NULL;
 static CAKeepAliveConnectionCallback g_connKeepAliveCallback = NULL;
 
 static void CATCPPacketReceivedCB(const CASecureEndpoint_t *sep,
-                                  const void *data, uint32_t dataLength);
+                                  const void *data, size_t dataLength);
 
 static void CATCPErrorHandler(const CAEndpoint_t *endpoint, const void *data,
                               size_t dataLength, CAResult_t result);
@@ -111,7 +111,7 @@ static CATCPData *CACreateTCPData(const CAEndpoint_t *remoteEndpoint,
                                   bool isMulticast);
 void CAFreeTCPData(CATCPData *ipData);
 
-static void CADataDestroyer(void *data, uint32_t size);
+static void CADataDestroyer(void *data, size_t size);
 
 CAResult_t CATCPInitializeQueueHandles()
 {
@@ -157,7 +157,7 @@ void CATCPConnectionStateCB(const char *ipAddress, CANetworkStatus_t status)
 }
 
 void CATCPPacketReceivedCB(const CASecureEndpoint_t *sep, const void *data,
-                           uint32_t dataLength)
+                           size_t dataLength)
 {
     VERIFY_NON_NULL_VOID(sep, TAG, "sep is NULL");
     VERIFY_NON_NULL_VOID(data, TAG, "data is NULL");
@@ -481,7 +481,7 @@ static size_t CAQueueTCPData(bool isMulticast, const CAEndpoint_t *endpoint,
 }
 
 int32_t CASendTCPUnicastData(const CAEndpoint_t *endpoint,
-                             const void *data, uint32_t dataLength,
+                             const void *data, size_t dataLength,
                              CADataType_t dataType)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -494,7 +494,7 @@ int32_t CASendTCPUnicastData(const CAEndpoint_t *endpoint,
 }
 
 int32_t CASendTCPMulticastData(const CAEndpoint_t *endpoint,
-                               const void *data, uint32_t dataLength,
+                               const void *data, size_t dataLength,
                                CADataType_t dataType)
 {
     (void)dataType;
@@ -651,7 +651,7 @@ void CAFreeTCPData(CATCPData *tcpData)
     OICFree(tcpData);
 }
 
-void CADataDestroyer(void *data, uint32_t size)
+void CADataDestroyer(void *data, size_t size)
 {
     if (size < sizeof(CATCPData))
     {

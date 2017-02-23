@@ -75,12 +75,12 @@ TEST(ULinkList, FreeNull)
 
 TEST_F(ULinkListF, AddHead)
 {
-    ASSERT_EQ(static_cast<uint32_t>(0), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(0), u_linklist_length(list));
 
     int dummy = 0;
     EXPECT_EQ(CA_STATUS_OK, u_linklist_add_head(list, &dummy));
 
-    ASSERT_EQ(static_cast<uint32_t>(1), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(1), u_linklist_length(list));
 
     // Add a few times without checking, just in case checking has side-effects
     dummy++;
@@ -90,17 +90,17 @@ TEST_F(ULinkListF, AddHead)
     dummy++;
     EXPECT_EQ(CA_STATUS_OK, u_linklist_add_head(list, &dummy));
 
-    ASSERT_EQ(static_cast<uint32_t>(4), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(4), u_linklist_length(list));
 }
 
 TEST_F(ULinkListF, Length)
 {
-    ASSERT_EQ(static_cast<uint32_t>(0), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(0), u_linklist_length(list));
 
     int dummy = 0;
     EXPECT_EQ(CA_STATUS_OK, u_linklist_add(list, &dummy));
 
-    ASSERT_EQ(static_cast<uint32_t>(1), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(1), u_linklist_length(list));
 
     // Add a few times without checking, just in case checking has side-effects
     dummy++;
@@ -110,12 +110,12 @@ TEST_F(ULinkListF, Length)
     dummy++;
     EXPECT_EQ(CA_STATUS_OK, u_linklist_add(list, &dummy));
 
-    ASSERT_EQ(static_cast<uint32_t>(4), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(4), u_linklist_length(list));
 }
 
 TEST_F(ULinkListF, LengthMulti)
 {
-    ASSERT_EQ(static_cast<uint32_t>(0), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(0), u_linklist_length(list));
 
     int dummy[1000] = {0};
     size_t cap = sizeof(dummy) / sizeof(dummy[0]);
@@ -126,12 +126,12 @@ TEST_F(ULinkListF, LengthMulti)
         EXPECT_EQ(CA_STATUS_OK, u_linklist_add(list, &dummy[i]));
     }
 
-    ASSERT_EQ(static_cast<uint32_t>(1000), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(1000), u_linklist_length(list));
 }
 
 TEST_F(ULinkListF, Get)
 {
-    ASSERT_EQ(static_cast<uint32_t>(0), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(0), u_linklist_length(list));
 
     int dummy[1000] = {0};
     size_t cap = sizeof(dummy) / sizeof(dummy[0]);
@@ -141,7 +141,7 @@ TEST_F(ULinkListF, Get)
         dummy[i] = i;
         EXPECT_EQ(CA_STATUS_OK, u_linklist_add(list, &dummy[i]));
     }
-    ASSERT_EQ(static_cast<uint32_t>(1000), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(1000), u_linklist_length(list));
 
     u_linklist_iterator_t *iterTable = NULL;
     u_linklist_init_iterator(list, &iterTable);
@@ -156,7 +156,7 @@ TEST_F(ULinkListF, Get)
 
 TEST_F(ULinkListF, Remove)
 {
-    ASSERT_EQ(static_cast<uint32_t>(0), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(0), u_linklist_length(list));
 
     int dummy[1000] = {0};
     size_t cap = sizeof(dummy) / sizeof(dummy[0]);
@@ -166,7 +166,7 @@ TEST_F(ULinkListF, Remove)
         dummy[i] = i;
         EXPECT_EQ(CA_STATUS_OK, u_linklist_add(list, &dummy[i]));
     }
-    ASSERT_EQ(static_cast<uint32_t>(1000), u_linklist_length(list));
+    ASSERT_EQ(static_cast<size_t>(1000), u_linklist_length(list));
 
     u_linklist_iterator_t *iterTable = NULL;
     u_linklist_init_iterator(list, &iterTable);

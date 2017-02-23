@@ -92,7 +92,7 @@ typedef CAResult_t (*CAAdapterStartDiscoveryServer)();
  * @return The number of bytes sent on the network. Return value equal to -1 indicates error.
  */
 typedef int32_t (*CAAdapterSendUnicastData)(const CAEndpoint_t *endpoint,
-                                            const void *data, uint32_t dataLen,
+                                            const void *data, size_t dataLen,
                                             CADataType_t dataType);
 
 /**
@@ -105,7 +105,7 @@ typedef int32_t (*CAAdapterSendUnicastData)(const CAEndpoint_t *endpoint,
  * @return The number of bytes sent on the network. Return value equal to -1 indicates error.
  */
 typedef int32_t (*CAAdapterSendMulticastData)(const CAEndpoint_t *endpoint,
-                                              const void *data, uint32_t dataLen,
+                                              const void *data, size_t dataLen,
                                               CADataType_t dataType);
 
 /**
@@ -114,7 +114,7 @@ typedef int32_t (*CAAdapterSendMulticastData)(const CAEndpoint_t *endpoint,
  * @param[out]   size           Number of local connectivity structures.
  * @return ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h)
  */
-typedef CAResult_t (*CAAdapterGetNetworkInfo)(CAEndpoint_t **info, uint32_t *size);
+typedef CAResult_t (*CAAdapterGetNetworkInfo)(CAEndpoint_t **info, size_t *size);
 
 /**
  * Read Synchronous API callback.

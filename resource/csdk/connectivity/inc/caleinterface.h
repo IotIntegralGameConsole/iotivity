@@ -65,7 +65,7 @@ typedef struct
     uint8_t *data;
 
     /// Length of the data being transmitted.
-    uint32_t dataLen;
+    size_t dataLen;
 
     /// Sender information list
     u_arraylist_t * senderInfo;
@@ -117,8 +117,8 @@ typedef void (*CALEConnectionStateChangedCallback)(CATransportAdapter_t adapter,
  */
 typedef CAResult_t (*CABLEDataReceivedCallback)(const char *remoteAddress,
                                                 const uint8_t *data,
-                                                uint32_t dataLength,
-                                                uint32_t *sentLength);
+                                                size_t dataLength,
+                                                size_t *sentLength);
 
 /**
  * Initialize the LE adapter layer. This will be invoked from the CA
@@ -285,7 +285,7 @@ void CASetLEReqRespServerCallback(CABLEDataReceivedCallback callback);
  */
 CAResult_t CAUpdateCharacteristicsToGattClient(const char *address,
                                                const uint8_t *value,
-                                               uint32_t valueLen);
+                                               size_t valueLen);
 
 /**
  * Update characteristics(Read/Write) value that we want to multicast
@@ -300,7 +300,7 @@ CAResult_t CAUpdateCharacteristicsToGattClient(const char *address,
  * @retval ::CA_STATUS_FAILED Operation failed
  */
 CAResult_t CAUpdateCharacteristicsToAllGattClients(const uint8_t *value,
-                                                   uint32_t valueLen);
+                                                   size_t valueLen);
 
 /**
  * Start @c CAStartBleGattClientThread for initializing Gatt Client.
@@ -360,7 +360,7 @@ void CACheckLEData();
  */
 CAResult_t  CAUpdateCharacteristicsToGattServer(const char *remoteAddress,
                                                 const uint8_t *data,
-                                                uint32_t dataLen,
+                                                size_t dataLen,
                                                 CALETransferType_t type,
                                                 int32_t position);
 
@@ -377,7 +377,7 @@ CAResult_t  CAUpdateCharacteristicsToGattServer(const char *remoteAddress,
  * @retval ::CA_STATUS_FAILED Operation failed
  */
 CAResult_t CAUpdateCharacteristicsToAllGattServers(const uint8_t *data,
-                                                   uint32_t dataLen);
+                                                   size_t dataLen);
 
 /**
  * Store upper layer callback locally which will be used to send the
@@ -440,7 +440,7 @@ CAResult_t CAUnSetLENWConnectionStateChangedCb();
  */
 typedef void (*CABLEErrorHandleCallback)(const char *remoteAddress,
                                          const uint8_t *data,
-                                         uint32_t dataLength,
+                                         size_t dataLength,
                                          CAResult_t result);
 /**
  * Set the client error handler callback.

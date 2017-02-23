@@ -29,7 +29,7 @@
 #include "caedrutils.h"
 #include "logger.h"
 
-CAResult_t CAEDRSendData(int serverFD, const char *addr, const void *data, uint32_t dataLength)
+CAResult_t CAEDRSendData(int serverFD, const char *addr, const void *data, size_t dataLength)
 {
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "IN");
 

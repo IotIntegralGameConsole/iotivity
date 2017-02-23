@@ -410,7 +410,7 @@ void CAIPConnectionStateChangedCb(connection_type_e type, void* userData)
     }
 }
 
-CAResult_t CAGetLinkLocalZoneIdInternal(uint32_t ifindex, char **zoneId)
+CAResult_t CAGetLinkLocalZoneIdInternal(size_t ifindex, char **zoneId)
 {
     if (!zoneId || (*zoneId != NULL))
     {

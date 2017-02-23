@@ -285,7 +285,7 @@ CAResult_t CAUpdateMessageId(coap_pdu_t *pdu, const CABlockDataID_t *blockID);
  */
 CAResult_t CAUpdateBlockOptionItems(CABlockData_t *currData, const coap_pdu_t *pdu,
                                     coap_block_t *block, uint16_t blockType,
-                                    uint32_t status);
+                                    size_t status);
 /**
  * Set the M-bit of block option.
  * @param[in]   payloadLen  payload length of current bulk data.
@@ -393,7 +393,7 @@ CAData_t* CACreateNewDataSet(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint
  * @return ::CASTATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
 CAResult_t CAHandleBlockErrorResponse(coap_block_t *block, uint16_t blockType,
-                                      uint32_t responseResult);
+                                      size_t responseResult);
 
 /**
  * Check the received payload and if an error happens, return error type.

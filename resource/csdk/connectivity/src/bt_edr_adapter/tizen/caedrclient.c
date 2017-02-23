@@ -668,7 +668,7 @@ void CAEDRClientDisconnectAll(void)
 
 CAResult_t CAEDRClientSendUnicastData(const char *remoteAddress,
                                       const uint8_t *data,
-                                      uint32_t dataLength)
+                                      size_t dataLength)
 {
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "IN");
 
@@ -766,7 +766,7 @@ CAResult_t CAEDRClientSendUnicastData(const char *remoteAddress,
 }
 
 CAResult_t CAEDRClientSendMulticastData(const uint8_t *data,
-                                        uint32_t dataLength)
+                                        size_t dataLength)
 {
     OIC_LOG(DEBUG, EDR_ADAPTER_TAG, "IN");
 
@@ -1035,7 +1035,7 @@ void CAEDRDataRecvCallback(bt_socket_received_data_s *data, void *userData)
             OIC_LOG_V(DEBUG, EDR_ADAPTER_TAG,"data will be sent to callback routine: %s, %d",
                       deviceInfo->recvData, deviceInfo->recvDataLen);
 
-            uint32_t sentLength = 0;
+            size_t sentLength = 0;
             g_edrPacketReceivedCallback(device->remoteAddress, (void*) deviceInfo->recvData,
                                         deviceInfo->recvDataLen, &sentLength);
 

@@ -240,7 +240,7 @@ TEST(CAProtocolMessage, CAGetInfoFromPDU)
 
     pdu = CAGeneratePDU(CA_GET, &inData, &tempRep, &options, &transport);
 
-    uint32_t code = CA_NOT_FOUND;
+    size_t code = CA_NOT_FOUND;
     CAInfo_t outData;
     memset(&outData, 0, sizeof(CAInfo_t));
 

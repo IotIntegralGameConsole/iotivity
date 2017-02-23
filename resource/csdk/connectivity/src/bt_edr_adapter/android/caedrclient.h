@@ -79,7 +79,7 @@ void CAEDRCoreJniInit();
  * @retval  ::CA_STATUS_OK  Successful.
  * @retval  ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendUnicastMessage(const char *address, const uint8_t *data, uint32_t dataLen);
+CAResult_t CAEDRSendUnicastMessage(const char *address, const uint8_t *data, size_t dataLen);
 
 /**
  * Send data for multicast.
@@ -89,7 +89,7 @@ CAResult_t CAEDRSendUnicastMessage(const char *address, const uint8_t *data, uin
  * @retval  ::CA_STATUS_OK  Successful.
  * @retval  ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendMulticastMessage(const uint8_t *data, uint32_t dataLen);
+CAResult_t CAEDRSendMulticastMessage(const uint8_t *data, size_t dataLen);
 
 /**
  * Get Local EDR Address.
@@ -115,7 +115,7 @@ void CAEDRGetLocalAddress(char **address);
  * @retval  ::CA_STATUS_OK  Successful.
  * @retval  ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendUnicastMessageImpl(const char *address, const uint8_t *data, uint32_t dataLen);
+CAResult_t CAEDRSendUnicastMessageImpl(const char *address, const uint8_t *data, size_t dataLen);
 
 /**
  * Send data for multicast (implement).
@@ -126,7 +126,7 @@ CAResult_t CAEDRSendUnicastMessageImpl(const char *address, const uint8_t *data,
  * @retval  ::CA_STATUS_OK  Successful.
  * @retval  ::CA_STATUS_FAILED Operation failed.
  */
-CAResult_t CAEDRSendMulticastMessageImpl(JNIEnv *env, const uint8_t *data, uint32_t dataLen);
+CAResult_t CAEDRSendMulticastMessageImpl(JNIEnv *env, const uint8_t *data, size_t dataLen);
 
 /**
  * EDR Method
@@ -141,7 +141,7 @@ CAResult_t CAEDRSendMulticastMessageImpl(JNIEnv *env, const uint8_t *data, uint3
  * @return ::CA_STATUS_OK or Appropriate error code.
  */
 CAResult_t CAEDRNativeSendData(JNIEnv *env, const char* address, const uint8_t* data,
-                               uint32_t dataLength);
+                               size_t dataLength);
 
 /**
  * This function will connect to remote device.

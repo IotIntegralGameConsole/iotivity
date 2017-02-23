@@ -71,7 +71,7 @@ static EthernetServer server(TCP_UNICAST_PORT);
  * @var g_receivedDataLen
  * @brief Actual length of data received.
  */
-static uint32_t g_receivedDataLen = 0;
+static size_t g_receivedDataLen = 0;
 
 static void CATCPReadDataInternal();
 
@@ -274,7 +274,7 @@ void CATCPReadDataInternal()
     return;
 }
 
-CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
+CAResult_t CAGetTCPInterfaceInformation(CAEndpoint_t **info, size_t *size)
 {
     OIC_LOG(DEBUG, TAG, "IN");
 
@@ -304,7 +304,7 @@ static ssize_t sendData(const CAEndpoint_t *endpoint,
         return -1;
     }
 
-    uint32_t ret = send(g_unicastSocket, (const uint8_t *)data, (uint16_t)dlen);
+    size_t ret = send(g_unicastSocket, (const uint8_t *)data, (uint16_t)dlen);
     if (ret <= 0)
     {
         OIC_LOG_V(ERROR, TAG, "SendData failed: %d", ret);

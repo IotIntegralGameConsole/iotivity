@@ -86,7 +86,7 @@ CAResult_t CAStartNFCDiscoveryServer();
  * @remark  dataLen must be > 0.
  */
 int32_t CASendNFCUnicastData(const CAEndpoint_t *endpoint, const void *data,
-                             uint32_t dataLen, CADataType_t dataType);
+                             size_t dataLen, CADataType_t dataType);
 
 /**
  * Send Multicast data to the endpoint using the NFC connectivity.
@@ -98,7 +98,7 @@ int32_t CASendNFCUnicastData(const CAEndpoint_t *endpoint, const void *data,
  * @remark  dataLen must be > 0.
  */
 int32_t CASendNFCMulticastData(const CAEndpoint_t *endpoint, const void *data,
-                               uint32_t dataLen, CADataType_t dataType);
+                               size_t dataLen, CADataType_t dataType);
 
 /**
  * Get NFC Connectivity network information
@@ -107,7 +107,7 @@ int32_t CASendNFCMulticastData(const CAEndpoint_t *endpoint, const void *data,
  * @return  ::CA_STATUS_OK, if success or Appropriate error code.
  * @remarks info is allocated in this API and must be freed by the caller.
  */
-CAResult_t CAGetNFCInterfaceInformation(CAEndpoint_t **info, uint32_t *size);
+CAResult_t CAGetNFCInterfaceInformation(CAEndpoint_t **info, size_t *size);
 
 /**
  * Read Synchronous API callback.

@@ -168,7 +168,7 @@ CAResult_t u_queue_remove_element(u_queue_t *queue)
     return CA_STATUS_OK;
 }
 
-uint32_t u_queue_get_size(u_queue_t *queue)
+size_t u_queue_get_size(u_queue_t *queue)
 {
     if (NULL == queue)
     {

@@ -93,22 +93,22 @@ void CAAdapterTerminateQueues();
 void CAAdapterDataSendHandler(void *context);
 void CAAdapterDataReceiverHandler(void *context);
 CAResult_t CAAdapterStopQueue();
-void CAAdapterRecvData(const char *remoteAddress, const uint8_t *data, uint32_t dataLength,
-                       uint32_t *sentLength);
+void CAAdapterRecvData(const char *remoteAddress, const uint8_t *data, size_t dataLength,
+                       size_t *sentLength);
 void CAEDRNotifyNetworkStatus(CANetworkStatus_t status);
 void CAEDROnNetworkStatusChanged(void *context);
 CAResult_t CAAdapterSendData(const char *remoteAddress, const char *serviceUUID,
-                             const uint8_t *data, uint32_t dataLength, uint32_t *sentLength);
+                             const uint8_t *data, size_t dataLength, size_t *sentLength);
 CAEDRNetworkEvent *CAEDRCreateNetworkEvent(CAEndpoint_t *connectivity, CANetworkStatus_t status);
 CAResult_t CAEDRClientSendData(const char *remoteAddress, const uint8_t *data,
-                               uint32_t dataLength);
+                               size_t dataLength);
 
 /**
  * @fn CACreateEDRData
  * @brief Helper function to create CAEDRData
  */
 static CAEDRData *CACreateEDRData(const CAEndpoint_t *remoteEndpoint, const uint8_t *data,
-                                  uint32_t dataLength);
+                                  size_t dataLength);
 
 /**
  * @fn CAFreeEDRData
@@ -122,10 +122,10 @@ static void CAFreeEDRData(CAEDRData *edrData);
  */
 void CAEDRFreeNetworkEvent(CAEDRNetworkEvent *event);
 
-static void CAEDRDataDestroyer(void *data, uint32_t size);
+static void CAEDRDataDestroyer(void *data, size_t size);
 
 static void CAEDRErrorHandler(const char *remoteAddress, const uint8_t *data,
-                              uint32_t dataLength, CAResult_t result);
+                              size_t dataLength, CAResult_t result);
 
 CAResult_t CAInitializeEDR(CARegisterConnectivityCallback registerCallback,
                            CANetworkPacketReceivedCallback packetReceivedCallback,
@@ -264,7 +264,7 @@ CAResult_t CAStartEDRDiscoveryServer()
 }
 
 int32_t CASendEDRUnicastData(const CAEndpoint_t *remoteEndpoint, const void *data,
-                             uint32_t dataLength, CADataType_t dataType)
+                             size_t dataLength, CADataType_t dataType)
 {
     // Input validation
     VERIFY_NON_NULL_RET(remoteEndpoint, TAG, "Remote endpoint is null", -1);
@@ -283,7 +283,7 @@ int32_t CASendEDRUnicastData(const CAEndpoint_t *remoteEndpoint, const void *dat
         return -1;
     }
 
-    uint32_t sentLength = 0;
+    size_t sentLength = 0;
     const char *serviceUUID = OIC_EDR_SERVICE_ID;
     const char *address = remoteEndpoint->addr;
     CAResult_t err = CAAdapterSendData(address, serviceUUID, data, dataLength, &sentLength);
@@ -297,7 +297,7 @@ int32_t CASendEDRUnicastData(const CAEndpoint_t *remoteEndpoint, const void *dat
     return sentLength;
 }
 
-int32_t CASendEDRMulticastData(const CAEndpoint_t *endpoint, const void *data, uint32_t dataLength,
+int32_t CASendEDRMulticastData(const CAEndpoint_t *endpoint, const void *data, size_t dataLength,
                                CADataType_t dataType)
 {
     OIC_LOG(DEBUG, TAG, "IN - CASendEDRMulticastData");
@@ -312,7 +312,7 @@ int32_t CASendEDRMulticastData(const CAEndpoint_t *endpoint, const void *data, u
         return -1;
     }
 
-    uint32_t sentLen = 0;
+    size_t sentLen = 0;
     const char *serviceUUID = OIC_EDR_SERVICE_ID;
     CAResult_t err = CAAdapterSendData(NULL, serviceUUID, data, dataLength, &sentLen);
     if (CA_STATUS_OK != err)
@@ -326,7 +326,7 @@ int32_t CASendEDRMulticastData(const CAEndpoint_t *endpoint, const void *data, u
     return sentLen;
 }
 
-CAResult_t CAGetEDRInterfaceInformation(CAEndpoint_t **info, uint32_t *size)
+CAResult_t CAGetEDRInterfaceInformation(CAEndpoint_t **info, size_t *size)
 {
     VERIFY_NON_NULL(info, TAG, "LocalConnectivity info is null");
 
@@ -531,7 +531,7 @@ void CAAdapterDataSendHandler(void *context)
 }
 
 CAResult_t CAEDRClientSendData(const char *remoteAddress, const uint8_t *data,
-                               uint32_t dataLength)
+                               size_t dataLength)
 {
     CAResult_t result = CA_SEND_FAILED;
 
@@ -634,8 +634,8 @@ CAResult_t CAAdapterStopQueue()
     return CA_STATUS_OK;
 }
 
-void CAAdapterRecvData(const char *remoteAddress, const uint8_t *data, uint32_t dataLength,
-                       uint32_t *sentLength)
+void CAAdapterRecvData(const char *remoteAddress, const uint8_t *data, size_t dataLength,
+                       size_t *sentLength)
 {
     if (false == g_adapterState)
     {
@@ -668,7 +668,7 @@ void CAAdapterRecvData(const char *remoteAddress, const uint8_t *data, uint32_t 
 }
 
 void CAEDRErrorHandler(const char *remoteAddress, const uint8_t *data,
-                       uint32_t dataLength, CAResult_t result)
+                       size_t dataLength, CAResult_t result)
 {
     // Input validation
     VERIFY_NON_NULL_VOID(data, TAG, "Data is null");
@@ -689,7 +689,7 @@ void CAEDRErrorHandler(const char *remoteAddress, const uint8_t *data,
 }
 
 CAResult_t CAAdapterSendData(const char *remoteAddress, const char *serviceUUID, const uint8_t *data,
-                             uint32_t dataLength, uint32_t *sentLength)
+                             size_t dataLength, size_t *sentLength)
 {
     OIC_LOG(DEBUG, TAG, "IN - CAAdapterSendData");
 
@@ -834,7 +834,7 @@ void CAEDRFreeNetworkEvent(CAEDRNetworkEvent *event)
 }
 
 CAEDRData *CACreateEDRData(const CAEndpoint_t *remoteEndpoint,
-                           const uint8_t *data, uint32_t dataLength)
+                           const uint8_t *data, size_t dataLength)
 {
     CAEDRData *edrData = (CAEDRData *) OICCalloc(1, sizeof(*edrData));
     if (!edrData)
@@ -867,7 +867,7 @@ void CAFreeEDRData(CAEDRData *edrData)
     OICFree(edrData);
 }
 
-void CAEDRDataDestroyer(void *data, uint32_t size)
+void CAEDRDataDestroyer(void *data, size_t size)
 {
     if ((size_t)size < sizeof(CAEDRData))
     {

@@ -42,7 +42,7 @@ extern "C"
 typedef void (*CAThreadTask)(void *threadData);
 
 /** Data destroy function. **/
-typedef void (*CADataDestroyFunction)(void *data, uint32_t size);
+typedef void (*CADataDestroyFunction)(void *data, size_t size);
 
 typedef struct
 {
@@ -87,7 +87,7 @@ CAResult_t CAQueueingThreadStart(CAQueueingThread_t *thread);
  * @param[in]   size         length of the data.
  * @return  CA_STATUS_OK or ERROR CODES (CAResult_t error codes in cacommon.h).
  */
-CAResult_t CAQueueingThreadAddData(CAQueueingThread_t *thread, void *data, uint32_t size);
+CAResult_t CAQueueingThreadAddData(CAQueueingThread_t *thread, void *data, size_t size);
 
 /**
  * Stop the queuing thread.

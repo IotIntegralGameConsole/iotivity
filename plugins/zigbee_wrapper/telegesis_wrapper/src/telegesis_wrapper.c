@@ -2132,7 +2132,7 @@ TWResultCode HandleATResponse(TWEntry* entry, TWContext* ctx)
     int32_t i = 0;
     for (; i < entry->count; i++)
     {
-        uint32_t k = 0;
+        size_t k = 0;
         for (; k < sizeof(g_TWATResultHandlerPairArray)/sizeof(TWATResultHandlerPair); ++k)
         {
             const char* line = (entry)->lines[i].line;
@@ -3045,7 +3045,7 @@ TWResultCode AsciiHexToValue(char* hexString, int length, uint64_t* value)
     *value = (uint64_t)retVal;
     for (int i = 1; i < length; ++i)
     {
-        if (sizeof(hexString) > (uint32_t)i)
+        if (sizeof(hexString) > (size_t)i)
         {
             *value <<= 4;
             retVal = AsciiToHex(hexString[i]);

@@ -121,7 +121,7 @@ typedef enum {
  * @retval ::CA_STATUS_FAILED         Operation failed
  */
 CAResult_t CAGenerateVariableForFragmentation(size_t dataLength,
-                                              uint32_t *midPacketCount,
+                                              size_t *midPacketCount,
                                               size_t *remainingLen,
                                               size_t *totalLength,
                                               uint16_t mtuSize);
@@ -202,7 +202,7 @@ CAResult_t CAGenerateHeaderPayloadLength(uint8_t *header,
  */
 CAResult_t CAMakeFirstDataSegment(uint8_t *dataSegment,
                                   const uint8_t *data,
-                                  const uint32_t dataLength,
+                                  const size_t dataLength,
                                   const uint8_t *dataHeader,
                                   const uint8_t *lengthHeader);
 
@@ -231,10 +231,10 @@ CAResult_t CAMakeFirstDataSegment(uint8_t *dataSegment,
  * @retval ::CA_STATUS_FAILED         Operation failed
  */
 CAResult_t CAMakeRemainDataSegment(uint8_t *dataSegment,
-                                   const uint32_t segmentPayloadLength,
+                                   const size_t segmentPayloadLength,
                                    const uint8_t *sourceData,
-                                   const uint32_t sourceDataLength,
-                                   const uint32_t segmentNum,
+                                   const size_t sourceDataLength,
+                                   const size_t segmentNum,
                                    const uint8_t *dataHeader,
                                    uint16_t mtuSize);
 
@@ -289,7 +289,7 @@ CAResult_t CAParseHeader(const uint8_t *header,
  */
 CAResult_t CAParseHeaderPayloadLength(uint8_t *header,
                                       size_t headerLength,
-                                      uint32_t *dataLength);
+                                      size_t *dataLength);
 
 #ifdef __cplusplus
 } /* extern "C" */

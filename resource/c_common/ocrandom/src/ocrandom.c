@@ -141,7 +141,7 @@ static void OCSeedRandom()
         return;
     }
 
-    uint32_t result =0;
+    size_t result =0;
     uint8_t i;
     for (i=32; i--;)
     {
@@ -220,9 +220,9 @@ bool OCGetRandomBytes(uint8_t * output, size_t len)
     return true;
 }
 
-uint32_t OCGetRandom()
+size_t OCGetRandom()
 {
-    uint32_t result = 0;
+    size_t result = 0;
     if (!OCGetRandomBytes((uint8_t*)&result, sizeof(result)))
     {
         OIC_LOG(FATAL, OCRANDOM_TAG, "OCGetRandom failed!");
@@ -235,7 +235,7 @@ uint32_t OCGetRandom()
  * Binary search algorithm from Section 5-3 of:
  *     H.S. Warren Jr. Hacker's Delight. Addison-Wesley. 2003.
  */
-static int nlz(uint32_t x)
+static int nlz(size_t x)
 {
     if (x == 0)
     {
@@ -252,23 +252,23 @@ static int nlz(uint32_t x)
     return n;
 }
 
-uint32_t OCGetRandomRange(uint32_t firstBound, uint32_t secondBound)
+size_t OCGetRandomRange(size_t firstBound, size_t secondBound)
 {
     if (firstBound == secondBound)
     {
         return secondBound;
     }
 
-    uint32_t rangeBase = OC_MIN(firstBound, secondBound);
-    uint32_t rangeWidth = (firstBound > secondBound) ? (firstBound - secondBound) : (secondBound - firstBound);
+    size_t rangeBase = OC_MIN(firstBound, secondBound);
+    size_t rangeWidth = (firstBound > secondBound) ? (firstBound - secondBound) : (secondBound - firstBound);
 
     /*
      * Compute a random number between 0 and rangeWidth. Avoid using floating
      * point types to avoid overflow when rangeWidth is large. The condition
      * in the while loop will be false with probability at least 1/2.
      */
-    uint32_t rangeMask = 0xFFFFFFFF >> nlz(rangeWidth);
-    uint32_t offset = 0;
+    size_t rangeMask = 0xFFFFFFFF >> nlz(rangeWidth);
+    size_t offset = 0;
     do
     {
         if(!OCGetRandomBytes((uint8_t*)&offset, sizeof(offset)))

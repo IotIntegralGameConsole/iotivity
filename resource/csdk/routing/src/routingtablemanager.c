@@ -232,7 +232,7 @@ OCStackResult RTMTerminate(u_linklist_t **gatewayTable, u_linklist_t **endpointT
  * Adds Entry to Tail if route cost is > 1.
  * Checks for Gateway id Memory and assigns to next hop address to achieve better memory usage.
  */
-OCStackResult RTMAddGatewayEntry(uint32_t gatewayId, uint32_t nextHop, uint32_t routeCost,
+OCStackResult RTMAddGatewayEntry(size_t gatewayId, size_t nextHop, size_t routeCost,
                                  const RTMDestIntfInfo_t *destInterfaces, u_linklist_t **gatewayTable)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -558,7 +558,7 @@ OCStackResult RTMAddEndpointEntry(uint16_t *endpointId, const CAEndpoint_t *dest
     return OC_STACK_OK;
 }
 
-OCStackResult RTMAddObserver(uint32_t obsID, CAEndpoint_t devAddr, u_linklist_t **gatewayTable)
+OCStackResult RTMAddObserver(size_t obsID, CAEndpoint_t devAddr, u_linklist_t **gatewayTable)
 {
     OIC_LOG(DEBUG, TAG, "IN");
     RM_NULL_CHECK_WITH_RET(gatewayTable, TAG, "gatewayTable");
@@ -570,7 +570,7 @@ OCStackResult RTMAddObserver(uint32_t obsID, CAEndpoint_t devAddr, u_linklist_t 
     {
         RTMGatewayEntry_t *entry = u_linklist_get_data(iterTable);
 
-        for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+        for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
         {
             RTMDestIntfInfo_t *destCheck = u_arraylist_get(entry->destination->destIntfAddr, i);
             if (NULL != destCheck &&
@@ -614,7 +614,7 @@ bool RTMIsObserverPresent(CAEndpoint_t devAddr, OCObservationId *obsID,
             OIC_LOG(ERROR, TAG, "entry is NULL");
             return false;
         }
-        for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+        for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
         {
             RTMDestIntfInfo_t *destCheck =
                 u_arraylist_get(entry->destination->destIntfAddr, i);
@@ -633,7 +633,7 @@ bool RTMIsObserverPresent(CAEndpoint_t devAddr, OCObservationId *obsID,
     return false;
 }
 
-OCStackResult RTMRemoveGatewayEntry(uint32_t gatewayId, u_linklist_t **removedGatewayNodes,
+OCStackResult RTMRemoveGatewayEntry(size_t gatewayId, u_linklist_t **removedGatewayNodes,
                                     u_linklist_t **gatewayTable)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -687,7 +687,7 @@ OCStackResult RTMRemoveGatewayEntry(uint32_t gatewayId, u_linklist_t **removedGa
     return OC_STACK_OK;
 }
 
-OCStackResult RTMRemoveGatewayDestEntry(uint32_t gatewayId, uint32_t nextHop,
+OCStackResult RTMRemoveGatewayDestEntry(size_t gatewayId, size_t nextHop,
                                         const RTMDestIntfInfo_t *destInfAdr,
                                         RTMGatewayEntry_t **existEntry, u_linklist_t **gatewayTable)
 {
@@ -712,7 +712,7 @@ OCStackResult RTMRemoveGatewayDestEntry(uint32_t gatewayId, uint32_t nextHop,
         // Update the time for NextHop entry.
         if (NULL != entry->destination && nextHop == entry->destination->gatewayId)
         {
-            for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+            for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *destCheck = u_arraylist_get(entry->destination->destIntfAddr, i);
                 if(!destCheck)
@@ -873,7 +873,7 @@ void RTMGetNeighbours(u_linklist_t **neighbourNodes, const u_linklist_t *gateway
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
-RTMGatewayId_t *RTMGetNextHop(uint32_t gatewayId, const u_linklist_t *gatewayTable)
+RTMGatewayId_t *RTMGetNextHop(size_t gatewayId, const u_linklist_t *gatewayTable)
 {
     OIC_LOG(DEBUG, TAG, "IN");
     if (0 == gatewayId)
@@ -982,7 +982,7 @@ void RTMGetObserverList(OCObservationId **obsList, uint8_t *obsListLen,
     OIC_LOG(DEBUG, TAG, "OUT");
 }
 
-OCStackResult RTMUpdateDestinationIntfAdr(uint32_t gatewayId, RTMDestIntfInfo_t destInterfaces,
+OCStackResult RTMUpdateDestinationIntfAdr(size_t gatewayId, RTMDestIntfInfo_t destInterfaces,
                                           bool addAdr, u_linklist_t **gatewayTable)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -999,7 +999,7 @@ OCStackResult RTMUpdateDestinationIntfAdr(uint32_t gatewayId, RTMDestIntfInfo_t 
         {
             if (addAdr)
             {
-                for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+                for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
                 {
                     RTMDestIntfInfo_t *destCheck =
                         u_arraylist_get(entry->destination->destIntfAddr, i);
@@ -1042,7 +1042,7 @@ OCStackResult RTMUpdateDestinationIntfAdr(uint32_t gatewayId, RTMDestIntfInfo_t 
                 return OC_STACK_DUPLICATE_REQUEST;
             }
 
-            for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+            for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *removeAdr =
                     u_arraylist_get(entry->destination->destIntfAddr, i);
@@ -1067,7 +1067,7 @@ OCStackResult RTMUpdateDestinationIntfAdr(uint32_t gatewayId, RTMDestIntfInfo_t 
     return OC_STACK_OK;
 }
 
-OCStackResult RTMUpdateMcastSeqNumber(uint32_t gatewayId, uint16_t seqNum,
+OCStackResult RTMUpdateMcastSeqNumber(size_t gatewayId, uint16_t seqNum,
                                       u_linklist_t **gatewayTable)
 {
     OIC_LOG(DEBUG, TAG, "IN");
@@ -1156,7 +1156,7 @@ OCStackResult RTMUpdateDestAddrValidity(u_linklist_t **invalidTable, u_linklist_
         }
         else if (1 == entry->routeCost)
         {
-            for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+            for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *destCheck = u_arraylist_get(entry->destination->destIntfAddr, i);
                 if (!destCheck)
@@ -1207,7 +1207,7 @@ OCStackResult RTMRemoveInvalidGateways(u_linklist_t **invalidTable, u_linklist_t
         }
         else if (NULL != entry->destination && (1 == entry->routeCost))
         {
-            for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+            for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *destCheck = u_arraylist_get(entry->destination->destIntfAddr, i);
                 if (!destCheck && !destCheck->isValid)
@@ -1248,7 +1248,7 @@ OCStackResult RTMRemoveInvalidGateways(u_linklist_t **invalidTable, u_linklist_t
     return OC_STACK_OK;
 }
 
-OCStackResult RTMUpdateEntryParameters(uint32_t gatewayId, uint32_t seqNum,
+OCStackResult RTMUpdateEntryParameters(size_t gatewayId, size_t seqNum,
                                        const RTMDestIntfInfo_t *destAdr, u_linklist_t **gatewayTable,
                                        bool forceUpdate)
 {
@@ -1270,7 +1270,7 @@ OCStackResult RTMUpdateEntryParameters(uint32_t gatewayId, uint32_t seqNum,
         }
         if (NULL != entry->destination && gatewayId == entry->destination->gatewayId)
         {
-            for (uint32_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
+            for (size_t i = 0; i < u_arraylist_length(entry->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *destCheck =
                     u_arraylist_get(entry->destination->destIntfAddr, i);
@@ -1335,7 +1335,7 @@ void RTMPrintTable(const u_linklist_t *gatewayTable, const u_linklist_t *endpoin
         if (1 == hop->routeCost && NULL != hop->destination &&
             hop->destination->destIntfAddr != NULL)
         {
-            for (uint32_t i = 0; i < u_arraylist_length(hop->destination->destIntfAddr); i++)
+            for (size_t i = 0; i < u_arraylist_length(hop->destination->destIntfAddr); i++)
             {
                 RTMDestIntfInfo_t *dest = u_arraylist_get(hop->destination->destIntfAddr, i);
                 if (NULL != dest)

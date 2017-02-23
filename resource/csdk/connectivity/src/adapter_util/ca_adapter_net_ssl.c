@@ -357,7 +357,7 @@ static const CrtVerifyAlert_t crtVerifyAlerts[] = {
     {0, 0}
 };
 
-static int GetAlertCode(uint32_t flags)
+static int GetAlertCode(size_t flags)
 {
     const CrtVerifyAlert_t *cur;
 
@@ -870,8 +870,8 @@ static int GetPskCredentialsCallback(void * notUsed, mbedtls_ssl_context * ssl,
  */
 static SslEndPoint_t *GetSslPeer(const CAEndpoint_t *peer)
 {
-    uint32_t listIndex = 0;
-    uint32_t listLength = 0;
+    size_t listIndex = 0;
+    size_t listLength = 0;
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
     VERIFY_NON_NULL_RET(peer, NET_SSL_TAG, "TLS peer is NULL", NULL);
     VERIFY_NON_NULL_RET(g_caSslContext, NET_SSL_TAG, "SSL Context is NULL", NULL);
@@ -946,12 +946,12 @@ const CASecureEndpoint_t *GetCASecureEndpointData(const CAEndpoint_t* peer)
  *
  * @return  true if the secure endpoint has been found, false otherwise.
  */
-bool SetCASecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t newAttribute)
+bool SetCASecureEndpointAttribute(const CAEndpoint_t* peer, size_t newAttribute)
 {
     bool result = false;
 
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s(peer = %s:%u, attribute = %#x)", __func__,
-        peer->addr, (uint32_t)peer->port, newAttribute);
+        peer->addr, (size_t)peer->port, newAttribute);
 
     oc_mutex_lock(g_sslContextMutex);
 
@@ -988,12 +988,12 @@ bool SetCASecureEndpointAttribute(const CAEndpoint_t* peer, uint32_t newAttribut
  *
  * @return  true if the secure endpoint has been found, false otherwise.
  */
-bool GetCASecureEndpointAttributes(const CAEndpoint_t* peer, uint32_t* allAttributes)
+bool GetCASecureEndpointAttributes(const CAEndpoint_t* peer, size_t* allAttributes)
 {
     bool result = false;
 
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s(peer = %s:%u)", __func__,
-        peer->addr, (uint32_t)peer->port);
+        peer->addr, (size_t)peer->port);
 
     oc_mutex_lock(g_sslContextMutex);
 
@@ -1047,8 +1047,8 @@ static void DeleteCacheList(u_arraylist_t * cacheList)
 {
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
     VERIFY_NON_NULL_VOID(cacheList, NET_SSL_TAG, "cacheList");
-    uint32_t listIndex = 0;
-    uint32_t listLength = 0;
+    size_t listIndex = 0;
+    size_t listLength = 0;
 
     listLength = u_arraylist_length(cacheList);
     for (listIndex = 0; listIndex < listLength; listIndex++)
@@ -1090,8 +1090,8 @@ static void RemovePeerFromList(CAEndpoint_t * endpoint)
 {
     VERIFY_NON_NULL_VOID(g_caSslContext, NET_SSL_TAG, "SSL Context is NULL");
     VERIFY_NON_NULL_VOID(endpoint, NET_SSL_TAG, "endpoint");
-    uint32_t listLength = u_arraylist_length(g_caSslContext->peerList);
-    for (uint32_t listIndex = 0; listIndex < listLength; listIndex++)
+    size_t listLength = u_arraylist_length(g_caSslContext->peerList);
+    for (size_t listIndex = 0; listIndex < listLength; listIndex++)
     {
         SslEndPoint_t * tep = (SslEndPoint_t *)u_arraylist_get(g_caSslContext->peerList,listIndex);
         if (NULL == tep)
@@ -1114,8 +1114,8 @@ static void DeletePeerList()
 {
     VERIFY_NON_NULL_VOID(g_caSslContext, NET_SSL_TAG, "SSL Context is NULL");
 
-    uint32_t listLength = u_arraylist_length(g_caSslContext->peerList);
-    for (uint32_t listIndex = 0; listIndex < listLength; listIndex++)
+    size_t listLength = u_arraylist_length(g_caSslContext->peerList);
+    for (size_t listIndex = 0; listIndex < listLength; listIndex++)
     {
         SslEndPoint_t * tep = (SslEndPoint_t *)u_arraylist_get(g_caSslContext->peerList,listIndex);
         if (NULL == tep)
@@ -1181,10 +1181,10 @@ void CAcloseSslConnectionAll(CATransportAdapter_t transportType)
         return;
     }
 
-    uint32_t listLength = u_arraylist_length(g_caSslContext->peerList);
+    size_t listLength = u_arraylist_length(g_caSslContext->peerList);
     OIC_LOG_V(DEBUG, NET_SSL_TAG,
             "Required transport [%d], peer count [%u]", transportType, listLength);
-    for (uint32_t i = listLength; i > 0; i--)
+    for (size_t i = listLength; i > 0; i--)
     {
         SslEndPoint_t *tep = (SslEndPoint_t *)u_arraylist_get(g_caSslContext->peerList, i - 1);
         if (NULL == tep)
@@ -1518,8 +1518,8 @@ static int InitConfig(mbedtls_ssl_config * conf, int transport, int mode)
  */
 static int StartRetransmit()
 {
-    uint32_t listIndex = 0;
-    uint32_t listLength = 0;
+    size_t listIndex = 0;
+    size_t listLength = 0;
     SslEndPoint_t *tep = NULL;
 
     oc_mutex_lock(g_sslContextMutex);
@@ -1734,7 +1734,7 @@ SslCacheMessage_t *  NewCacheMessage(uint8_t * data, size_t dataLen)
 /* Send data via TLS connection.
  */
 CAResult_t CAencryptSsl(const CAEndpoint_t *endpoint,
-                        void *data, uint32_t dataLen)
+                        void *data, size_t dataLen)
 {
     int ret = 0;
 
@@ -1824,8 +1824,8 @@ static void SendCacheMessages(SslEndPoint_t * tep)
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
     VERIFY_NON_NULL_VOID(tep, NET_SSL_TAG, "Param tep is NULL");
 
-    uint32_t listIndex = 0;
-    uint32_t listLength = 0;
+    size_t listIndex = 0;
+    size_t listLength = 0;
     listLength = u_arraylist_length(tep->cacheList);
     for (listIndex = 0; listIndex < listLength;)
     {
@@ -1884,7 +1884,7 @@ void CAsetSslHandshakeCallback(CAErrorCallback tlsHandshakeCallback)
 
 /* Read data from TLS connection
  */
-CAResult_t CAdecryptSsl(const CASecureEndpoint_t *sep, uint8_t *data, uint32_t dataLen)
+CAResult_t CAdecryptSsl(const CASecureEndpoint_t *sep, uint8_t *data, size_t dataLen)
 {
     int ret = 0;
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
@@ -1947,7 +1947,7 @@ CAResult_t CAdecryptSsl(const CASecureEndpoint_t *sep, uint8_t *data, uint32_t d
                                                  sizeof(sep->endpoint.addr));
             ret = mbedtls_ssl_handshake_step(&peer->ssl);
         }
-        uint32_t flags = mbedtls_ssl_get_verify_result(&peer->ssl);
+        size_t flags = mbedtls_ssl_get_verify_result(&peer->ssl);
         if (0 != flags)
         {
             OIC_LOG_BUFFER(ERROR, NET_SSL_TAG, (const uint8_t *) &flags, sizeof(flags));
@@ -2116,7 +2116,7 @@ void CAsetSslAdapterCallbacks(CAPacketReceivedCallback recvCallback,
  * @return   corresponding enum
  */
 
-static SslCipher_t GetCipherIndex(const uint32_t cipher)
+static SslCipher_t GetCipherIndex(const size_t cipher)
 {
     switch(cipher)
     {
@@ -2171,7 +2171,7 @@ static SslCipher_t GetCipherIndex(const uint32_t cipher)
     }
 }
 
-CAResult_t CAsetTlsCipherSuite(const uint32_t cipher)
+CAResult_t CAsetTlsCipherSuite(const size_t cipher)
 {
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
     VERIFY_NON_NULL_RET(g_caSslContext, NET_SSL_TAG, "SSL context is not initialized." , CA_STATUS_NOT_INITIALIZED);

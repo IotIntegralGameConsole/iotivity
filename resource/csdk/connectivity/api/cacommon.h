@@ -307,7 +307,7 @@ typedef struct
     CATransportFlags_t      flags;      // transport modifiers
     uint16_t                port;       // for IP
     char                    addr[MAX_ADDR_STR_SIZE_CA]; // address for all
-    uint32_t                ifindex;    // usually zero for default interface
+    size_t                ifindex;    // usually zero for default interface
     char                    remoteId[CA_MAX_IDENTITY_SIZE]; // device ID of remote device
 #if defined (ROUTING_GATEWAY) || defined (ROUTING_EP)
     char                    routeData[MAX_ADDR_STR_SIZE_CA]; /**< GatewayId:ClientId of
@@ -324,7 +324,7 @@ typedef struct
     // TODO change name to deviceId
     CARemoteId_t identity;      /**< endpoint device uuid */
     CARemoteId_t userId;        /**< endpoint user uuid */
-    uint32_t attributes;
+    size_t attributes;
 } CASecureEndpoint_t;
 
 /**
@@ -535,7 +535,7 @@ typedef struct
     uint16_t messageId;
     char token[CA_MAX_TOKEN_LEN];
     uint8_t tokenLength;
-    uint32_t ifindex;
+    size_t ifindex;
 } CAHistoryItem_t;
 
 typedef struct

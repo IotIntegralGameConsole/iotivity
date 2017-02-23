@@ -60,7 +60,7 @@
 // Public APIs
 //-----------------------------------------------------------------------------
 #ifdef ENABLE_MALLOC_DEBUG
-static uint32_t count;
+static size_t count;
 #endif
 
 void *OICMalloc(size_t size)

@@ -29,7 +29,7 @@ void setup() {
     Serial.println("Testing Random Number generator for Arduino");
 
     Serial.print("Testing OCGetRandom ... ");
-    uint32_t value32 = OCGetRandom();
+    size_t value32 = OCGetRandom();
     if (value32 >= 0 && value32 < pow(2, 32)) {
         Serial.println("[Success]");
     } else {
