@@ -200,22 +200,19 @@ coap_pdu_t *CAParsePDU(const char *data, size_t length, uint32_t *outCode,
         transport = coap_get_tcp_header_type_from_initbyte(((unsigned char *)data)[0] >> 4);
     }
 #endif
-    OIC_LOG_V(DEBUG, TAG, "l=%d+%d/%d", length, sizeof(coap_pdu_t), freeMemory());
+    OIC_LOG_V(DEBUG, TAG, "mem: l=%d+%d/%d", length, sizeof(coap_pdu_t), freeMemory());
 
     coap_pdu_t *outpdu =
-        malloc(26)
-        // coap_pdu_init2(0, 0, ntohs(COAP_INVALID_TID), length, transport)
+        coap_pdu_init2(0, 0, ntohs(COAP_INVALID_TID), length, transport)
+        //coap_new_pdu2(transport, (unsigned int) length)
         ;
-    //coap_pdu_t *outpdu = coap_new_pdu2(transport, (unsigned int) length);
     if (NULL == outpdu)
     {
         OIC_LOG(ERROR, TAG, "outpdu is null");
         return NULL;
     }
 
-    //OIC_LOG_V(DEBUG, TAG, "max=%d", outpdu->max_size);
-    
-
+    OIC_LOG_V(DEBUG, TAG, "max=%d", outpdu->max_size);
     OIC_LOG_V(DEBUG, TAG, "pdu parse-transport type : %d", transport);
     size_t alength = (size_t) length;
     int ret = coap_pdu_parse2((unsigned char *) data, (size_t) alength, outpdu, transport);
