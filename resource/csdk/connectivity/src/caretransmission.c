@@ -77,6 +77,7 @@
 #include "logger.h"
 
 #define TAG "OIC_CA_RETRANS"
+#include "logger-off.h"
 
 typedef struct
 {
