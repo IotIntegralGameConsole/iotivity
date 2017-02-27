@@ -39,8 +39,9 @@
 #include "oic_string.h"
 
 #define TAG "IPS"
-//#undef OIC_LOG_V
+#undef OIC_LOG_V
 //#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 // Length of the IP address decimal notation string
 #define IPNAMESIZE (16)
