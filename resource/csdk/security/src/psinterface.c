@@ -26,12 +26,10 @@
 #include <string.h>
 
 #include "cainterface.h"
-#include "logger.h"
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
 #include "ocstack.h"
-#include "oic_malloc.h"
-#include "payload_logging.h"
+
 #include "resourcemanager.h"
 #include "secureresourcemanager.h"
 #include "srmresourcestrings.h"
@@ -39,9 +37,13 @@
 #include "pstatresource.h"
 #include "doxmresource.h"
 
+#include "logger.h"
 #define TAG  "OIC_SRM_PSI"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 //#undef OIC_LOG_V
 //#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 //SVR database buffer block size
 #ifdef _WIN32
