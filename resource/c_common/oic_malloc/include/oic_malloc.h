@@ -36,6 +36,12 @@
 //-----------------------------------------------------------------------------
 #include <stdio.h>
 
+#undef OICMalloc
+#define OICMalloc OICMalloc_
+
+#undef OICCalloc
+#define OICCalloc OICCalloc_
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -133,6 +139,25 @@ void OICFree(void *ptr);
  * @param n   - Size of buf in bytes. If zero, nothing happens.
  */
 void OICClearMemory(void *buf, size_t n);
+
+
+
+void OCLogf(const char * format, ...);
+
+#if 1
+    void* OICMalloclog_( size_t size, char* file, int line);
+    void *OICCalloclog_(size_t num, size_t size, char* file, int line );
+
+//#define OICMalloc(...) OICMalloclog_(__VA_ARGS__,__FILE__,__LINE__)
+//#define OICCalloc(...) OICCalloclog_(__VA_ARGS__,__FILE__,__LINE__)
+
+#define OICMalloc(...) OICMalloclog_(__VA_ARGS__, TAG, __LINE__)
+#define OICCalloc(...) OICCalloclog_(__VA_ARGS__, TAG, __LINE__)
+
+#else
+#define OICMalloc(...) OICMalloc_(__VA_ARGS__)
+#define OICCalloc(...) OICCalloc_(__VA_ARGS__)
+#endif
 
 #ifdef __cplusplus
 }
