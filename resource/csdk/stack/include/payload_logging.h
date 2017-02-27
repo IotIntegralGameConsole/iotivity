@@ -46,7 +46,8 @@ extern "C"
 // PL_TAG is made as generic predefined tag because of build problems in arduino for using logging
 #define PL_TAG "PayloadLog"
 
-#ifdef TB_LOG
+//#ifdef TB_LOG
+#if 0
     #define OIC_LOG_PAYLOAD(level, payload) OCPayloadLog((level),(payload))
     #define UUID_SIZE (16)
 
