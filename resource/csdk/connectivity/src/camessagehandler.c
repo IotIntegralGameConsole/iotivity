@@ -68,6 +68,7 @@ static CAQueueingThread_t g_receiveThread;
 #define TAG "OIC_CA_MSG_HANDLE"
 #undef OIC_LOG_V
 #define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 static CARetransmission_t g_retransmissionContext;
 
