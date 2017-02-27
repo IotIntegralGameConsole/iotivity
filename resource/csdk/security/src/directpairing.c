@@ -35,12 +35,10 @@
 #endif
 
 #include "ocstack.h"
-#include "oic_malloc.h"
 #include "oic_string.h"
 #include "logger.h"
 #include "utlist.h"
 #include "ocpayload.h"
-#include "payload_logging.h"
 #include "cainterface.h"
 #include "directpairing.h"
 #include "srmresourcestrings.h" //@note: SRM's internal header
@@ -56,6 +54,9 @@
 #endif
 
 #define TAG ("OIC_DP")
+#include "oic_malloc.h"
+#include "payload_logging.h"
+
 static const uint16_t CBOR_SIZE = 1024;
 
 /**
