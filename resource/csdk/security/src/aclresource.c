@@ -30,12 +30,10 @@
 #include "ocstack.h"
 #include "octypes.h"
 #include "ocserverrequest.h"
-#include "oic_malloc.h"
 #include "oic_string.h"
 #include "ocrandom.h"
 #include "ocpayload.h"
 #include "utlist.h"
-#include "payload_logging.h"
 #include "srmresourcestrings.h"
 #include "aclresource.h"
 #include "doxmresource.h"
@@ -47,6 +45,8 @@
 #include "security_internals.h"
 
 #define TAG  "OIC_SRM_ACL"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 #define NUMBER_OF_SEC_PROV_RSCS 3
 #define NUMBER_OF_DEFAULT_SEC_RSCS 2
 #define STRING_UUID_SIZE (UUID_LENGTH * 2 + 5)
