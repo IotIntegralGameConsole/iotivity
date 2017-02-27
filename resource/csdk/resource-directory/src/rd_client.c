@@ -22,14 +22,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "oic_malloc.h"
 #include "oic_string.h"
 #include "octypes.h"
 #include "ocstack.h"
 #include "ocpayload.h"
-#include "payload_logging.h"
+
 
 #define TAG "OIC_RD_CLIENT"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 
 #ifdef RD_CLIENT
 
