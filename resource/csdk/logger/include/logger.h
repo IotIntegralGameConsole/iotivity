@@ -34,8 +34,8 @@
 #elif defined(__TIZEN__)
 #include <dlog.h>
 #elif defined(ARDUINO)
-#include "Arduino.h"
-#include "avr/pgmspace.h"
+#include <Arduino.h>
+#include <avr/pgmspace.h>
 #endif
 
 #ifdef __cplusplus
@@ -272,7 +272,7 @@ void OCLogBuffer(LogLevel level, const char* tag, const uint8_t* buffer, size_t 
     {                                             \
         OIC_LOG_V(DEBUG, TAG, "{%s %s:%d",        \
                   __func__, __FILE__, __LINE__);  \
-        OIC_LOG_V(DEBUG, TAG, "mem: free=%d", freeMemory() );     \
+        /* OIC_LOG_V(DEBUG, TAG, "mem: free=%d", freeMemory() ); */     \
     }
 
 #ifdef __cplusplus
