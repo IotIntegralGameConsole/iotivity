@@ -21,9 +21,9 @@
 
 #include <string.h>
 #include <assert.h>
-#include "oic_malloc.h"
 
 #define TAG "OIC_STRING"
+#include "oic_malloc.h"
 char *OICStrdup(const char *str)
 {
     if(!str)
