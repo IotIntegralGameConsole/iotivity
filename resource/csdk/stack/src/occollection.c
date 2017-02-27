@@ -31,9 +31,11 @@
 #include "ocstack.h"
 #include "oicgroup.h"
 #include "oic_string.h"
-#include "payload_logging.h"
 
 #define TAG "OIC_RI_COLLECTION"
+#include "oic_malloc.h"
+#include "payload_logging.h"
+
 
 static bool AddRTSBaslinePayload(OCRepPayload **linkArray, int size, OCRepPayload **colPayload)
 {
