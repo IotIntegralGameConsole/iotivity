@@ -41,6 +41,9 @@
 #include "oic_string.h"
 
 #define TAG "IPNW"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 // Since the CA abstraction expects a value for "family", AF_INET will be
 // defined & used (as-is defined in the linux socket headers).
