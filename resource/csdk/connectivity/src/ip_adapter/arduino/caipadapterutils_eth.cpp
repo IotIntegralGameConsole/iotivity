@@ -32,6 +32,9 @@
 #include "caadapterutils.h"
 
 #define TAG "IPU"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 CAResult_t CAArduinoGetAvailableSocket(int *sockID)
 {
