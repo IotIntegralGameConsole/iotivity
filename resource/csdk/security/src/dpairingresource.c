@@ -22,8 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ocstack.h"
-#include "logger.h"
-#include "oic_malloc.h"
 #include "oic_string.h"
 #include "base64.h"
 #include "resourcemanager.h"
@@ -40,7 +38,6 @@
 #include "ocserverrequest.h"
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
-#include "payload_logging.h"
 #if defined(__WITH_DTLS__) || defined (__WITH_TLS__)
 #include <mbedtls/ssl_ciphersuites.h>
 #endif
@@ -50,6 +47,9 @@
 #endif
 
 #define TAG  "OIC_SRM_DPAIRING"
+#include "oic_malloc.h"
+#include "payload_logging.h"
+#include "logger.h"
 
 /** Default cbor payload size. This value is increased in case of CborErrorOutOfMemory.
  * The value of payload size is increased until reaching belox max cbor size. */
