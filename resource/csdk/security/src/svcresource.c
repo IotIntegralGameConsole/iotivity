@@ -23,9 +23,7 @@
 #include "ocstack.h"
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
-#include "oic_malloc.h"
 #include "utlist.h"
-#include "payload_logging.h"
 #include "resourcemanager.h"
 #include "psinterface.h"
 #include "svcresource.h"
@@ -35,6 +33,8 @@
 #include "security_internals.h"
 
 #define TAG  "OIC_SRM_SVC"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 
 /** Default cbor payload size. This value is increased in case of CborErrorOutOfMemory.
  * The value of payload size is increased until reaching belox max cbor size. */
