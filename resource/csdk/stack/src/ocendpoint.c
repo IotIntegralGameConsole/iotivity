@@ -29,6 +29,8 @@
 #define VERIFY_GT_ZERO(arg) { if (arg < 1) {OIC_LOG(FATAL, TAG, #arg " < 1"); goto exit;} }
 #define VERIFY_GT(arg1, arg2) { if (arg1 <= arg2) {OIC_LOG(FATAL, TAG, #arg1 " <= " #arg2); goto exit;} }
 #define TAG  "OIC_RI_ENDPOINT"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
 
 OCStackResult OCGetSupportedEndpointFlags(const OCTpsSchemeFlags givenFlags, OCTpsSchemeFlags* out)
 {
