@@ -35,6 +35,9 @@
 #include "timer.h"
 
 #define TAG "OIC_RI_GROUP"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+//#include "logger-off.h"
 
 #define DESC_DELIMITER          "\""
 #define ACTION_DELIMITER        "*"
