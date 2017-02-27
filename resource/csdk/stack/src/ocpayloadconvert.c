@@ -37,6 +37,7 @@
 #define TAG "OIC_RI_PAYLOADCONVERT"
 //#undef OIC_LOG_V
 //#define OIC_LOG_V OIC_LOG_V_
+//#include "logger-off.h"
 
 // Arbitrarily chosen size that seems to contain the majority of packages
 #define INIT_SIZE (255)
@@ -70,7 +71,7 @@ static int64_t ConditionalAddTextStringToMap(CborEncoder *map, const char *key, 
         const char *value);
 
 OCStackResult OCConvertPayload(OCPayload* payload, uint8_t** outPayload, size_t* size)
-{
+{ OIC_LOG_HERE();//TODO   OIC_LOG_HERE();
     // TinyCbor Version 47a78569c0 or better on master is required for the re-allocation
     // strategy to work.  If you receive the following assertion error, please do a git-pull
     // from the extlibs/tinycbor/tinycbor directory
@@ -87,7 +88,7 @@ OCStackResult OCConvertPayload(OCPayload* payload, uint8_t** outPayload, size_t*
     VERIFY_PARAM_NON_NULL(TAG, outPayload, "OutPayload parameter is NULL");
     VERIFY_PARAM_NON_NULL(TAG, size, "size parameter is NULL");
 
-    OIC_LOG_V(INFO, TAG, "Converting payload of type %d", payload->type);
+    OIC_LOG_V_(INFO, TAG, "Converting payload of type %d", payload->type);
     if (PAYLOAD_TYPE_SECURITY == payload->type)
     {
         size_t securityPayloadSize = ((OCSecurityPayload *)payload)->payloadSize;
@@ -98,7 +99,8 @@ OCStackResult OCConvertPayload(OCPayload* payload, uint8_t** outPayload, size_t*
     }
 
     ret = OC_STACK_NO_MEMORY;
-
+    OIC_LOG_HERE();
+    OIC_LOG_V_(INFO, TAG, "size=%d=255", curSize);
     for (;;)
     {
         out = (uint8_t *)OICCalloc(1, curSize);
@@ -126,7 +128,7 @@ OCStackResult OCConvertPayload(OCPayload* payload, uint8_t** outPayload, size_t*
         *size = curSize;
         *outPayload = out;
         OIC_LOG_V(DEBUG, TAG, "Payload Size: %zd Payload : ", *size);
-        OIC_LOG_BUFFER(DEBUG, TAG, *outPayload, *size);
+        //OIC_LOG_BUFFER(DEBUG, TAG, *outPayload, *size);
         return OC_STACK_OK;
     }
 
@@ -139,7 +141,7 @@ exit:
 }
 
 static int64_t OCConvertPayloadHelper(OCPayload* payload, uint8_t* outPayload, size_t* size)
-{
+{ OIC_LOG_HERE();//TODO
     switch(payload->type)
     {
         case PAYLOAD_TYPE_DISCOVERY:
@@ -157,7 +159,7 @@ static int64_t OCConvertPayloadHelper(OCPayload* payload, uint8_t* outPayload, s
 }
 
 static int64_t checkError(int64_t err, CborEncoder* encoder, uint8_t* outPayload, size_t* size)
-{
+{ OIC_LOG_HERE();//TODO
     if (err == CborErrorOutOfMemory)
     {
         *size += cbor_encoder_get_extra_bytes_needed(encoder);
@@ -178,7 +180,7 @@ static int64_t checkError(int64_t err, CborEncoder* encoder, uint8_t* outPayload
 
 static int64_t OCConvertSecurityPayload(OCSecurityPayload* payload, uint8_t* outPayload,
         size_t* size)
-{
+{ OIC_LOG_HERE();//TODO
     memcpy(outPayload, payload->securityData, payload->payloadSize);
     *size = payload->payloadSize;
 
@@ -186,7 +188,7 @@ static int64_t OCConvertSecurityPayload(OCSecurityPayload* payload, uint8_t* out
 }
 
 static int64_t OCStringLLJoin(CborEncoder *map, char *type, OCStringLL *val)
-{
+{ OIC_LOG_HERE();//TODO
     uint16_t count = 0;
     int64_t err = CborNoError;
 
@@ -212,7 +214,7 @@ static int64_t OCStringLLJoin(CborEncoder *map, char *type, OCStringLL *val)
 
 static int64_t OCConvertDiscoveryPayload(OCDiscoveryPayload *payload, uint8_t *outPayload,
                                          size_t *size)
-{
+{ OIC_LOG_HERE();//TODO
     CborEncoder encoder;
     int64_t err = CborNoError;
 
@@ -468,7 +470,7 @@ exit:
 
 static int64_t OCConvertArrayItem(CborEncoder *array, const OCRepPayloadValueArray *valArray,
         size_t index)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = CborNoError;
     switch (valArray->type)
     {
@@ -522,7 +524,7 @@ static int64_t OCConvertArrayItem(CborEncoder *array, const OCRepPayloadValueArr
 }
 
 static int64_t OCConvertArray(CborEncoder *parent, const OCRepPayloadValueArray *valArray)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = CborNoError;
     CborEncoder array;
     err |= cbor_encoder_create_array(parent, &array, valArray->dimensions[0]);
@@ -586,7 +588,7 @@ exit:
 }
 
 static int64_t OCConvertRepMap(CborEncoder *map, const OCRepPayload *payload)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = CborNoError;
     CborEncoder encoder;
     OCRepPayloadValue *value = NULL;
@@ -633,7 +635,7 @@ exit:
 }
 
 static int64_t OCConvertSingleRepPayloadValue(CborEncoder *parent, const OCRepPayloadValue *value)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = CborNoError;
     switch (value->type)
     {
@@ -669,7 +671,7 @@ static int64_t OCConvertSingleRepPayloadValue(CborEncoder *parent, const OCRepPa
 }
 
 static int64_t OCConvertSingleRepPayload(CborEncoder *repMap, const OCRepPayload *payload)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = CborNoError;
     OCRepPayloadValue *value = payload->values;
     while (value)
@@ -687,7 +689,7 @@ exit:
 }
 
 static int64_t OCConvertRepPayload(OCRepPayload *payload, uint8_t *outPayload, size_t *size)
-{
+{ OIC_LOG_HERE();//TODO
     CborEncoder encoder;
     int64_t err = CborNoError;
 
@@ -755,7 +757,7 @@ exit:
 
 static int64_t OCConvertPresencePayload(OCPresencePayload *payload, uint8_t *outPayload,
         size_t *size)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = CborNoError;
     CborEncoder encoder;
 
@@ -800,7 +802,7 @@ exit:
 
 static int64_t AddTextStringToMap(CborEncoder* map, const char* key, size_t keylen,
         const char* value)
-{
+{ OIC_LOG_HERE();//TODO
     int64_t err = cbor_encode_text_string(map, key, keylen);
     if (CborNoError != err)
     {
@@ -811,6 +813,6 @@ static int64_t AddTextStringToMap(CborEncoder* map, const char* key, size_t keyl
 
 static int64_t ConditionalAddTextStringToMap(CborEncoder* map, const char* key, size_t keylen,
         const char* value)
-{
+{ OIC_LOG_HERE();//TODO
     return value ? AddTextStringToMap(map, key, keylen, value) : 0;
 }
