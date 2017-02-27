@@ -41,7 +41,7 @@
 #include "ocresourcehandler.h"
 #include "ocobserve.h"
 #include "occollection.h"
-#include "oic_malloc.h"
+
 #include "oic_string.h"
 #include "logger.h"
 #include "ocpayload.h"
@@ -51,7 +51,6 @@
 #include "ocpayload.h"
 #include "oickeepalive.h"
 #include "platform_features.h"
-#include "payload_logging.h"
 #include "ocendpoint.h"
 #include "ocstackinternal.h"
 #include "oickeepalive.h"
@@ -62,8 +61,12 @@
 
 /// Module Name
 #define TAG "OIC_RI_RESOURCE"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 #undef OIC_LOG_V
 #define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
+
 // using 1k as block size since most persistent storage implementations use a power of 2.
 #define INTROSPECTION_FILE_SIZE_BLOCK 1024
 
