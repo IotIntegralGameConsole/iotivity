@@ -33,12 +33,11 @@
 #include <inttypes.h>
 
 #include "cainterface.h"
-#include "payload_logging.h"
+
 #include "ocstack.h"
 #include "ocrandom.h"
 #include "base64.h"
 #include "ocserverrequest.h"
-#include "oic_malloc.h"
 #include "oic_string.h"
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
@@ -61,13 +60,14 @@
 #include <unistd.h>
 #endif
 
-#define TAG  "OIC_SRM_CREDL"
-
 #ifdef HAVE_WINDOWS_H
 #include <wincrypt.h>
 #include <intsafe.h>
 #endif
 
+#define TAG  "OIC_SRM_CREDL"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 
 /** Max credential types number used for TLS */
 #define MAX_TYPE 2
