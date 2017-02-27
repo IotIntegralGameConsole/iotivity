@@ -22,10 +22,9 @@
 #include <string.h>
 
 #include "ocstack.h"
-#include "oic_malloc.h"
+
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
-#include "payload_logging.h"
 #include "resourcemanager.h"
 #include "pstatresource.h"
 #include "doxmresource.h"
@@ -34,6 +33,8 @@
 #include "srmutility.h"
 
 #define TAG  "OIC_SRM_PSTAT"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 
 /** Default cbor payload size. This value is increased in case of CborErrorOutOfMemory.
  * The value of payload size is increased until reaching below max cbor size. */
