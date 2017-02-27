@@ -27,6 +27,9 @@
 #include "logger.h"
 
 #define TAG "OIC_CA_NW_CONFIG"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 static u_arraylist_t *g_selectedNetworkList = NULL;
 static CATransportAdapter_t CASelectedNetwork = CA_DEFAULT_ADAPTER;
