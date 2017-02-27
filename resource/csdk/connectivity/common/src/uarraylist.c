@@ -25,6 +25,9 @@
 #include "oic_malloc.h"
 
 #define TAG "OIC_UARRAYLIST"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 /**
  * Use this default capacity when initialized
