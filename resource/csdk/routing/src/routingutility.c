@@ -24,6 +24,7 @@
 #include "routingmanager.h"
 #include "oic_malloc.h"
 #include "include/logger.h"
+#include "include/logger-off.h"
 
 /**
  * Logging tag for module name.
