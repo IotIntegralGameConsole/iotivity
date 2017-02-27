@@ -77,6 +77,7 @@
 #define TAG "OIC_CA_TCP_SERVER"
 //#undef OIC_LOG_V
 //#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 /**
  * Maximum CoAP over TCP header length
