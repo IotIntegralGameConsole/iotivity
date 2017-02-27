@@ -20,10 +20,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "oic_malloc.h"
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
-#include "payload_logging.h"
 #include "psinterface.h"
 #include "resourcemanager.h"
 #include "utlist.h"
@@ -32,6 +30,8 @@
 #include "amaclresource.h"
 
 #define TAG  "OIC_SRM_AMACL"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 
 /** Default cbor payload size. This value is increased in case of CborErrorOutOfMemory.
  * The value of payload size is increased until reaching belox max cbor size. */
