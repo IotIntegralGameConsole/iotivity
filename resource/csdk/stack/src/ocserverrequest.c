@@ -42,6 +42,9 @@
 #define VERIFY_NON_NULL(arg) { if (!arg) {OIC_LOG(FATAL, TAG, #arg " is NULL"); goto exit;} }
 
 #define TAG  "OIC_RI_SERVERREQUEST"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+//#include "logger-off.h"
 
 // for RB tree
 static int RBRequestTokenCmp(OCServerRequest *target, OCServerRequest *treeNode)
@@ -216,6 +219,8 @@ OCServerRequest * GetServerRequestUsingToken (const CAToken_t token, uint8_t tok
  */
 OCServerRequest * GetServerRequestUsingHandle (const OCServerRequest * handle)
 {
+    OIC_LOG_HERE();
+
     if (!handle)
     {
         OIC_LOG(ERROR, TAG, "Invalid Parameter handle");
