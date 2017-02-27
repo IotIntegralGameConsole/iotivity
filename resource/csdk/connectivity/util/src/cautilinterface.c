@@ -28,7 +28,11 @@
 #if defined(TCP_ADAPTER) && defined(WITH_CLOUD)
 #include "caconnectionmanager.h"
 #endif
+
 #define TAG "OIC_CA_COMMON_UTILS"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 CAResult_t CARegisterNetworkMonitorHandler(CAAdapterStateChangedCB adapterStateCB,
                                            CAConnectionStateChangedCB connStateCB)
