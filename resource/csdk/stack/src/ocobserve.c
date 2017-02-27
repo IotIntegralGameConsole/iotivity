@@ -39,6 +39,9 @@
 #define MOD_NAME "ocobserve"
 
 #define TAG  "OIC_RI_OBSERVE"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 #define VERIFY_NON_NULL(arg) { if (!arg) {OIC_LOG(FATAL, TAG, #arg " is NULL"); goto exit;} }
 
