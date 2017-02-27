@@ -48,6 +48,7 @@
 #define TAG "OIC_CA_INF_CTR"
 #undef OIC_LOG_V
 #define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 #define CA_MEMORY_ALLOC_CHECK(arg) {if (arg == NULL) \
     {OIC_LOG(ERROR, TAG, "memory error");goto memory_error_exit;} }
