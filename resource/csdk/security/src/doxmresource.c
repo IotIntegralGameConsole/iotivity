@@ -27,8 +27,6 @@
 #endif
 
 #include "ocstack.h"
-#include "oic_malloc.h"
-#include "payload_logging.h"
 #include "utlist.h"
 #include "ocrandom.h"
 #include "ocpayload.h"
@@ -56,8 +54,11 @@
 #endif
 
 #define TAG  "OIC_SRM_DOXM"
+#include "oic_malloc.h"
+#include "payload_logging.h"
 //#undef OIC_LOG_V
 //#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 #define CHAR_ZERO ('0')
 
