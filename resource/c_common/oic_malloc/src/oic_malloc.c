@@ -37,8 +37,14 @@
 #define TAG "OIC_MALLOC"
 #undef OIC_LOG_V
 #define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 #endif
 
+#undef OICMalloc
+#define OICMalloc OICMalloc_
+
+#undef OICCalloc
+#define OICCalloc OICCalloc_
 //-----------------------------------------------------------------------------
 // Typedefs
 //-----------------------------------------------------------------------------
@@ -173,3 +179,22 @@ void OICClearMemory(void *buf, size_t n)
 #endif
     }
 }
+
+void* OICMalloclog_(size_t size, char* file, int line)
+{
+    OIC_LOG_V_(INFO, TAG, "%d:%d:%s mem:", 
+               size, freeMemory(),
+               file);
+    return OICMalloc_(size);
+}
+
+
+void *OICCalloclog_(size_t num, size_t size, char* file, int line )
+{
+    OIC_LOG_V_(INFO, TAG, "%d:%d:%s mem:",
+               size, freeMemory(),
+               file);
+    return  OICCalloc_(num,size);
+}
+
+
