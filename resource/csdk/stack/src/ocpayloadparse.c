@@ -34,13 +34,17 @@
 #include "oic_malloc.h"
 #include "ocpayloadcbor.h"
 #include "ocstackinternal.h"
-#include "payload_logging.h"
 #include "platform_features.h"
 #include "ocendpoint.h"
 
 #define TAG "OIC_RI_PAYLOADPARSE"
 //#undef OIC_LOG_V
 //#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
+#include "payload_logging.h"
+
+#define TAG "OIC_RI_PAYLOADPARSE"
+
 /*
  * The length of UINT64_MAX as a decimal string.
  */
