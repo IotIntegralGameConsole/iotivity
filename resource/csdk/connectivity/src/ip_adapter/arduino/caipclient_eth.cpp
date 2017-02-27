@@ -37,6 +37,9 @@
 #include "oic_string.h"
 
 #define TAG "IPC"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 static int g_sockID = 0;
 
