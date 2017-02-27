@@ -36,7 +36,11 @@
 #if defined( __WITH_TLS__) || defined(__WITH_DTLS__)
 #include "pkix_interface.h"
 #endif //__WITH_TLS__ or __WITH_DTLS__
+
 #define TAG  "OIC_SRM"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 //Request Callback handler
 static CARequestCallback gRequestHandler = NULL;
