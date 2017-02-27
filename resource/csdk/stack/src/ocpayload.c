@@ -35,6 +35,10 @@
 #include "cacommon.h"
 
 #define TAG "OIC_RI_PAYLOAD"
+#undef OIC_LOG_V
+#define OIC_LOG_V OIC_LOG_V_
+//#include "logger-off.h"
+
 #define CSV_SEPARATOR ','
 
 static void OCFreeRepPayloadValueContents(OCRepPayloadValue* val);
