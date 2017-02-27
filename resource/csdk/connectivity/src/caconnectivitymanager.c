@@ -44,6 +44,9 @@ CAGlobals_t caglobals = { .clientFlags = 0,
                           .serverFlags = 0, };
 
 #define TAG "OIC_CA_CONN_MGR"
+#undef OIC_LOG_V
+//#define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 static bool g_isInitialized = false;
 
