@@ -21,14 +21,12 @@
 #include "iotivity_config.h"
 #include <stdlib.h>
 #include <string.h>
-#include "ocstack.h"
-#include "logger.h"
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include "base64.h"
 #include "ocpayload.h"
 #include "ocpayloadcbor.h"
-#include "payload_logging.h"
+
 #include "resourcemanager.h"
 #include "pconfresource.h"
 #include "psinterface.h"
@@ -43,7 +41,11 @@
 #include <strings.h>
 #endif
 
+#include "logger.h"
 #define TAG  "OIC_SRM_PCONF"
+#include "ocstack.h"
+#include "payload_logging.h"
+
 
 static const uint16_t CBOR_SIZE = 1024;
 static const uint64_t CBOR_MAX_SIZE = 4400;
