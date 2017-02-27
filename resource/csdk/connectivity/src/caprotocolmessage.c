@@ -47,6 +47,7 @@
 #define TAG "OIC_CA_PRTCL_MSG"
 #undef OIC_LOG_V
 #define OIC_LOG_V OIC_LOG_V_
+#include "logger-off.h"
 
 #define CA_PDU_MIN_SIZE (4)
 #define CA_ENCODE_BUFFER_SIZE (4)
@@ -72,8 +73,7 @@ CAResult_t CAGetRequestInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *en
 
     uint32_t code = CA_NOT_FOUND;
     OIC_LOG_HERE();
-    //CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outReqInfo->info));
-    CAResult_t ret = CAGetInfoFromPDU(0,0,0,0);
+    CAResult_t ret = CAGetInfoFromPDU(pdu, endpoint, &code, &(outReqInfo->info));
     OIC_LOG_HERE();
     outReqInfo->method = code;
     OIC_LOG_HERE();
@@ -147,14 +147,14 @@ coap_pdu_t *CAGeneratePDU(uint32_t code, const CAInfo_t *info, const CAEndpoint_
         {
             OIC_LOG_V(DEBUG, TAG, "uri : %s", info->resourceUri);
 
-            uint32_t length = strlen(info->resourceUri);
+            size_t length = strlen(info->resourceUri);
             if (CA_MAX_URI_LENGTH < length)
             {
                 OIC_LOG(ERROR, TAG, "URI len err");
                 return NULL;
             }
 
-            uint32_t uriLength = length + sizeof(COAP_URI_HEADER);
+            size_t uriLength = length + sizeof(COAP_URI_HEADER);
             char *coapUri = (char *) OICCalloc(1, uriLength);
             if (NULL == coapUri)
             {
@@ -736,6 +736,11 @@ CAResult_t CAGetInfoFromPDU(const coap_pdu_t *pdu, const CAEndpoint_t *endpoint,
                             uint32_t *outCode, CAInfo_t *outInfo)
 {
     OIC_LOG_HERE();
+
+    void* p = malloc(1);
+    OIC_LOG_V(DEBUG, TAG, "mem=%x", p);
+    int mem = freeMemory();
+    OIC_LOG_V(DEBUG, TAG, "mem=%d", mem);
     VERIFY_NON_NULL(pdu, TAG, "pdu");
     VERIFY_NON_NULL(endpoint, TAG, "endpoint");
     VERIFY_NON_NULL(outCode, TAG, "outCode");
