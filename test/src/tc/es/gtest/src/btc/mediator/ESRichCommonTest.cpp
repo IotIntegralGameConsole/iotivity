@@ -181,7 +181,7 @@ TEST_F(ESRichCommonTest_btc, SetCloudProp_NV_N)
     }
     catch (exception& e)
     {
-        ASSERT_EQ(std::string(e.what()), "basic_string::_S_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
+        ASSERT_EQ(std::string(e.what()), "basic_string::_M_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
     }
 }
 
@@ -253,7 +253,7 @@ TEST_F(ESRichCommonTest_btc, setCloudID_NV_P)
     }
     catch (exception& e)
     {
-        ASSERT_EQ(std::string(e.what()), "basic_string::_S_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
+        ASSERT_EQ(std::string(e.what()), "basic_string::_M_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
 //        SET_FAILURE("Exception occurred in set CloudId: " + std::string(e.what()));
     }
 }
@@ -427,7 +427,7 @@ TEST_F(ESRichCommonTest_btc, SetWiFiProp_NV_N)
     }
     catch (exception& e)
     {
-        ASSERT_EQ(std::string(e.what()), "basic_string::_S_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
+        ASSERT_EQ(std::string(e.what()), "basic_string::_M_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
     }
 }
 
@@ -499,7 +499,7 @@ TEST_F(ESRichCommonTest_btc, SetDevConfProp_NV_N)
     }
     catch (exception& e)
     {
-        ASSERT_EQ(std::string(e.what()), "basic_string::_S_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
+        ASSERT_EQ(std::string(e.what()), "basic_string::_M_construct null not valid")<<"Exception occurred in provisionProperties but not null type";
     }
 }
 
