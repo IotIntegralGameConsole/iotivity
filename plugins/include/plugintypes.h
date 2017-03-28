@@ -49,7 +49,11 @@ typedef enum
 /**
  * Handle to a plugin.
  */
-typedef struct PIPlugin {} PIPlugin;
+typedef struct PIPlugin {
+#if defined(_MSC_VER) || defined(__clang__)
+    const uint8_t unused;
+#endif
+} PIPlugin;
 
 #ifdef __cplusplus
 }
