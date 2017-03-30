@@ -40,6 +40,9 @@ Import('env')
 if os.environ.get('TERM') is not None:
     env['ENV']['TERM'] = os.environ['TERM']
 
+env["CC"] = 'clang'
+env["CXX"] = 'clang++'
+
 # Load extra options
 SConscript('extra_options.scons')
 
