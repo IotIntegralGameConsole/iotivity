@@ -25,12 +25,15 @@
 import platform
 Import('env')
 
+target_os = env.get('TARGET_OS')
+
 if env.get('RELEASE'):
     env.AppendUnique(CCFLAGS=['-Os'])
     env.AppendUnique(CPPDEFINES=['NDEBUG'])
 else:
     env.AppendUnique(CCFLAGS=['-g'])
-
+    if target_os in ['linux', 'tizen']:
+        env.AppendUnique(LINKFLAGS = ['--coverage'])
 if env.get('LOGGING'):
     env.AppendUnique(CPPDEFINES=['TB_LOG'])
 
