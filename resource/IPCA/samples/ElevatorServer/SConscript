@@ -67,7 +67,7 @@ elevator_server_env.PrependUnique(LIBS = [
 
 if elevator_server_env.get('SECURED') == '1':
     elevator_server_env.AppendUnique(CPPDEFINES = ['SECURED'])
-    elevator_server_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509','mbedcrypto', 'ocprovision'])
+    elevator_server_env.AppendUnique(LIBS = ['mbedtls', 'mbedx509','mbedcrypto', 'ocprovision', 'ocpmapi'])
 
 if target_os in ['msys_nt', 'windows']:
     elevator_server_env.AppendUnique(LINKFLAGS = ['/subsystem:CONSOLE'])

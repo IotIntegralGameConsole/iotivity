@@ -77,12 +77,19 @@ if use_iotivity == 1:
             'mbedtls',
             'mbedx509',
             'mbedcrypto',
-            'ocprovision'
+            'ocprovision',
+            'ocpmapi',
             ])
 
 if target_os in ['msys_nt', 'windows']:
     ipcatest_env.AppendUnique(LINKFLAGS = ['/subsystem:CONSOLE'])
     ipcatest_env.AppendUnique(LIBS=['win_helper'])
+else:
+    ipcatest_env.PrependUnique(LIBS = [
+        'oc',
+        'connectivity_abstraction',
+        'coap',
+])
 
 ######################################################################
 # Source files and Targets

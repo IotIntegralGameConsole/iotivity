@@ -35,7 +35,18 @@ ipcaapp_env.PrependUnique(CPPPATH = [
 ipcaapp_env.PrependUnique(LIBS = ['ipca'])
 
 if target_os not in ['windows', 'msys_nt']:
-    ipcaapp_env.AppendUnique(LIBS = ['dl'])
+    ipcaapp_env.AppendUnique(LIBS = [
+        'oc',
+        'octbstack',
+        'oc_logger',
+        'connectivity_abstraction',
+        'dl'
+])
+    if ipcaapp_env.get('SECURED') == '1':
+        ipcaapp_env.AppendUnique(LIBS = [
+             'ocprovision',
+             'ocpmapi'
+])
 
 if 'g++' in ipcaapp_env.get('CXX'):
     ipcaapp_env.AppendUnique(CXXFLAGS = ['-Wall', '-std=c++0x'])
