@@ -121,13 +121,8 @@ install:
 	scons ${config_build} $@
 	${MAKE} rule/install
 
-rule/install: rule/fix rule/install_headers
-	@echo "TODO:  rule/install_examples"
-	install -d ${DESTDIR}${libdir}/${name}/examples/
-	touch ${DESTDIR}${libdir}/${name}/examples/TODO
-
+rule/install: rule/fix rule/install_headers rule/install_examples
 	install -d ${DESTDIR}${libdir}
-
 	find . -iname "lib*.a" -exec install "{}" ${DESTDIR}${libdir}/ \;
 	find . -iname "lib*.so" -exec install "{}" ${DESTDIR}${libdir}/ \;
 	-rm -fv ${DESTDIR}${libdir}/lib*.a
@@ -180,6 +175,7 @@ rule/install_headers: resource service
 
 
 rule/install_examples: out/${TARGET_OS}/${TARGET_ARCH}/${build_dir}
+	install -d ${DESTDIR}${libdir}/${name}/examples/
 	install $</resource/examples/*client ${DESTDIR}${libdir}/${name}/examples/
 	install $</resource/examples/*server ${DESTDIR}${libdir}/${name}/examples/
 	install $</*/*/*/*client ${DESTDIR}${libdir}/${name}/examples/
