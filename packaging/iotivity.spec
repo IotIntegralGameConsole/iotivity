@@ -3,7 +3,7 @@ Version: 1.2.1
 Release: 0
 Summary: IoT Connectivity sponsored by the OCF
 Group: Network & Connectivity / IoT Connectivity
-License: Apache-2.0 and BSD-2-Clause and (MIT or BSL-1.0) and MIT
+License: Apache-2.0
 URL: https://www.iotivity.org/
 Source0: http://mirrors.kernel.org/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source1001: %{name}.manifest
@@ -123,24 +123,7 @@ developing applications that use %{name}.
 %setup -q
 chmod g-w %_sourcedir/*
 
-find . \
-     -iname "LICEN*E*"  \
-     -o -name "*BSD*" \
-     -o -name "*COPYING*" \
-     -o -name "*GPL*" \
-     -o -name "*MIT*" \
-     | sort | uniq \
-     | grep -v 'libcoap-4.1.1/LICENSE.GPL'  \
-     | while read file ; do \
-          dir=$(dirname -- "$file")
-          echo "Files: ${dir}/*"
-          echo "License: ${file}"
-          sed 's/^/ /' "${file}"
-          echo ""
-          echo ""
-     done > tmp.tmp && mv tmp.tmp LICENSE
-
-cat LICENSE
+cp LICENSE.md LICENSE
 
 cp %{SOURCE1001} .
 %if 0%{?tizen_version_major} < 3
@@ -148,7 +131,6 @@ cp %{SOURCE1002} .
 %else
 cp %{SOURCE1001} ./%{name}-test.manifest
 %endif
-
 
 %build
 scons %{?_smp_mflags} --prefix=%{_prefix} \
