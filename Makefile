@@ -156,7 +156,7 @@ rule/install_examples: ${outdir}
 	install $</resource/examples/* ${DESTDIR}${libdir}/${name}/examples/cpp/
 	rm -f ${DESTDIR}${libdir}/${name}/examples/cpp/*.o
 
-rule/install/secure_mode:  ${outdir}  rule/install/secure_mode/1
+rule/install/secure_mode/:  ${outdir}  rule/install/secure_mode/1
 	find $< -type f -executable | grep -v '.so$$'
 
 rule/install/secure_mode/1: ${outdir}
