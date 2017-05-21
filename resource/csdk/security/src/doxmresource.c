@@ -953,6 +953,11 @@ static bool ValidateQuery(const char * query)
             bDeviceIDQry = true;
             OicUuid_t subject = {.id={0}};
 
+            if (sizeof(subject.id) < parseIter.valLen)
+            {
+                OIC_LOG (ERROR, TAG, "Subject ID length is too long");
+                return false;
+            }
             memcpy(subject.id, parseIter.valPos, parseIter.valLen);
             if (0 == memcmp(&gDoxm->deviceID.id, &subject.id, sizeof(gDoxm->deviceID.id)))
             {
@@ -1087,6 +1092,12 @@ void MultipleOwnerDTLSHandshakeCB(const CAEndpoint_t *object,
         CAResult_t caRes = CAGetSecureEndpointData(object, &authenticationSubOwnerInfo);
         if (CA_STATUS_OK == caRes)
         {
+            if (!gDoxm)
+            {
+                OIC_LOG_V(WARNING, TAG, "%s: gDoxm is NULL", __func__);
+                return;
+            }
+
             if (0 == memcmp(authenticationSubOwnerInfo.identity.id, gDoxm->owner.id,
                             authenticationSubOwnerInfo.identity.id_length))
             {
@@ -1111,6 +1122,11 @@ void MultipleOwnerDTLSHandshakeCB(const CAEndpoint_t *object,
                 if(subOwnerInst)
                 {
                     char* strUuid = NULL;
+                    if (sizeof(subOwnerInst->uuid.id) < authenticationSubOwnerInfo.identity.id_length)
+                    {
+                        OIC_LOG(ERROR, TAG, "Identity id is too long");
+                        return;
+                    }
                     memcpy(subOwnerInst->uuid.id, authenticationSubOwnerInfo.identity.id,
                            authenticationSubOwnerInfo.identity.id_length);
                     if(OC_STACK_OK != ConvertUuidToStr(&subOwnerInst->uuid, &strUuid))
@@ -1250,6 +1266,8 @@ static OCEntityHandlerResult HandleDoxmPostRequest(OCEntityHandlerRequest * ehRe
                 ehRet = OC_EH_NOT_ACCEPTABLE;
                 goto exit;
             }
+
+            VERIFY_NOT_NULL(TAG, gDoxm, ERROR);
 
             // in owned state
             if (true == gDoxm->owned)
@@ -1583,7 +1601,7 @@ static OCEntityHandlerResult HandleDoxmPostRequest(OCEntityHandlerRequest * ehRe
                         ehRet = OC_EH_ERROR;
                     }
 
-                    RegisterOTMSslHandshakeCallback(NULL);
+                    RegisterOTMSslHandshakeCallback(DoxmDTLSHandshakeCB);
                     CAResult_t caRes = CAEnableAnonECDHCipherSuite(false);
                     VERIFY_SUCCESS(TAG, caRes == CA_STATUS_OK, ERROR);
                     OIC_LOG(INFO, TAG, "ECDH_ANON CipherSuite is DISABLED");
@@ -1759,7 +1777,7 @@ OCStackResult CreateDoxmResource()
                                          OIC_RSRC_DOXM_URI,
                                          DoxmEntityHandler,
                                          NULL,
-                                         OC_SECURE |
+                                         OC_SECURE | OC_NONSECURE |
                                          OC_DISCOVERABLE);
 
     if (OC_STACK_OK != ret)
@@ -1777,8 +1795,12 @@ OCStackResult CreateDoxmResource()
  */
 static OCStackResult CheckDeviceID()
 {
+    OIC_LOG_V(DEBUG, TAG, "IN: %s", __func__);
+
     OCStackResult ret = OC_STACK_ERROR;
     bool validId = false;
+
+    VERIFY_NOT_NULL_RETURN(TAG, gDoxm, ERROR, OC_STACK_INVALID_PARAM);
 
     for (uint8_t i = 0; i < UUID_LENGTH; i++)
     {
@@ -1861,6 +1883,8 @@ static OCStackResult CheckDeviceID()
     {
         ret = OC_STACK_OK;
     }
+
+    OIC_LOG_V(DEBUG, TAG, "OUT: %s", __func__);
 
     return ret;
 }
@@ -2219,6 +2243,8 @@ OCStackResult SetMOTStatus(bool enable)
     bool isDeallocateRequired = false;
 
     OIC_LOG_V(DEBUG, TAG, "In %s", __func__);
+
+    VERIFY_NOT_NULL(TAG, gDoxm, ERROR);
 
     if (NULL == gDoxm->mom && !enable)
     {

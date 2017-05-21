@@ -49,8 +49,6 @@
 
 #include "srmutility.h"
 
-static const unsigned int USECS_PER_MSEC = 1000;
-
 #define TAG ("OIC_PM_UTILITY")
 
 typedef struct _DiscoveryInfo{
@@ -762,7 +760,7 @@ static OCStackApplicationResult SecurePortDiscoveryHandler(void *ctx, OCDoHandle
                         ((OC_IP_USE_V6 == clientResponse->devAddr.flags &&
                           strchr(eps->addr, ':')) ||
                          (OC_IP_USE_V4 == clientResponse->devAddr.flags &&
-                          strchr(eps->addr, ','))))
+                          strchr(eps->addr, '.'))))
                     {
                             securePort = eps->port;
                             break;
@@ -1262,6 +1260,9 @@ OCStackResult PMSingleDeviceDiscoveryInUnicast(unsigned short waittime, const Oi
 }
 
 #ifdef MULTIPLE_OWNER
+
+static const unsigned int IOTIVITY_USECS_PER_MSEC = 1000;
+
 static OCStackApplicationResult MOTDeviceDiscoveryHandler(void *ctx, OCDoHandle UNUSED,
                                 OCClientResponse *clientResponse)
 {
@@ -1481,7 +1482,7 @@ OCStackResult PMMultipleOwnerSingleDeviceDiscovery(unsigned short timeoutSeconds
             }
 
             // Sleep for 100 ms to free up the CPU
-            usleep(100 * USECS_PER_MSEC);
+            usleep(100 * IOTIVITY_USECS_PER_MSEC);
 
             res = OCProcess();
         }

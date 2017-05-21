@@ -21,7 +21,9 @@
 
 #include "iotivity_config.h"
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -1370,10 +1372,10 @@ static void SetupCipher(mbedtls_ssl_config * config, CATransportAdapter_t adapte
     // Add all certificate ciphersuites
     if (true == g_caSslContext->cipherFlag[1])
     {
-        for (int i = 0; i < SSL_CIPHER_MAX - 1; i++)
+        for (unsigned int i = 0; i < SSL_CIPHER_MAX - 1; i++)
         {
-            if (MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 != tlsCipher[i][0] &&
-                    i != g_caSslContext->cipher)
+            if ((MBEDTLS_TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 != tlsCipher[i][0]) &&
+                    (i != (unsigned int)g_caSslContext->cipher))
             {
                 g_cipherSuitesList[index] = tlsCipher[i][0];
                 index ++;
@@ -1789,7 +1791,7 @@ SslCacheMessage_t *  NewCacheMessage(uint8_t * data, size_t dataLen)
 /* Send data via TLS connection.
  */
 CAResult_t CAencryptSsl(const CAEndpoint_t *endpoint,
-                        void *data, size_t dataLen)
+                        const void *data, size_t dataLen)
 {
     int ret = 0;
 
@@ -2074,7 +2076,7 @@ CAResult_t CAdecryptSsl(const CASecureEndpoint_t *sep, uint8_t *data, size_t dat
                     OIC_LOG_V(DEBUG, NET_SSL_TAG, "Out %s", __func__);
                     return CA_STATUS_FAILED;
                 }
-                else if (ret > sizeof(peer->sep.publicKey))
+                else if ((size_t)ret > sizeof(peer->sep.publicKey))
                 {
                     assert(!"publicKey field of CASecureEndpoint_t is too small for the public key!");
                     OIC_LOG(ERROR, NET_SSL_TAG, "Public key of remote peer was too large");

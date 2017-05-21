@@ -498,7 +498,17 @@ OCStackResult BuildResponseRepresentation(const OCResource *resourcePtr,
             OIC_LOG_V(DEBUG, TAG, "value: %s", value);
             itf[i] = OICStrdup(value);
         }
-        OCRepPayloadSetStringArrayAsOwner(tempPayload, OC_RSRVD_INTERFACE, itf, ifDim);
+
+        bool b = OCRepPayloadSetStringArrayAsOwner(tempPayload, OC_RSRVD_INTERFACE, itf, ifDim);
+
+        if (!b)
+        {
+            for (uint8_t i = 0; i < numElement; i++)
+            {
+                OICFree(itf[i]);
+            }
+            OICFree(itf);
+        }
     }
 
     for (OCAttribute *resAttrib = resourcePtr->rsrcAttributes; resAttrib; resAttrib = resAttrib->next)
@@ -1273,11 +1283,6 @@ OCStackResult BuildVirtualResourceResponse(const OCResource *resourcePtr,
        }
     }
 
-    bool isVirtual = false;
-    if (GetTypeOfVirtualURI(resourcePtr->uri) != OC_UNKNOWN_URI)
-    {
-        isVirtual = true;
-    }
 #ifdef TCP_ADAPTER
     uint16_t tcpPort = 0;
     GetTCPPortInfo(devAddr, &tcpPort, (resourcePtr->resourceProperties & OC_SECURE));
