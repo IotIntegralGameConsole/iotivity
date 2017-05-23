@@ -94,7 +94,7 @@ Alias("easysetup_enrollee_test", easysetup_enrollee_test)
 env.AppendTarget('easysetup_enrollee_test')
 
 if env.get('TEST') == '1':
-    if target_os in ['linux'] and env.get('SECURED') != '1':
+    if target_os in ['TODO/linux'] and env.get('SECURED') != '1':
         from tools.scons.RunTest import run_test
         run_test(easysetup_enrollee_test_env,
 #      temporary blocking until valigrind error resolved in /resource layer
