@@ -493,6 +493,8 @@ def build_simulator(flag, extra_option_str):
     build_options = {
                         'SIMULATOR':1,
                         'RELEASE':flag,
+                        'SECURED':0,
+                        'TARGET_TRANSPORT':'IP',
                     }
     call_scons(build_options, extra_option_str)
 
