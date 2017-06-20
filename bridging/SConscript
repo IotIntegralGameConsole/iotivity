@@ -48,3 +48,13 @@ if target_os not in [
     SConscript('plugins/nest_plugin/SConscript')
 
     SConscript('plugins/lyric_plugin/SConscript')
+
+    env.UserInstallTargetHeader('#/bridging/include/ConcurrentIotivityUtils.h', 'bridging', 'ConcurrentIotivityUtils.h')
+    env.UserInstallTargetHeader('#/bridging/include/curlClient.h', 'bridging', 'curlClient.h')
+    env.UserInstallTargetHeader('#/bridging/include/IotivityWorkItem.h', 'bridging', 'IotivityWorkItem.h')
+    env.UserInstallTargetHeader('#/bridging/include/JsonHelper.h', 'bridging', 'JsonHelper.h')
+    env.UserInstallTargetHeader('#/bridging/include/messageHandler.h', 'bridging', 'messageHandler.h')
+    env.UserInstallTargetHeader('#/bridging/include/mpmErrorCode.h', 'bridging', 'mpmErrorCode.h')
+    env.UserInstallTargetHeader('#/bridging/include/pluginIf.h', 'bridging', 'pluginIf.h')
+    env.UserInstallTargetHeader('#/bridging/include/pluginServer.h', 'bridging', 'pluginServer.h')
+    env.UserInstallTargetHeader('#/bridging/include/WorkQueue.h', 'bridging', 'WorkQueue.h')

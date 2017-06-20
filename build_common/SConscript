@@ -259,6 +259,43 @@ if target_os == 'windows':
                      default='0',
                      allowed_values=('0', '1')))
 
+help_vars.Add(
+    BoolVariable('BUILD_JAVA',
+                 'Build Java bindings',
+                 False))
+help_vars.Add(
+    PathVariable('JAVA_HOME',
+                 'JDK directory',
+                 os.environ.get('JAVA_HOME'),
+                 PathVariable.PathAccept))
+help_vars.Add(
+    EnumVariable('OIC_SUPPORT_TIZEN_TRACE',
+                 'Tizen Trace(T-trace) api availability',
+                 'False',
+                 allowed_values=('True', 'False')))
+
+help_vars.Add(
+    PathVariable('PREFIX',
+                 'Installation Prefix directory',
+                 None,
+                 PathVariable.PathAccept))
+
+help_vars.Add(
+    PathVariable('prefix',
+                 'Installation Prefix directory',
+                 None,
+                 PathVariable.PathAccept))
+
+help_vars.Add(
+    BoolVariable('WITH_EXAMPLES',
+                 'Install example binaries',
+                 False))
+
+help_vars.Add(
+    BoolVariable('WITH_UNIT_TESTS',
+                 'Install unit tests',
+                 False))
+
 AddOption(
     '--prefix',
     dest='prefix',
@@ -438,7 +475,44 @@ def __set_dir(env, dir):
     env.Replace(SRC_DIR=dir)
 
 
-def __src_to_obj(env, src, home=''):
+######################################################################
+# Installation configurations and routines
+######################################################################
+
+def firstNotNone(iterable):
+    it = iter(iterable)
+    try:
+        return next(value for value in iterable if value is not None)
+    except StopIteration:
+        return None
+
+# Install prefix variable
+user_prefix = firstNotNone([
+    GetOption('prefix'),
+    env.get('PREFIX'),
+    env.get('prefix'),
+    os.getenv('PREFIX'),
+    '/usr/local'])
+
+# Library directory name (eg. lib or lib64)
+user_lib = firstNotNone([
+    env.get('LIB_INSTALL_DIR'),
+    os.getenv('LIB_INSTALL_DIR'),
+    'lib'])
+
+with_examples   = env.get('WITH_EXAMPLES')
+with_unit_tests = env.get('WITH_UNIT_TESTS')
+
+install_path               = os.path.join('$PREFIX')
+install_bindir             = os.path.join(install_path, 'bin')
+install_libdir             = os.path.join(install_path, user_lib)
+install_includedir         = os.path.join(install_path, 'include')
+install_includeiotivitydir = os.path.join(install_includedir, 'iotivity')
+install_datadir            = os.path.join(install_path, 'share')
+
+INSTALL_TARGET = 'install'
+
+def __src_to_obj(env, src, home = ''):
     #
     # make sure builds happen in BUILD_DIR (by default they
     # would happen in the directory of the source file)
@@ -457,47 +531,45 @@ def __install(ienv, targets, name):
 
 
 def __installlib(ienv, targets, name):
-    user_prefix = env.get('PREFIX')
-    if user_prefix:
-        user_lib = env.get('LIB_INSTALL_DIR')
-        if user_lib:
-            i_n = ienv.Install(user_lib, targets)
-        else:
-            i_n = ienv.Install(user_prefix + '/lib', targets)
-        ienv.Alias("install", i_n)
+    if INSTALL_TARGET in COMMAND_LINE_TARGETS:
+        i_n = ienv.Install(install_libdir, targets)
     else:
         i_n = ienv.Install(env.get('BUILD_DIR'), targets)
-    ienv.Alias("install", i_n)
+    ienv.Alias(INSTALL_TARGET, i_n)
 
 
 def __installbin(ienv, targets, name):
-    user_prefix = env.get('PREFIX')
-    if user_prefix:
-        i_n = ienv.Install(user_prefix + '/bin', targets)
-        ienv.Alias("install", i_n)
+    if INSTALL_TARGET not in COMMAND_LINE_TARGETS:
+        return
+    i_n = ienv.Install(install_bindir, targets)
+    ienv.Alias(INSTALL_TARGET, i_n)
 
 
-def __installheader(ienv, targets, dir, name):
-    user_prefix = env.get('PREFIX')
-    if user_prefix:
-        i_n = ienv.Install(user_prefix + '/include/iotivity/' + dir, targets)
+def __installexamplebin(ienv, targets, name):
+    if not with_examples or INSTALL_TARGET not in COMMAND_LINE_TARGETS:
+        return
+    __installbin(ienv, targets, name)
+
+
+def __installunittestbin(ienv, targets, name):
+    if not with_unit_tests or INSTALL_TARGET not in COMMAND_LINE_TARGETS:
+        return
+    __installbin(ienv, targets, name)
+
+def __installheader(ienv, targets, dir='', name=None):
+    if INSTALL_TARGET in COMMAND_LINE_TARGETS:
+        i_n = ienv.Install(os.path.join(install_includeiotivitydir, dir), targets)
     else:
-        i_n = ienv.Install(
-            os.path.join(env.get('BUILD_DIR'), 'include', dir), targets)
-    ienv.Alias("install", i_n)
+        i_n = ienv.Install(os.path.join(env.get('BUILD_DIR'), 'include', dir), targets)
+    ienv.Alias(INSTALL_TARGET, i_n)
 
 
 def __installpcfile(ienv, targets, name):
-    user_prefix = env.get('PREFIX')
-    if user_prefix:
-        user_lib = env.get('LIB_INSTALL_DIR')
-        if user_lib:
-            i_n = ienv.Install(user_lib + '/pkgconfig', targets)
-        else:
-            i_n = ienv.Install(user_prefix + '/lib/pkgconfig', targets)
+    if INSTALL_TARGET in COMMAND_LINE_TARGETS:
+        i_n = ienv.Install(os.path.join(install_libdir, 'pkgconfig'), targets)
     else:
-        i_n = ienv.Install(env.get('BUILD_DIR') + 'lib/pkgconfig', targets)
-    ienv.Alias("install", i_n)
+        i_n = ienv.Install(os.path.join(env.get('BUILD_DIR'), 'pkgconfig'), targets)
+    ienv.Alias(INSTALL_TARGET, i_n)
 
 
 def __append_target(ienv, name, targets=None):
@@ -531,6 +603,8 @@ env.AddMethod(__src_to_obj, 'SrcToObj')
 env.AddMethod(__append_target, 'AppendTarget')
 env.AddMethod(__add_pthread_if_needed, 'AddPthreadIfNeeded')
 env.AddMethod(__install, 'InstallTarget')
+env.AddMethod(__installexamplebin, 'InstallExampleTarget')
+env.AddMethod(__installunittestbin, 'InstallUnitTestTarget')
 env.AddMethod(__installlib, 'UserInstallTargetLib')
 env.AddMethod(__installbin, 'UserInstallTargetBin')
 env.AddMethod(__installheader, 'UserInstallTargetHeader')
@@ -546,14 +620,7 @@ Export('env')
 ######################################################################
 pc_file = env.get('SRC_DIR') + '/iotivity.pc.in'
 
-user_prefix = env.get('PREFIX')
-user_lib = env.get('LIB_INSTALL_DIR')
-
-if not user_prefix:
-    user_prefix = env.get('BUILD_DIR').encode('string_escape')
-
-if not user_lib:
-    user_lib = '$${prefix}/lib'
+user_prefix = user_prefix.encode('string_escape')
 
 defines = []
 if env.get('LOGGING'):
@@ -579,7 +646,7 @@ pc_vars = {
     '\@VERSION\@': project_version,
     '\@PREFIX\@': user_prefix,
     '\@EXEC_PREFIX\@': user_prefix,
-    '\@LIB_INSTALL_DIR\@': user_lib,
+    '\@LIB_INSTALL_DIR\@': '$${prefix}/' + user_lib,
     '\@DEFINES\@': " ".join(defines),
     '\@LIBS\@': " ".join(libs)
 }
@@ -629,7 +696,7 @@ if (target_os == 'arduino'):
 elif (('IP' in target_transport) or ('ALL' in target_transport)):
     env.AppendUnique(CPPDEFINES=['WITH_BWT'])
 
-if (target_os in ['linux', 'tizen', 'android'] and with_tcp):
+if (target_os in ['linux', 'tizen', 'android', 'yocto'] and with_tcp):
     env.AppendUnique(CPPDEFINES=['WITH_TCP'])
 
 if (target_os in ['linux', 'tizen', 'android', 'arduino', 'ios']):

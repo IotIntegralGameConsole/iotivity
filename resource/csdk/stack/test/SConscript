@@ -85,6 +85,8 @@ if target_os not in ['msys_nt', 'windows']:
 ######################################################################
 stacktests = stacktest_env.Program('stacktests', ['stacktests.cpp'])
 cbortests = stacktest_env.Program('cbortests', ['cbortests.cpp'])
+stacktest_env.InstallUnitTestTarget(stacktests, 'stacktest')
+stacktest_env.InstallUnitTestTarget(cbortests, 'cbortests')
 
 Alias("test", [stacktests, cbortests])
 

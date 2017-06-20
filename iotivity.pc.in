@@ -3,8 +3,9 @@
 prefix=@PREFIX@
 exec_prefix=${prefix}
 libdir=@LIB_INSTALL_DIR@
-includedir=${prefix}/include/iotivity
-svcincludedir=${includedir}/service
+includedir=${prefix}/include
+iotincludedir=${includedir}/iotivity
+svcincludedir=${iotincludedir}/service
 
 Name: iotivity
 Description: IoTivity is an open source reference implementation of the OIC standard specifications. This includes the libs for resource c and c++ sdk apis.
@@ -12,10 +13,11 @@ Version: @VERSION@
 URL: https://www.iotivity.org
 Requires:
 Libs: -L${libdir} -loc -loc_logger -loc_logger_core -loctbstack -lconnectivity_abstraction @LIBS@
-Cflags: -I${includedir}/resource \
-			-I${includedir}/resource/stack \
-			-I${includedir}/resource/oc_logger \
-			-I${includedir}/c_common \
+Cflags: -I${includedir} \
+			-I${iotincludedir}/resource \
+			-I${iotincludedir}/resource/stack \
+			-I${iotincludedir}/resource/oc_logger \
+			-I${iotincludedir}/c_common \
 			-I${svcincludedir}/easy-setup \
 			-I${svcincludedir}/notification \
 			-I${svcincludedir}/resource-encapsulation \

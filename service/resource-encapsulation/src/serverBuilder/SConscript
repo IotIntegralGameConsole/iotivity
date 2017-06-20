@@ -132,6 +132,7 @@ if target_os in ['linux']:
         'rcs_server_test', server_builder_test_src)
     Alias("rcs_server_test", server_builder_test)
     server_builder_test_env.AppendTarget('rcs_server_test')
+    server_builder_test_env.InstallUnitTestTarget(server_builder_test, 'rcs_server_test')
 
     if server_builder_test_env.get('TEST') == '1':
         server_builder_test_env.AppendUnique(CPPDEFINES=['HIPPOMOCKS_ISSUE'])

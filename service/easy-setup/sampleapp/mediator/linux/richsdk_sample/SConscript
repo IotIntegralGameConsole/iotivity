@@ -76,6 +76,8 @@ if env.get('SECURED') == '1':
 
 mediator = mediator_env.Program('mediator', 'mediator.cpp')
 submediator = mediator_env.Program('submediator', 'submediator.cpp')
+mediator_env.InstallExampleTarget(mediator, 'mediator')
+mediator_env.InstallExampleTarget(submediator, 'submediator')
 
 submediator += mediator_env.ScanJSON('service/easy-setup/sampleapp/mediator/linux/richsdk_sample')
 

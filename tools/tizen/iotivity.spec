@@ -276,10 +276,8 @@ cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/oic_svr_db_cl
 find "%{buildroot}" -type f -perm /u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
-# Support legacy path (transitional, use pkg-config)
-ln -fs iotivity/resource %{buildroot}%{_includedir}/
-ln -fs iotivity/service %{buildroot}%{_includedir}/
-ln -fs iotivity/c_common %{buildroot}%{_includedir}/
+# Support legacy places (before pkg-config)
+ln -fs iotivity/{resource,service,c_common}  %{buildroot}%{_includedir}/
 
 rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 

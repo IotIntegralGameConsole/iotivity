@@ -53,6 +53,7 @@ rcs_common_test_src = [
 rcs_common_test = rcs_common_test_env.Program('rcs_common_test', rcs_common_test_src)
 Alias("rcs_common_test", rcs_common_test)
 rcs_common_test_env.AppendTarget('rcs_common_test')
+rcs_common_test_env.InstallUnitTestTarget(rcs_common_test, 'rcs_common_test')
 
 if rcs_common_test_env.get('TEST') == '1':
     rcs_common_test_env.AppendUnique(CPPDEFINES=['HIPPOMOCKS_ISSUE'])

@@ -92,6 +92,7 @@ easysetup_mediator_test = easysetup_mediator_test_env.Program(
     'easysetup_mediator_test', src_files)
 Alias("easysetup_mediator_test", easysetup_mediator_test)
 env.AppendTarget('easysetup_mediator_test')
+easysetup_mediator_test_env.InstallUnitTestTarget(easysetup_mediator_test, 'easysetup_mediator_test')
 
 if env.get('TEST') == '1':
     if target_os in ['linux'] and env.get('SECURED') != '1':

@@ -150,3 +150,6 @@ if target_os in ['msys_nt', 'windows']:
 
 Alias("examples", examples)
 examples_env.AppendTarget('examples')
+
+for name, example in zip(example_names, examples):
+    examples_env.InstallExampleTarget(example, name)

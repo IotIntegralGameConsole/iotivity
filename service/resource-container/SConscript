@@ -293,6 +293,7 @@ if target_os not in ['ios']:
                                                      containersampleapp_src)
     Alias("containersample", containersampleapp)
     env.AppendTarget('containersample')
+    containersample_env.InstallExampleTarget(containersampleapp, 'containersample')
 
     ######################################################################
     # Build Container Sample Client
@@ -306,6 +307,7 @@ if target_os not in ['ios']:
         'ContainerSampleClient', containersampleclient_src)
     Alias("containersampleclient", containersampleclientapp)
     env.AppendTarget('containersampleclient')
+    containersample_env.InstallExampleTarget(containersampleclientapp, 'containersampleclient')
 
 ######################################################################
 # Build Container Java SDK

@@ -57,6 +57,8 @@ else:
 examples_c = examples_env.Program(
     'examples_c', 'test_logging.c', OBJPREFIX='c_')
 examples_cpp = examples_env.Program('examples_cpp', 'test_logging.cpp')
+examples_env.InstallUnitTestTarget(examples_c, 'logger_test_c')
+examples_env.InstallUnitTestTarget(examples_cpp, 'logger_test_cpp')
 
 Alias('liboc_logger_examples', [examples_c, examples_cpp])
 examples_env.AppendTarget('liboc_logger_examples')

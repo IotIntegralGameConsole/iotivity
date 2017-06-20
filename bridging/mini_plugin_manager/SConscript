@@ -59,4 +59,4 @@ else:
     mpmlib = manager_env.StaticLibrary('minipluginmanager', minipluginmanager_src)
 manager_env.InstallTarget(mpmlib, 'minipluginmanager')
 manager_env.UserInstallTargetLib(mpmlib, 'minipluginmanager')
-
+manager_env.UserInstallTargetHeader('#/bridging/mini_plugin_manager/miniPluginManager.h', 'bridging', 'miniPluginManager.h')

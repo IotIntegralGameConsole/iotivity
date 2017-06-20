@@ -187,6 +187,7 @@ container_test = container_gtest_env.Program('container_test',
                                              container_gtest_src)
 Alias("container_test", container_test)
 container_gtest_env.AppendTarget('container_test')
+container_gtest_env.InstallUnitTestTarget(container_test, 'container_test')
 
 # Copy test configuration
 Command("./ResourceContainerTestConfig.xml",
