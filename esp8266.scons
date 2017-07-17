@@ -1,0 +1,47 @@
+#******************************************************************
+#
+# Copyright 2016 Web of Objects project All Rights Reserved.
+# Author: Khaled Q. AbdelFadeel <kqorany2@gmail.com> and Khaled F. Elsayed <kelsayed@gmail.com>
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#
+##
+# This script includes esp8266 specific config for oic-resource
+##
+Import('env')
+
+vars = Variables()
+vars.Add(EnumVariable('SHIELD', 'Network connection type', 'WIFI', ['WIFI']))
+vars.Update(env)
+Help(vars.GenerateHelpText(env))
+
+env.ImportLib('Wire')
+env.ImportLib('SPI')
+env.ImportLib('ESP8266WiFi')
+env.ImportLib('ESP8266mDNS')
+env.ImportLib('ESP8266WebServer')
+#Add Debugger Lib
+#env.ImportLib('GDBStub')
+env.AppendUnique(CPPDEFINES = ['ESP8266WIFI'])
+env.ImportLib('Time')
+
+# we have variety of macros for ESP8266!!
+env.AppendUnique(CPPDEFINES = ['WITH_ESP8266', '__ESP8266__','ARDUINO_ESP8266_ESP01','ARDUINO_ARCH_ESP8266','ESP8266'])
+# Set device name to __OIC_DEVICE_NAME__
+env.AppendUnique(CPPDEFINES = ['-D__OIC_DEVICE_NAME__=' + "\'\"" + env.get('DEVICE_NAME') + "\"\'"])
+if env.get('LOGGING'):
+	env.AppendUnique(CPPDEFINES = ['TB_LOG'])
