@@ -29,7 +29,7 @@ Import('env')
 
 def __parse_config(f):
 	dict = {}
-
+        print f
 	if not os.path.isfile(f):
 		return dict
 
@@ -273,7 +273,7 @@ env.Replace(RANLIB = 'xtensa-lx106-elf-ranlib')
 
 #Board option, let user to select the board
 boards = __get_boards(boards_info)
-
+print boards
 help_vars = Variables()
 help_vars.Add(EnumVariable('BOARD', 'esp8266 board', boards[3], boards)) 
 # generic
