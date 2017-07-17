@@ -97,7 +97,7 @@
                                       } \
                                     }
 
-#elif defined(WITH_ARDUINO)
+#elif defined(WITH_ARDUINO) || defined(WITH_ESP8266)
 
  #define MUTEX_LOCK(ARG_NAME)       { }
  #define MUTEX_UNLOCK(ARG_NAME)     { }
