@@ -365,32 +365,6 @@ void OCDiscoveryPayloadAddResourceWithEps(OCDiscoveryPayload *payload, const OCR
 OCStackResult GetTCPPortInfo(OCDevAddr *endpoint, uint16_t *port, bool secured);
 #endif
 
-/**
- * This function creates list of OCEndpointPayload structure,
- *  which matches with endpointType from list of CAEndpoint_t.
- *
- * @param[in] endpointType Bit combination of type for Endpoint.
- * @param[in] devAddr devAddr Structure pointing to the address.
- * @param[in] networkInfo array of CAEndpoint_t
- * @param[in] infoSize size of array
- * @param[out] listHead pointer to HeadNode pointer
- * @param[out] epSize size of array
- *
- * @return if success return pointer else NULL
- */
-OCEndpointPayload* CreateEndpointPayloadList(OCTpsSchemeFlags endpointType,
-    const OCDevAddr *devAddr, CAEndpoint_t *networkInfo,
-    size_t infoSize, OCEndpointPayload **listHead, size_t* epSize);
-
-/*
-* This function returns to destroy endpoint payload
-*
-*/
-void OC_CALL OCEndpointPayloadDestroy(OCEndpointPayload* payload);
-
-// Check on Accept Version option.
-bool OCRequestIsOCFContentFormat(OCEntityHandlerRequest *ehRequest, bool* isOCFContentFormat);
-
 #ifdef __cplusplus
 }
 #endif // __cplusplus
