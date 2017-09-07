@@ -1453,6 +1453,7 @@ static OicSecAcl_t* CBORPayloadToAclVersionOpt(const uint8_t *cborPayload, const
                     OIC_LOG_V(DEBUG, TAG, "%s Found v1 ACL; assigning 'versionCheck' and returning NULL.", __func__);
                     *versionCheck = OIC_SEC_ACL_V1;
                     OICFree(acl);
+                    free(tagName);
                     return NULL;
                 }
                 OIC_LOG_V(DEBUG, TAG, "%s decoding v1 ACL.", __func__);
@@ -1467,6 +1468,7 @@ static OicSecAcl_t* CBORPayloadToAclVersionOpt(const uint8_t *cborPayload, const
                     OIC_LOG_V(DEBUG, TAG, "%s Found v2 ACL; assigning 'versionCheck' and returning NULL.", __func__);
                     *versionCheck = OIC_SEC_ACL_V2;
                     OICFree(acl);
+                    free(tagName);
                     return NULL;
                 }
                 OIC_LOG_V(DEBUG, TAG, "%s decoding v2 ACL.", __func__);
@@ -1481,6 +1483,7 @@ static OicSecAcl_t* CBORPayloadToAclVersionOpt(const uint8_t *cborPayload, const
                         " Assigning 'versionCheck' to OIC_SEC_ACL_UNKNOWN and returning NULL.", __func__);
                     *versionCheck = OIC_SEC_ACL_UNKNOWN;
                     OICFree(acl);
+                    free(tagName);
                     return NULL;
                 }
             }
@@ -1724,6 +1727,8 @@ static OicSecAcl_t* CBORPayloadToAclVersionOpt(const uint8_t *cborPayload, const
                                                 {
                                                     OIC_LOG_V(WARNING, TAG, "Unknown tag in subject map: %s", subjectTag);
                                                 }
+
+                                                free(subjectTag);       // we are done with this instance
                                             }
 
                                             // advance to next elt in subject map
@@ -2066,19 +2071,16 @@ exit:
         acl = NULL;
     }
 
-    if(NULL != subjectTag)
-    {
-        free(subjectTag);
-        subjectTag = NULL;
-    }
-
-    if (NULL != rMapName)
+    if (rMapName)
     {
         free(rMapName);
         rMapName = NULL;
     }
 
-    free(tagName);
+    if (tagName)
+    {
+        free(tagName);
+    }
 
     return acl;
 }
