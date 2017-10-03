@@ -86,7 +86,7 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %{!?WITH_MQ: %define WITH_MQ OFF}
 %{!?WITH_PROXY: %define WITH_PROXY 0}
 %{!?WITH_TCP: %define WITH_TCP 1}
-%{!?MULTIPLE_OWNER: %define MULTIPLE_OWNER 0}
+%{!?MULTIPLE_OWNER: %define MULTIPLE_OWNER 1}
 %{!?OIC_SUPPORT_TIZEN_TRACE: %define OIC_SUPPORT_TIZEN_TRACE False}
 
 BuildRequires:  expat-devel
