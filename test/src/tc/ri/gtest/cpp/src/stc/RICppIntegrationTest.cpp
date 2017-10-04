@@ -47,7 +47,9 @@ protected:
     OCResourceHandle m_ResourceHandle;
     const string m_TemperatureUri = TEMPERATURE_URI;
     const string m_TemperatureType = TEMPERATURE_TYPE;
-    OCResourceHandle m_temperatureHandle;bool m_foundResourceCheck = false;bool m_deviceDiscoveryCheck =
+    OCResourceHandle m_temperatureHandle;
+    bool m_foundResourceCheck = false;
+    bool m_deviceDiscoveryCheck =
             false;bool m_PlatformDiscoveryCheck = false;bool m_foundAllPlatformInfo = true;bool m_foundAllDeviceInfo =
             true;bool isGetCorrect = false;bool isPutCorrect = false;bool isPostCorrect = false;bool isDeleteCorrect =
             false;bool isObserveCorrect = false;
@@ -401,15 +403,23 @@ TEST_F(RICppIntegrationTest_stc, CreateAndFindResource_SQV_CV_P)
 {
     try
     {
-        m_temperatureHandle = m_RIHelper->registerResource(m_TemperatureUri, m_TemperatureType,
-                m_ResourceInterface);
+        m_temperatureHandle = m_RIHelper->registerResource
+            (m_TemperatureUri, 
+             m_TemperatureType,
+             "oic.if.baseline" // m_ResourceInterface
+            );
         ASSERT_NE(m_temperatureHandle,(OCResourceHandle)NULL) << "Register Resource failed";
 
+        CommonUtil::waitInSecond(CALLBACK_WAIT_DEFAULT);
         std::ostringstream requestURI;
         requestURI << OC_RSRVD_WELL_KNOWN_URI;
         IOTIVITYTEST_LOG(INFO, "Finding Resource...");
+        OCConnectivityType connectivityType(CT_ADAPTER_IP);
         ASSERT_EQ(OC_STACK_OK,
-                OCPlatform::findResource("", requestURI.str(), CT_DEFAULT, std::bind(&RICppIntegrationTest_stc::foundResource, this, PH::_1), QualityOfService::HighQos))
+                OCPlatform::findResource("", requestURI.str(), 
+                                         connectivityType,
+                                         std::bind(&RICppIntegrationTest_stc::foundResource, this, PH::_1), 
+                                         QualityOfService::LowQos))
         << "findResource does not return success";
         CommonUtil::waitInSecond(CALLBACK_WAIT_DEFAULT);
         if(!m_foundResourceCheck)
