@@ -38,4 +38,4 @@ else:
     logger_src = ['./src/logger.c', './src/trace.c']
 
 loggerlib = local_env.StaticLibrary('logger', logger_src)
-local_env.InstallTarget(loggerlib, 'logger')
+local_env.UserInstallTargetLib(loggerlib, 'logger')
