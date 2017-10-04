@@ -20,6 +20,8 @@
  ******************************************************************/
 
 #include "RIHelper.h"
+#undef IOTIVITYTEST_LOG
+#define IOTIVITYTEST_LOG(tag, ...) printf( __VA_ARGS__)
 
 #define KEY_PLATFORM_ID "pi"
 #define KEY_MANUFACTURER_NAME "mnmn"
@@ -410,16 +412,20 @@ TEST_F(RICppIntegrationTest_stc, CreateAndFindResource_SQV_CV_P)
             );
         ASSERT_NE(m_temperatureHandle,(OCResourceHandle)NULL) << "Register Resource failed";
 
-        CommonUtil::waitInSecond(CALLBACK_WAIT_DEFAULT);
-        std::ostringstream requestURI;
-        requestURI << OC_RSRVD_WELL_KNOWN_URI;
+        CommonUtil::waitInSecond(10);
+        string coap_multicast_discovery = string(OC_RSRVD_WELL_KNOWN_URI);
         IOTIVITYTEST_LOG(INFO, "Finding Resource...");
         OCConnectivityType connectivityType(CT_ADAPTER_IP);
+
+        OC::FindCallback findCallback =
+            std::bind(&RICppIntegrationTest_stc::foundResource, this,  placeholders::_1);
+
         ASSERT_EQ(OC_STACK_OK,
-                OCPlatform::findResource("", requestURI.str(), 
-                                         connectivityType,
-                                         std::bind(&RICppIntegrationTest_stc::foundResource, this, PH::_1), 
-                                         QualityOfService::LowQos))
+                  OCPlatform::findResource("", 
+                                           coap_multicast_discovery.c_str(),
+                                           connectivityType,
+                                           findCallback,                                      
+                                           QualityOfService::LowQos))
         << "findResource does not return success";
         CommonUtil::waitInSecond(CALLBACK_WAIT_DEFAULT);
         if(!m_foundResourceCheck)
@@ -439,6 +445,7 @@ TEST_F(RICppIntegrationTest_stc, CreateAndFindResource_SQV_CV_P)
 }
 #endif
 
+#if 0
 /**
  * @since 2016-08-04
  * @see void Configure (const PlatformConfig &config)
@@ -1650,4 +1657,5 @@ TEST_F(RICppIntegrationTest_stc, CreateResourceAndSendDeleteRequestWithQos_SQV_C
         SET_FAILURE("Exception occured. Exception is " + std::string(e.what()));
     }
 }
+#endif
 #endif
