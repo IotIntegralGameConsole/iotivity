@@ -93,7 +93,7 @@ class RIHelper
 private:
     static RIHelper* s_riHelperInstance;
     static std::mutex s_mutex;
-    const uint8_t m_ResourceProperty = OC_ACTIVE | OC_DISCOVERABLE | OC_OBSERVABLE;
+    const uint8_t m_ResourceProperty = /*OC_ACTIVE |*/ OC_DISCOVERABLE | OC_OBSERVABLE;
     OCResourceHandle m_ResourceHandle;
 
     OCEntityHandlerResult entityHandler(shared_ptr< OCResourceRequest > request);bool ocResourcePayloadAddStringLL(
