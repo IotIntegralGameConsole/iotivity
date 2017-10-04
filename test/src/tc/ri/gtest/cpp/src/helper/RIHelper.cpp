@@ -22,6 +22,10 @@
 #include "RIHelper.h"
 #include "ocpayload.h"
 
+#undef IOTIVITYTEST_LOG
+#define IOTIVITYTEST_LOG(tag, ...) printf( __VA_ARGS__)
+
+
 RIHelper* RIHelper::s_riHelperInstance = NULL;
 std::mutex RIHelper::s_mutex;
 
@@ -52,8 +56,10 @@ RIHelper* RIHelper::getInstance(void)
 void RIHelper::configClientServerPlatform(void)
 {
     PlatformConfig config
-    { OC::ServiceType::InProc, OC::ModeType::Both, CT_DEFAULT, CT_DEFAULT,
-            OC::QualityOfService::HighQos };
+    { OC::ServiceType::InProc, OC::ModeType::Both, 
+            "0.0.0.0", //
+            CT_DEFAULT,
+            OC::QualityOfService::LowQos };
 
     OCPlatform::Configure(config);
 }
@@ -63,6 +69,7 @@ void RIHelper::setTemperatureRep()
     m_temperatureRep.setValue(KEY_TEMPERATURE, m_temp);
     m_temperatureRep.setValue(KEY_HOUR, m_hour);
 }
+
 
 OCEntityHandlerResult RIHelper::entityHandler(shared_ptr< OCResourceRequest > request)
 {
@@ -271,7 +278,7 @@ OCResourceHandle RIHelper::registerResource(string uri, string type, string ifac
     configClientServerPlatform();
 
     OCStackResult result = OCPlatform::registerResource(m_ResourceHandle, uri, type, iface,
-            bind(&RIHelper::entityHandler, this, PH::_1), m_ResourceProperty);
+            bind(&RIHelper::entityHandler, this, placeholders::_1), m_ResourceProperty);
 
     if (result == OC_STACK_OK)
         return m_ResourceHandle;
