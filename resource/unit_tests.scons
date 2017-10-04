@@ -62,3 +62,5 @@ if build_tests:
 
     # Build C unit tests
     SConscript('csdk/unittests/SConscript', 'test_env')
+
+    SConscript('../test/src/tc/ri/gtest/cpp/src/stc/SConscript', 'test_env')
