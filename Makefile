@@ -78,7 +78,7 @@ endif
 # Default variables to override:
 #release_mode?=0
 #secure_mode?=0
-#logging_mode?=True
+logging_mode?=True
 
 TARGET_ARCH?=${host_arch}
 TARGET_OS?=${uname}
