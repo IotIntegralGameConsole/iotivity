@@ -37,7 +37,6 @@ RUN echo "#log: Preparing system for ${project}" \
   sudo \
   devscripts \
   debhelper \
-
 \
   wget \
   autoconf \
