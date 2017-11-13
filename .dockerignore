@@ -1,6 +1,7 @@
 #******************************************************************
 #
 # Copyright 2014 Intel Mobile Communications GmbH All Rights Reserved.
+# Copyright 2017 Samsung Electronics France SAS
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #
@@ -17,6 +18,17 @@
 # limitations under the License.
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+#{ Docker related files
+Dockerfile
+*~
+tmp/
+run.sh
+# Docker: Ignore .git files
+.git*
+#}
+
+# Here is a copy of .gitignore without extlibs
 
 # Ignore output dirs
 /release
@@ -129,6 +141,3 @@ debian/*.debhelper.log
 debian/*.substvars
 debian/iotivity*/*
 debian/tmp/*
-
-# Docker: Ignore .git files
-.git*
