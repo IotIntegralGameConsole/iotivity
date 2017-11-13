@@ -41,12 +41,12 @@ void CASetLENetworkMonitorCallbacks(CAAdapterStateChangedCB adapterStateCB,
 /**
  * Set device information for auto connection.
  */
-CAResult_t CASetLEClientAutoConnectionDeviceInfo();
+CAResult_t CASetLEClientAutoConnectionDeviceInfo(void);
 
 /**
  * Unset device information to stop auto connection.
  */
-CAResult_t CAUnsetLEClientAutoConnectionDeviceInfo();
+CAResult_t CAUnsetLEClientAutoConnectionDeviceInfo(void);
 
 #if defined(__ANDROID__) && defined(LE_ADAPTER)
 /**
@@ -84,13 +84,13 @@ void CAManagerLEStopScan();
  * start BLE advertising.
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CAManagerLEStartAdvertising();
+CAResult_t CAManagerLEStartAdvertising(void);
 
 /**
  * stop BLE advertising.
  * @return  ::CA_STATUS_OK or ERROR CODES (::CAResult_t error codes in cacommon.h).
  */
-CAResult_t CAManagerLEStopAdvertising();
+CAResult_t CAManagerLEStopAdvertising(void);
 
 /**
  * set CAUtilConfig_t configure.

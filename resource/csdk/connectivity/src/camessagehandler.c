@@ -119,7 +119,7 @@ void CAAddDataToReceiveThread(CAData_t *data)
 }
 #endif
 
-static bool CAIsSelectedNetworkAvailable()
+static bool CAIsSelectedNetworkAvailable(void)
 {
     u_arraylist_t *list = CAGetSelectedNetworkList();
     if (!list || u_arraylist_length(list) == 0)
@@ -851,7 +851,7 @@ exit:
     OIC_TRACE_END();
 }
 
-void CAHandleRequestResponseCallbacks()
+void CAHandleRequestResponseCallbacks(void)
 {
 #ifdef SINGLE_THREAD
     CAReadData();
@@ -1159,7 +1159,7 @@ CAResult_t CAInitializeMessageHandler(CATransportAdapter_t transportType)
     return CA_STATUS_OK;
 }
 
-void CATerminateMessageHandler()
+void CATerminateMessageHandler(void)
 {
 #ifndef SINGLE_THREAD
     // stop adapters

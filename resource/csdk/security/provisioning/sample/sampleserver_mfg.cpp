@@ -430,7 +430,7 @@ static CAResult_t peerCNVerifyCallback(const unsigned char *cn, size_t cnLen)
     }
 }
 
-int main()
+int main(void)
 {
     struct timespec timeout;
 

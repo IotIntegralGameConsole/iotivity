@@ -279,13 +279,13 @@ static void CALEConnectionStateChangedCb(CATransportAdapter_t adapter, const cha
  * @retval  ::CA_STATUS_FAILED Operation failed.
  *
  */
-static CAResult_t CAInitLEAdapterMutex();
+static CAResult_t CAInitLEAdapterMutex(void);
 
 /**
  * Terminate all required mutex variables for LE adapter
  * implementation.
  */
-static void CATerminateLEAdapterMutex();
+static void CATerminateLEAdapterMutex(void);
 
 /**
  * Prepares and notify error through error callback.
@@ -377,14 +377,14 @@ static void CALEClientDataReceiverHandler(void *threadData);
  * GattClient. All four queues will be be stopped with this function
  * invocations.
  */
-static void CAStopLEQueues();
+static void CAStopLEQueues(void);
 
 /**
  * This function will terminate all queues created for GattServer and
  * GattClient. All four queues will be be terminated with this
  * function invocations.
  */
-static void CATerminateLEQueues();
+static void CATerminateLEQueues(void);
 
 #if !defined(ROUTING_GATEWAY) && !defined(SINGLE_THREAD)
 /**
@@ -423,7 +423,7 @@ static void CALEServerDataReceiverHandler(void *threadData);
  * @retval ::CA_STATUS_INVALID_PARAM  Invalid input arguments.
  * @retval ::CA_STATUS_FAILED Operation failed.
  */
-static CAResult_t CAInitLEServerQueues();
+static CAResult_t CAInitLEServerQueues(void);
 
 /**
  * This function will initalize the Receiver queue for
@@ -436,7 +436,7 @@ static CAResult_t CAInitLEServerQueues();
  * @retval ::CA_STATUS_INVALID_PARAM  Invalid input arguments.
  * @retval ::CA_STATUS_FAILED Operation failed.
  */
-static CAResult_t CAInitLEServerSenderQueue();
+static CAResult_t CAInitLEServerSenderQueue(void);
 
 /**
  * This function will initialize the Receiver queue for
@@ -450,7 +450,7 @@ static CAResult_t CAInitLEServerSenderQueue();
  * @retval ::CA_STATUS_FAILED Operation failed
  *
  */
-static CAResult_t CAInitLEServerReceiverQueue();
+static CAResult_t CAInitLEServerReceiverQueue(void);
 #endif // not ROUTING_GATEWAY not SINGLE_THREAD
 
 /**
@@ -465,7 +465,7 @@ static CAResult_t CAInitLEServerReceiverQueue();
  * @retval ::CA_STATUS_FAILED Operation failed.
  *
  */
-static CAResult_t CAInitLEClientQueues();
+static CAResult_t CAInitLEClientQueues(void);
 
 /**
  * This function will initalize the Receiver queue for
@@ -478,7 +478,7 @@ static CAResult_t CAInitLEClientQueues();
  * @retval ::CA_STATUS_INVALID_PARAM  Invalid input arguments.
  * @retval ::CA_STATUS_FAILED Operation failed.
  */
-static CAResult_t CAInitLEClientSenderQueue();
+static CAResult_t CAInitLEClientSenderQueue(void);
 
 /**
  * This function will initialize the Receiver queue for
@@ -492,7 +492,7 @@ static CAResult_t CAInitLEClientSenderQueue();
  * @retval ::CA_STATUS_FAILED Operation failed
  *
  */
-static CAResult_t CAInitLEClientReceiverQueue();
+static CAResult_t CAInitLEClientReceiverQueue(void);
 
 /**
  * This function will create the Data required to send it in the
@@ -579,7 +579,7 @@ static CAResult_t CALEGetPortsFromSenderInfo(const char *leAddress,
                                             u_arraylist_t *portList);
 #endif
 
-static CAResult_t CAInitLEClientQueues()
+static CAResult_t CAInitLEClientQueues(void)
 {
     oc_mutex_lock(g_bleAdapterThreadPoolMutex);
 
@@ -614,7 +614,7 @@ static CAResult_t CAInitLEClientQueues()
     return CA_STATUS_OK;
 }
 
-static CAResult_t CAInitLEClientReceiverQueue()
+static CAResult_t CAInitLEClientReceiverQueue(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CAInitLEClientReceiverQueue");
     // Check if the message queue is already initialized
@@ -655,7 +655,7 @@ static CAResult_t CAInitLEClientReceiverQueue()
 }
 
 #if !defined(ROUTING_GATEWAY) && !defined(SINGLE_THREAD)
-static CAResult_t CAInitLEServerQueues()
+static CAResult_t CAInitLEServerQueues(void)
 {
     oc_mutex_lock(g_bleAdapterThreadPoolMutex);
 
@@ -690,7 +690,7 @@ static CAResult_t CAInitLEServerQueues()
     return CA_STATUS_OK;
 }
 
-static CAResult_t CAInitLEServerReceiverQueue()
+static CAResult_t CAInitLEServerReceiverQueue(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CAInitLEServerReceiverQueue");
     // Check if the message queue is already initialized
@@ -730,7 +730,7 @@ static CAResult_t CAInitLEServerReceiverQueue()
     return CA_STATUS_OK;
 }
 
-static CAResult_t CAInitLEServerSenderQueue()
+static CAResult_t CAInitLEServerSenderQueue(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CAInitLEServerSenderQueue");
     // Check if the message queue is already initialized
@@ -1179,13 +1179,13 @@ static void CALEClearSenderInfoImpl(u_arraylist_t ** list)
     u_arraylist_free(list);
 }
 
-static void CALEClearSenderInfo()
+static void CALEClearSenderInfo(void)
 {
     CALEClearSenderInfoImpl(&g_bleServerSenderInfo);
     CALEClearSenderInfoImpl(&g_bleClientSenderInfo);
 }
 
-static CAResult_t CAInitLEClientSenderQueue()
+static CAResult_t CAInitLEClientSenderQueue(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CAInitLEClientSenderQueue");
 
@@ -1215,7 +1215,7 @@ static CAResult_t CAInitLEClientSenderQueue()
     return CA_STATUS_OK;
 }
 
-static void CAStopLEQueues()
+static void CAStopLEQueues(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "IN - CAStopLEQueues");
 
@@ -1236,7 +1236,7 @@ static void CAStopLEQueues()
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "OUT - CAStopLEQueues");
 }
 
-static void CATerminateLEQueues()
+static void CATerminateLEQueues(void)
 {
     CAQueueingThreadDestroy(g_bleClientSendQueueHandle);
     OICFree(g_bleClientSendQueueHandle);
@@ -2372,7 +2372,7 @@ static CAResult_t CALEServerSendDataSingleThread(const uint8_t *data,
 }
 #endif
 
-static CAResult_t CAInitLEAdapterMutex()
+static CAResult_t CAInitLEAdapterMutex(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CAInitLEAdapterMutex");
 
@@ -2475,7 +2475,7 @@ static CAResult_t CAInitLEAdapterMutex()
     return CA_STATUS_OK;
 }
 
-static void CATerminateLEAdapterMutex()
+static void CATerminateLEAdapterMutex(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CATerminateLEAdapterMutex");
 
@@ -2514,7 +2514,7 @@ static void CATerminateLEAdapterMutex()
  *
  * @return ::CA_STATUS_OK or Appropriate error code.
  */
-static CAResult_t CAStartLE();
+static CAResult_t CAStartLE(void);
 
 /**
  * Start listening server for receiving multicast search requests.
@@ -2524,7 +2524,7 @@ static CAResult_t CAStartLE();
  *   per OIC Specification.
  * @return  ::CA_STATUS_OK or Appropriate error code.
  */
-static CAResult_t CAStartLEListeningServer();
+static CAResult_t CAStartLEListeningServer(void);
 
 /**
  * Stops listening server from receiving multicast search requests.
@@ -2534,7 +2534,7 @@ static CAResult_t CAStartLEListeningServer();
  *   per OIC Specification.
  * @return  ::CA_STATUS_OK or Appropriate error code.
  */
-static CAResult_t CAStopLEListeningServer();
+static CAResult_t CAStopLEListeningServer(void);
 
 /**
  * Sarting discovery of servers for receiving multicast
@@ -2546,7 +2546,7 @@ static CAResult_t CAStopLEListeningServer();
  *
  * @return ::CA_STATUS_OK or Appropriate error code
  */
-static CAResult_t CAStartLEDiscoveryServer();
+static CAResult_t CAStartLEDiscoveryServer(void);
 
 /**
  * Send data to the endpoint using the adapter connectivity.
@@ -2599,7 +2599,7 @@ static CAResult_t CAGetLEInterfaceInformation(CAEndpoint_t **info,
  *
  * @return  ::CA_STATUS_OK or Appropriate error code.
  */
-static CAResult_t CAReadLEData();
+static CAResult_t CAReadLEData(void);
 
 /**
  * Stopping the adapters and close socket connections.
@@ -2608,14 +2608,14 @@ static CAResult_t CAReadLEData();
  *
  * @return ::CA_STATUS_OK or Appropriate error code.
  */
-static CAResult_t CAStopLE();
+static CAResult_t CAStopLE(void);
 
 /**
  * Terminate the LE connectivity adapter.
  *
  * Configuration information will be deleted from further use.
  */
-static void CATerminateLE();
+static void CATerminateLE(void);
 
 /**
  * This function will receive the data from the GattServer and add the
@@ -2706,7 +2706,7 @@ static CAResult_t CALEAdapterClientSendData(const CAEndpoint_t *remoteEndpoint,
                                             const uint8_t *data,
                                             uint32_t dataLen);
 
-static CAResult_t CALEAdapterGattServerStart()
+static CAResult_t CALEAdapterGattServerStart(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CALEAdapterGattServerStart");
 
@@ -2743,7 +2743,7 @@ static CAResult_t CALEAdapterGattServerStart()
     return result;
 }
 
-static CAResult_t CALEAdapterGattServerStop()
+static CAResult_t CALEAdapterGattServerStop(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "Server Stop");
 
@@ -2776,7 +2776,7 @@ static CAResult_t CALEAdapterGattServerStop()
 #endif
 }
 
-static CAResult_t CALEAdapterGattClientStart()
+static CAResult_t CALEAdapterGattClientStart(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CALEAdapterGattClientStart");
 
@@ -2805,7 +2805,7 @@ static CAResult_t CALEAdapterGattClientStart()
     return result;
 }
 
-static CAResult_t CALEAdapterGattClientStop()
+static CAResult_t CALEAdapterGattClientStop(void)
 {
 #ifndef SINGLE_THREAD
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CALEAdapterGattClientStop");
@@ -3002,12 +3002,12 @@ CAResult_t CAInitializeLE(CARegisterConnectivityCallback registerCallback,
     return CA_STATUS_OK;
 }
 
-static CAResult_t CAStartLE()
+static CAResult_t CAStartLE(void)
 {
     return CAStartLEAdapter();
 }
 
-static CAResult_t CAStopLE()
+static CAResult_t CAStopLE(void)
 {
 #ifdef __WITH_DTLS__
     CAdeinitSslAdapter();
@@ -3037,7 +3037,7 @@ static CAResult_t CAStopLE()
     return CAStopLEAdapter();
 }
 
-static void CATerminateLE()
+static void CATerminateLE(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "CATerminateLE");
 
@@ -3077,7 +3077,7 @@ static void CATerminateLE()
     CATerminateLEAdapterMutex();
 }
 
-static CAResult_t CAStartLEListeningServer()
+static CAResult_t CAStartLEListeningServer(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "IN - CAStartLEListeningServer");
 
@@ -3137,13 +3137,13 @@ static CAResult_t CAStartLEListeningServer()
 #endif // not ROUTING_GATEWAY
 }
 
-static CAResult_t CAStopLEListeningServer()
+static CAResult_t CAStopLEListeningServer(void)
 {
     OIC_LOG(ERROR, CALEADAPTER_TAG, "Listen server stop not supported.");
     return CA_NOT_SUPPORTED;
 }
 
-static CAResult_t CAStartLEDiscoveryServer()
+static CAResult_t CAStartLEDiscoveryServer(void)
 {
     OIC_LOG(DEBUG, CALEADAPTER_TAG, "IN - CAStartLEDiscoveryServer");
     CAResult_t result = CA_STATUS_OK;
@@ -3189,7 +3189,7 @@ static CAResult_t CAStartLEDiscoveryServer()
     return result;
 }
 
-static CAResult_t CAReadLEData()
+static CAResult_t CAReadLEData(void)
 {
 #ifdef SINGLE_THREAD
     CACheckLEData();

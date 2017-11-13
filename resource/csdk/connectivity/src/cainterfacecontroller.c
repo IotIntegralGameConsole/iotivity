@@ -274,7 +274,7 @@ static CAResult_t RemoveNetworkStateChangedCallback(CAAdapterStateChangedCB adap
 /**
  * Remove all network callback from the network callback list
  */
-static void RemoveAllNetworkStateChangedCallback()
+static void RemoveAllNetworkStateChangedCallback(void)
 {
     OIC_LOG(DEBUG, TAG, "Remove All NetworkStateChanged Callback");
 
@@ -563,7 +563,7 @@ void CAStopAdapter(CATransportAdapter_t transportType)
 }
 
 #ifndef SINGLE_THREAD
-void CAStopAdapters()
+void CAStopAdapters(void)
 {
     CATransportAdapter_t connType;
     u_arraylist_t *list = CAGetSelectedNetworkList();
@@ -813,7 +813,7 @@ CAResult_t CASendMulticastData(const CAEndpoint_t *endpoint, const void *data, u
     return CA_STATUS_OK;
 }
 
-CAResult_t CAStartListeningServerAdapters()
+CAResult_t CAStartListeningServerAdapters(void)
 {
     size_t index = 0;
     CAResult_t result = CA_STATUS_FAILED;
@@ -859,7 +859,7 @@ CAResult_t CAStartListeningServerAdapters()
     return result;
 }
 
-CAResult_t CAStopListeningServerAdapters()
+CAResult_t CAStopListeningServerAdapters(void)
 {
     size_t index = 0;
     CAResult_t res = CA_STATUS_FAILED;
@@ -897,7 +897,7 @@ CAResult_t CAStopListeningServerAdapters()
     return CA_STATUS_OK;
 }
 
-CAResult_t CAStartDiscoveryServerAdapters()
+CAResult_t CAStartDiscoveryServerAdapters(void)
 {
     size_t index = 0;
     CAResult_t result = CA_STATUS_FAILED;
@@ -959,7 +959,7 @@ bool CAIsLocalEndpoint(const CAEndpoint_t *ep)
     return false;
 }
 
-void CATerminateAdapters()
+void CATerminateAdapters(void)
 {
     for (size_t index = 0; index < g_numberOfAdapters; index++)
     {

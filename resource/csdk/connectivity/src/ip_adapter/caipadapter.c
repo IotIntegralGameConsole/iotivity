@@ -93,9 +93,9 @@ static void CAUpdateStoredIPAddressInfo(CANetworkStatus_t status);
 
 #ifndef SINGLE_THREAD
 
-static CAResult_t CAIPInitializeQueueHandles();
+static CAResult_t CAIPInitializeQueueHandles(void);
 
-static void CAIPDeinitializeQueueHandles();
+static void CAIPDeinitializeQueueHandles(void);
 
 static void CAIPSendDataThread(void *threadData);
 
@@ -107,7 +107,7 @@ void CAFreeIPData(CAIPData_t *ipData);
 
 static void CADataDestroyer(void *data, uint32_t size);
 
-CAResult_t CAIPInitializeQueueHandles()
+CAResult_t CAIPInitializeQueueHandles(void)
 {
     // Check if the message queue is already initialized
     if (g_sendQueueHandle)
@@ -148,7 +148,7 @@ CAResult_t CAIPInitializeQueueHandles()
     return CA_STATUS_OK;
 }
 
-void CAIPDeinitializeQueueHandles()
+void CAIPDeinitializeQueueHandles(void)
 {
     CAQueueingThreadDestroy(g_sendQueueHandle);
     OICFree(g_sendQueueHandle);
@@ -286,7 +286,7 @@ void CAIPErrorHandler(const CAEndpoint_t *endpoint, const void *data,
     }
 }
 
-static void CAInitializeIPGlobals()
+static void CAInitializeIPGlobals(void)
 {
     caglobals.ip.u6.fd  = OC_INVALID_SOCKET;
     caglobals.ip.u6s.fd = OC_INVALID_SOCKET;
@@ -386,7 +386,7 @@ CAResult_t CAInitializeIP(CARegisterConnectivityCallback registerCallback,
     return CA_STATUS_OK;
 }
 
-CAResult_t CAStartIP()
+CAResult_t CAStartIP(void)
 {
     //Initializing the Globals
     CAInitializeIPGlobals();
@@ -434,7 +434,7 @@ CAResult_t CAStartIP()
     return CA_STATUS_OK;
 }
 
-CAResult_t CAStartIPListeningServer()
+CAResult_t CAStartIPListeningServer(void)
 {
     CAResult_t ret = CAIPStartListenServer();
     if (CA_STATUS_OK != ret)
@@ -446,7 +446,7 @@ CAResult_t CAStartIPListeningServer()
     return CA_STATUS_OK;
 }
 
-CAResult_t CAStopIPListeningServer()
+CAResult_t CAStopIPListeningServer(void)
 {
     CAResult_t ret = CAIPStopListenServer();
     if (CA_STATUS_OK != ret)
@@ -457,7 +457,7 @@ CAResult_t CAStopIPListeningServer()
     return ret;
 }
 
-CAResult_t CAStartIPDiscoveryServer()
+CAResult_t CAStartIPDiscoveryServer(void)
 {
     return CAStartIPListeningServer();
 }
@@ -512,13 +512,13 @@ int32_t CASendIPMulticastData(const CAEndpoint_t *endpoint, const void *data, ui
     return CAQueueIPData(true, endpoint, data, dataLength);
 }
 
-CAResult_t CAReadIPData()
+CAResult_t CAReadIPData(void)
 {
     CAIPPullData();
     return CA_STATUS_OK;
 }
 
-CAResult_t CAStopIP()
+CAResult_t CAStopIP(void)
 {
 #ifdef __WITH_DTLS__
     CAdeinitSslAdapter();
@@ -537,7 +537,7 @@ CAResult_t CAStopIP()
     return CA_STATUS_OK;
 }
 
-void CATerminateIP()
+void CATerminateIP(void)
 {
 #ifdef __WITH_DTLS__
     CAsetSslAdapterCallbacks(NULL, NULL, NULL, CA_ADAPTER_IP);

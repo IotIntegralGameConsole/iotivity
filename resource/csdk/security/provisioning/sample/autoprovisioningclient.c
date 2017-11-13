@@ -347,7 +347,7 @@ static int initProvisionClient(void)
  * in order for the effect of the change to take effect. This function shuts
  * down the OC stack and restarts it.
  */
-static int closeAllSessions()
+static int closeAllSessions(void)
 {
     if (OC_STACK_OK != OCStop())
     {
@@ -1032,7 +1032,7 @@ exit:
  */
 
 #include "experimental/ocrandom.h"
-int workAroundBug()
+int workAroundBug(void)
 {
     /* Remove credential for 31313131-3131-3131-3131-313131313131 */
     const char* uuidStr = "31313131-3131-3131-3131-313131313131";
@@ -1768,7 +1768,7 @@ static int waitCallbackRet(void)
     return 0;
 }
 
-void shutdownProvisionClient()
+void shutdownProvisionClient(void)
 {
     if(OC_STACK_OK != OCStop())
     {
@@ -1781,7 +1781,7 @@ void shutdownProvisionClient()
     OICFreeAndSetToNull((void**)&g_prvn_fname);
 }
 
-static int initDiscoverRegisterAllDevices()
+static int initDiscoverRegisterAllDevices(void)
 {
     if(initProvisionClient())
     {
@@ -1811,7 +1811,7 @@ static int initDiscoverRegisterAllDevices()
 
 }
 
-int TestTrustAnchorProvisioning()
+int TestTrustAnchorProvisioning(void)
 {
     int ret = -1;
 
@@ -1839,7 +1839,7 @@ exit:
     return ret;
 }
 
-int TestCSRResource()
+int TestCSRResource(void)
 {
     int ret = -1;
 
@@ -1867,7 +1867,7 @@ exit:
     return ret;
 }
 
-int TestCertUse()
+int TestCertUse(void)
 {
     int ret = -1;
 
@@ -1895,7 +1895,7 @@ exit:
     return ret;
 }
 
-int TestRoleProvisioning()
+int TestRoleProvisioning(void)
 {
     int ret = -1;
 
@@ -1923,7 +1923,7 @@ exit:
     return ret;
 }
 
-int TestRoleAssertion()
+int TestRoleAssertion(void)
 {
     int ret = -1;
 
@@ -1951,7 +1951,7 @@ exit:
     return ret;
 }
 
-int TestRoleAssertionAndUse()
+int TestRoleAssertionAndUse(void)
 {
     int ret = -1;
 
@@ -1979,7 +1979,7 @@ exit:
     return ret;
 }
 
-int TestSymmetricRoleUse()
+int TestSymmetricRoleUse(void)
 {
     int ret = -1;
 

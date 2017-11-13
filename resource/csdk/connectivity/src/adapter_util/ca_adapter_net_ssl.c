@@ -1212,7 +1212,7 @@ static bool checkSslOperation(SslEndPoint_t*  peer,
 /**
  * Deletes session list.
  */
-static void DeletePeerList()
+static void DeletePeerList(void)
 {
     oc_mutex_assert_owner(g_sslContextMutex, true);
 
@@ -1598,7 +1598,7 @@ static SslEndPoint_t * InitiateTlsHandshake(const CAEndpoint_t *endpoint)
 /**
  * Stops DTLS retransmission.
  */
-static void StopRetransmit()
+static void StopRetransmit(void)
 {
     if (g_caSslContext)
     {
@@ -1607,7 +1607,7 @@ static void StopRetransmit()
     }
 }
 #endif
-void CAdeinitSslAdapter()
+void CAdeinitSslAdapter(void)
 {
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
 
@@ -1749,7 +1749,7 @@ static void StartRetransmit(void *ctx)
 }
 #endif
 
-CAResult_t CAinitSslAdapter()
+CAResult_t CAinitSslAdapter(void)
 {
     OIC_LOG_V(DEBUG, NET_SSL_TAG, "In %s", __func__);
     // Initialize mutex for tlsContext
