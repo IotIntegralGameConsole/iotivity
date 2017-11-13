@@ -72,7 +72,6 @@ class Configuration:
         Returns 1 if this system DOES support pthreads, 0
         otherwise
         """
-
         return self._context.TryCompile(self._pthreads_test_program(), '.c')
 
     # --------------------------------------------------------------
@@ -168,7 +167,7 @@ class Configuration:
         return """
 #include <unistd.h>
 #include <pthread.h>
-int main()
+int main(void)
 {
     #ifndef _POSIX_THREADS
     # error POSIX Threads support not available
