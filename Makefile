@@ -201,11 +201,11 @@ rule/help:
 	@echo "uname=${uname}"
 
 ${tarball}: ${CURDIR} Makefile distclean ${prep_dir}
-	cd ${@D} && tar cvfz \
- $@ \
- --transform "s/^${name}/${name}-${version}/" \
+	cd ${<} && tar cvfz \
+ ${@} \
+ --transform "s|^./|${name}-${version}/|" \
  --exclude 'debian' --exclude-vcs \
- ${<F}/
+ ./
 
 LICENSE.in: Makefile ${prep_dir}
 	find . \
