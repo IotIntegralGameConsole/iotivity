@@ -332,8 +332,8 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %{_libdir}/libESEnrolleeSDK.so
 %if 0${WITH_CLOUD} == 1
 %{_libdir}/libESMediatorRich.so
-%{_libdir}/libnotification*.so
 %endif
+%{_libdir}/libnotification*.so
 %if 0%{?WITH_PROXY} == 1
 %{_libdir}/libcoap_http_proxy.so
 %endif
