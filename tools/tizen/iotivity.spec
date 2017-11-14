@@ -29,6 +29,7 @@ Source1002: %{name}-test.manifest
 
 %if "%{TARGET_OS}" == "linux"
 %define TARGET_TRANSPORT IP
+%define WITH_CLOUD 0
 %endif
 
 
@@ -329,8 +330,10 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %{_libdir}/librcs_server.so
 %{_libdir}/libresource_directory.so
 %{_libdir}/libESEnrolleeSDK.so
+%if 0${WITH_CLOUD} == 1
 %{_libdir}/libESMediatorRich.so
 %{_libdir}/libnotification*.so
+%endif
 %if 0%{?WITH_PROXY} == 1
 %{_libdir}/libcoap_http_proxy.so
 %endif
