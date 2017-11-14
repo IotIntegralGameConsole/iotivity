@@ -184,7 +184,7 @@ static void CHPGetProxyURI(OCHeaderOption* options, uint8_t *numOptions, char* u
 }
 
 // TODO: Will be moved to OCProxyPayload
-static OCRepPayload* CHPGetDiscoveryPayload()
+static OCRepPayload* CHPGetDiscoveryPayload(void)
 {
     OCRepPayload* payload = OCRepPayloadCreate();
     if (!payload)
