@@ -24,7 +24,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef HAVE_MEMORY_H
 #include <memory.h>
+#endif
 #include <string>
 #include <vector>
 #include <map>
