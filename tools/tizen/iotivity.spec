@@ -11,8 +11,11 @@ Source1002: %{name}-test.manifest
 
 %if 0%{?tizen:1}
 %define TARGET_OS tizen
+%define WITH_CLOUD 1
 %else
 %define TARGET_OS linux
+#TODO
+%define SECURED 0
 %endif
 
 %if "%{tizen}" == "2.3"
@@ -29,7 +32,6 @@ Source1002: %{name}-test.manifest
 
 %if "%{TARGET_OS}" == "linux"
 %define TARGET_TRANSPORT IP
-%define WITH_CLOUD 0
 %endif
 
 
@@ -73,7 +75,7 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %endif
 
 # Default values to be eventually overiden BEFORE or as gbs params:
-%{!?ES_TARGET_ENROLLEE: %define ES_TARGET_ENROLLEE tizen}
+%{!?ES_TARGET_ENROLLEE: %define ES_TARGET_ENROLLEE %{TARGET_OS}}
 %{!?LOGGING: %define LOGGING 1}
 %{!?RD_MODE: %define RD_MODE CLIENT}
 %{!?RELEASE: %define RELEASE 1}
@@ -83,7 +85,7 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %{!?TARGET_OS: %define TARGET_OS tizen}
 %{!?TARGET_TRANSPORT: %define TARGET_TRANSPORT IP}
 %{!?VERBOSE: %define VERBOSE 1}
-%{!?WITH_CLOUD: %define WITH_CLOUD 1}
+%{!?WITH_CLOUD: %define WITH_CLOUD 0}
 %{!?WITH_MQ: %define WITH_MQ OFF}
 %{!?WITH_PROXY: %define WITH_PROXY 0}
 %{!?WITH_TCP: %define WITH_TCP 0}
@@ -330,7 +332,7 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %{_libdir}/librcs_server.so
 %{_libdir}/libresource_directory.so
 %{_libdir}/libESEnrolleeSDK.so
-%if 0${WITH_CLOUD} == 1
+%if 0%{WITH_CLOUD} == 1
 %{_libdir}/libESMediatorRich.so
 %endif
 %{_libdir}/libnotification*.so
