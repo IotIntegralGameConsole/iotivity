@@ -46,7 +46,7 @@ if target_os not in ['arduino', 'darwin', 'ios']:
     # Build liboc
     SConscript('src/SConscript')
 
-if target_os in ['windows', 'linux']:
+if target_os in ['windows', 'TODO/linux']:
     # Build IoTivity Procedural Client API
     SConscript('IPCA/SConscript')
 
