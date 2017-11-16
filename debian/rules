@@ -4,9 +4,13 @@
 # Comment this to turn off verbose mode.
 export DH_VERBOSE=1
 V=1
+project?=iotivity
 version?=$(shell [ -r debian/changelog ] && dpkg-parsechangelog \
-	| grep "Version:" | sed -e "s/Version: \(.*\)-.*/\1/g" )
-tarball?=${CURDIR}/../iotivity_${version}.orig.tar.xz
+	| grep "Version:" | sed -e "s/Version: \(.*\)-.*/\1/g" \
+	|| echo "0.0.0")
+export version
+
+tarball?=${CURDIR}/../${project}_${version}.orig.tar.gz
 export tarball
 
 default: rule/debuild
@@ -14,9 +18,36 @@ default: rule/debuild
 %:
 	dh $@ tarball=${tarball}
 
+rule/setup: /etc/debian_release
+	sudo apt-get install \
+ devscripts \
+ debhelper \
+ wget \
+ autoconf \
+ automake \
+ autotools-dev \
+ libtool \
+ libbz2-dev \
+ libglib2.0-dev \
+ libicu-dev \
+ python-dev \
+ scons \
+ sudo \
+ unzip \
+ uuid-dev \
+ libcurl4-openssl-dev \
+ valgrind \
+ libboost-thread-dev \
+ libboost-date-time-dev \
+ libboost-iostreams-dev \
+ libboost-log-dev \
+ libboost-program-options-dev \
+ libboost-regex-dev \
+ libboost-system-dev \
+ libsqlite3-dev
+
 rule/debuild: ${tarball}
-	which ${@F} \
-|| sudo apt-get install devscripts debhelper
+	which ${@F} || ./$@/setup
 	${@F}
 
 ${tarball}:
