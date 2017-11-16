@@ -42,7 +42,7 @@ if build_tests:
     # get it and install it
     test_env = SConscript('#extlibs/gtest/SConscript')
 
-    if target_os in ['linux', 'windows']:
+    if target_os in ['TODO/linux', 'windows']:
         # Verify that 'hippomocks' mocking code is installed.  If not,
         # get it and install it
         SConscript('#extlibs/hippomocks/SConscript')
