@@ -78,11 +78,7 @@ endif
 # Default variables to override:
 #release_mode?=0
 secure_mode?=0
-<<<<<<< HEAD
 logging_mode?=True
-=======
-#logging_mode?=True
->>>>>>> 3e14e6a... build: Disable security in Makefile
 
 TARGET_ARCH?=${host_arch}
 TARGET_OS?=${uname}
