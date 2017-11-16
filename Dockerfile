@@ -29,14 +29,16 @@ RUN echo "#log: Configuring locales" \
  && dpkg-reconfigure locales
 
 RUN echo "#log: Preparing system for ${project}" \
- && apt-get update \
+ && apt-get update -y \
  && apt-get install -y \
   bash \
   git \
   make \
-\
+  sudo \
   devscripts \
   debhelper \
+
+\
   wget \
   autoconf \
   automake \
@@ -47,7 +49,6 @@ RUN echo "#log: Preparing system for ${project}" \
   libicu-dev \
   python-dev \
   scons \
-  sudo \
   unzip \
   uuid-dev \
   libcurl4-openssl-dev \
