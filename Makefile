@@ -120,7 +120,9 @@ endif
 
 outdir?=out/${TARGET_OS}/${TARGET_ARCH}/${build_dir}
 version?=$(shell git describe || echo 0.0.0)
-tarball?=${CURDIR}/../iotivity-${version}.tar.xz
+package?=${name}-${version}
+distdir?=${CURDIR}/..
+tarball?=${distdir}/${package}.tar.gz
 doc_file?=${name}-doc.zip
 
 
@@ -162,13 +164,19 @@ install/post/binary: ${DESTDIR}
 install: install/scons install/post/binary install/extra
 	@echo "$@: $^"
 
-install/extra: LICENSE.in
+install/extra: LICENSE.in install/bad
 	@echo "TODO: package: $^"
 	cat $<
+install/bad:
 	install -d ${DESTDIR}${includedir}/iotivity
 	mv ${DESTDIR}${includedir}/c_common ${DESTDIR}${includedir}/iotivity/
 	mv ${DESTDIR}${includedir}/resource ${DESTDIR}${includedir}/iotivity/
 	mv ${DESTDIR}${includedir}/service ${DESTDIR}${includedir}/iotivity/
+	ln -fs iotivity/c_common ${DESTDIR}${includedir}/
+	ln -fs iotivity/resource ${DESTDIR}${includedir}/
+	ln -fs iotivity/service ${DESTDIR}${includedir}/
+
+install/good:
 	ln -fs iotivity/c_common ${DESTDIR}${includedir}/
 	ln -fs iotivity/resource ${DESTDIR}${includedir}/
 	ln -fs iotivity/service ${DESTDIR}${includedir}/
@@ -192,10 +200,11 @@ rule/help:
 	@echo "uname=${uname}"
 
 ${tarball}: ${CURDIR} Makefile distclean ${prep_dir}
-	cd ${@D} && tar cvfJ \
- $@ \
+	cd ${<} && tar cvfz \
+ ${@} \
+ --transform "s|^./|${name}-${version}/|" \
  --exclude 'debian' --exclude-vcs \
- ${<F}/
+ ./
 
 LICENSE.in: Makefile ${prep_dir}
 	find . \
@@ -220,20 +229,20 @@ LICENSE.in: Makefile ${prep_dir}
 rule/doc: out/doc
 
 ${doc_file}: resource/docs/javadocGen.sh
-	rm -rf ${docs_file}
+	rm -rf ${doc_file}
 	mkdir -p ${<D}/html
 	touch ${<D}/html/footer.html
 	cd ${<D} && ./${<F}
-	cd ${CURDIR} && zip -r9 ${docs_file} ./${<D}
+	cd ${CURDIR} && zip -r9 ${doc_file} ./${<D}
 	find . \
  -iname 'DoxyFile' -printf "%h\n" \
  -o -iname 'extlibs' -prune -a -iname 'out' -prune \
  | while read file ; do \
   cd "${CURDIR}/$${file}" && doxygen ; \
   cd ${CURDIR} ; \
-  zip -r9 ${docs_file} $${file} ; \
+  zip -r9 ${doc_file} $${file} ; \
 done
 	find . -iname "*.zip"
 
-out/doc: ${docs_file}
+out/doc: ${doc_file}
 	mkdir -p $@ && cd $@ && unzip ${CURDIR}/$<
