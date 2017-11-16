@@ -26,7 +26,7 @@ ENV package ${project}-${version}
 ENV archive_url http://mirrors.kernel.org/${project}/${version}/${project}-${version}.tar.gz
 ENV URL http://github.com/tizenteam/${project}
 ARG branch
-ENV branch ${branch:-sandbox/pcoval/on/next/devel}
+ENV branch ${branch:-sandbox/pcoval/on/previous/devel}
 ENV EMAIL ${EMAIL:-nobody@localhost}
 ENV NAME ${NAME:-Nobody}
 
