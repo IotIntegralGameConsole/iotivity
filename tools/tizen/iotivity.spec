@@ -64,8 +64,6 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %define TARGET_ARCH "x86"
 %endif
 
-%define ex_install_dir %{buildroot}%{_bindir}
-
 %if ! 0%{?license:0}
 %define license %doc
 %endif
@@ -73,6 +71,9 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %if ! 0%{?manifest:0}
 %define manifest %doc
 %endif
+
+%{!?exlibdir: %define exlibdir %{_libdir}/%{name}}
+%{!?ex_install_dir: %define ex_install_dir %{buildroot}/%{exlibdir}/examples}
 
 # Default values to be eventually overiden BEFORE or as gbs params:
 %{!?ES_TARGET_ENROLLEE: %define ES_TARGET_ENROLLEE %{TARGET_OS}}
@@ -235,7 +236,11 @@ scons install --install-sandbox=%{buildroot} --prefix=%{_prefix} \
     OIC_SUPPORT_TIZEN_TRACE=%{OIC_SUPPORT_TIZEN_TRACE} \
     #eol
 
-mkdir -p %{ex_install_dir}
+
+# TODO: Linux should rely on scons install then align for tizen (IOT-524) 
+install -d %{ex_install_dir}
+
+%if "%{TARGET_OS}" == "tizen"
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/examples/OICMiddle/OICMiddle %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/devicediscoveryclient %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/devicediscoveryserver %{ex_install_dir}
@@ -250,10 +255,8 @@ cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/presenceclien
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/presenceserver %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/roomclient %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/roomserver %{ex_install_dir}
-cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/simpleclient %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/simpleclientHQ %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/simpleclientserver %{ex_install_dir}
-cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/simpleserver %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/simpleserverHQ %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/threadingsample %{ex_install_dir}
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/examples/oic_svr_db_server.dat %{ex_install_dir}
@@ -269,14 +272,13 @@ cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/service/coap-http-proxy/samples
 mkdir -p %{ex_install_dir}/provisioning
 mkdir -p %{ex_install_dir}/provision-sample
 
-
 cp ./resource/csdk/security/include/*.h %{buildroot}%{_includedir}
 cp ./resource/csdk/connectivity/api/*.h %{buildroot}%{_includedir}/
 cp ./resource/csdk/security/include/internal/*.h %{buildroot}%{_includedir}/
 cp ./resource/csdk/security/provisioning/include/oxm/*.h %{buildroot}%{_includedir}
 cp ./resource/csdk/security/provisioning/include/internal/*.h %{buildroot}%{_includedir}
 cp ./resource/csdk/security/provisioning/include/*.h %{buildroot}%{_includedir}
-cp ./resource/csdk/security/provisioning/sample/oic_svr_db_server_justworks.dat %{buildroot}%{_libdir}/oic_svr_db_server.dat
+cp ./resource/csdk/security/provisioning/sample/oic_svr_db_server_justworks.dat %{ex_install_dir}/provision-sample//oic_svr_db_server.dat
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/csdk/security/provisioning/sample/sampleserver_justworks %{ex_install_dir}/provision-sample/
 cp ./resource/csdk/security/provisioning/sample/oic_svr_db_server_justworks.dat %{ex_install_dir}/provision-sample/
 cp out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/resource/csdk/security/provisioning/sample/sampleserver_randompin %{ex_install_dir}/provision-sample/
@@ -288,6 +290,14 @@ cp resource/c_common/*.h %{buildroot}%{_includedir}
 cp resource/csdk/include/*.h %{buildroot}%{_includedir}
 cp resource/csdk/stack/include/*.h %{buildroot}%{_includedir}
 cp resource/csdk/logger/include/*.h %{buildroot}%{_includedir}
+%endif
+
+cd out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/
+install -d %{ex_install_dir}/resource/cpp/
+install resource/examples/*.dat %{ex_install_dir}/resource/cpp/
+install resource/examples/*.json %{ex_install_dir}/resource/cpp/
+install resource/examples/simple{client,server} %{ex_install_dir}/resource/cpp/
+install lib*.a %{buildroot}%{_libdir}
 
 find "%{buildroot}" -type f -perm /u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
@@ -317,7 +327,6 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %if 0%{?SECURED} == 1
 %{_libdir}/libocpmapi.so
 %{_libdir}/libocprovision.so
-%{_libdir}/oic_svr_db_server.dat
 %endif
 
 %files service
@@ -332,9 +341,7 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %{_libdir}/librcs_container.so
 %{_libdir}/librcs_server.so
 %{_libdir}/libESEnrolleeSDK.so
-%if 0%{WITH_CLOUD} == 1
 %{_libdir}/libESMediatorRich.so
-%endif
 %{_libdir}/libnotification*.so
 %if 0%{?WITH_PROXY} == 1
 %{_libdir}/libcoap_http_proxy.so
@@ -349,7 +356,7 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %manifest %{name}-test.manifest
 %defattr(-,root,root,-)
 %license LICENSE
-%{_bindir}/*
+%{exlibdir}/examples/*
 
 %files devel
 %defattr(-,root,root,-)
