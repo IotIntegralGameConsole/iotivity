@@ -15,7 +15,7 @@
 # limitations under the License.
 #}
 
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER Philippe Coval (philippe.coval@osg.samsung.com)
 ENV project iotivity
 
