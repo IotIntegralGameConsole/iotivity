@@ -114,9 +114,12 @@ OIC_SUPPORT_TIZEN_TRACE=%{OIC_SUPPORT_TIZEN_TRACE} \\\
 %{?EXTRA_RPM_SCONSFLAGS}
 
 
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
 BuildRequires:  chrpath
 BuildRequires:  expat-devel
-BuildRequires:  python, libcurl-devel
+BuildRequires:  python
 BuildRequires:  scons
 BuildRequires:  openssl-devel
 BuildRequires:  boost-devel
@@ -125,6 +128,7 @@ BuildRequires:  boost-system
 BuildRequires:  boost-filesystem
 BuildRequires:  pkgconfig(uuid)
 BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  pkgconfig(sqlite3)
 %if "%{TARGET_OS}" == "tizen"
 BuildRequires:  gettext-tools
@@ -141,8 +145,14 @@ BuildRequires:  bluetooth-tools
 %endif
 %else
 %if 0%{?fedora:1}
-BuildRequires:  sqlite-devel
 BuildRequires:  gettext-devel
+BuildRequires:  git
+BuildRequires:  findutils
+BuildRequires:  pkgconfig
+BuildRequires:  bzip2 
+BuildRequires:  unzip 
+BuildRequires:  gcc-c++
+BuildRequires:  wget 
 %endif
 %endif
 Requires(postun): /sbin/ldconfig
