@@ -57,7 +57,7 @@ provisiontests_env.PrependUnique(LIBS = [
         'ocprovision',
 		'oc',
 		'ocpmapi',
-		'octbstack_test',
+		'octbstack',
 		'oc_logger',
 		'connectivity_abstraction',
 		'coap'
