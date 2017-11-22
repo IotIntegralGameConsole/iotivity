@@ -90,6 +90,29 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %{!?OIC_SUPPORT_TIZEN_TRACE: %define OIC_SUPPORT_TIZEN_TRACE False}
 %define BUILD_DIR out/%{TARGET_OS}/%{TARGET_ARCH}/%{build_mode}/
 
+%define SCONSFLAGS "\
+%{?_smp_mflags} \
+--prefix=%{_prefix} \
+--install-sandbox=%{buildroot} \
+ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} \
+LIB_INSTALL_DIR=%{_libdir} \
+LOGGING=%{LOGGING} \
+RD_MODE=%{RD_MODE} \
+RELEASE=%{RELEASE} \
+ROUTING=%{ROUTING} \
+SECURED=%{SECURED} \
+TARGET_ARCH=%{TARGET_ARCH} \
+TARGET_OS=%{TARGET_OS} \
+TARGET_TRANSPORT=%{TARGET_TRANSPORT} \
+VERBOSE=%{VERBOSE} \
+WITH_CLOUD=%{WITH_CLOUD} \
+WITH_MQ=%{WITH_MQ} \
+WITH_PROXY=%{WITH_PROXY} \
+WITH_TCP=%{WITH_TCP} \
+MULTIPLE_OWNER=%{MULTIPLE_OWNER} \
+OIC_SUPPORT_TIZEN_TRACE=%{OIC_SUPPORT_TIZEN_TRACE} \
+"
+
 BuildRequires:  chrpath
 BuildRequires:  expat-devel
 BuildRequires:  python, libcurl-devel
@@ -161,6 +184,11 @@ developing applications that use %{name}.
 %setup -q
 chmod g-w %_sourcedir/*
 
+[ -r 'config.md' ] || cat<<EOF | sed -e 's|%{buildroot}.*|(...)|g' > config.md
+# Build configuration info #
+SCONSFLAGS=%{SCONSFLAGS}
+EOF
+
 find . \
      -iname "LICEN*E*"  \
      -o -name "*BSD*" \
@@ -190,50 +218,14 @@ cp %{SOURCE1001} ./%{name}-test.manifest
 %endif
 
 %build
-scons %{?_smp_mflags} --prefix=%{_prefix} \
-    ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} \
-    LIB_INSTALL_DIR=%{_libdir} \
-    LOGGING=%{LOGGING} \
-    RD_MODE=%{RD_MODE} \
-    RELEASE=%{RELEASE} \
-    ROUTING=%{ROUTING} \
-    SECURED=%{SECURED} \
-    TARGET_ARCH=%{TARGET_ARCH} \
-    TARGET_OS=%{TARGET_OS} \
-    TARGET_TRANSPORT=%{TARGET_TRANSPORT} \
-    VERBOSE=%{VERBOSE} \
-    WITH_CLOUD=%{WITH_CLOUD} \
-    WITH_MQ=%{WITH_MQ} \
-    WITH_PROXY=%{WITH_PROXY} \
-    WITH_TCP=%{WITH_TCP} \
-    MULTIPLE_OWNER=%{MULTIPLE_OWNER} \
-    OIC_SUPPORT_TIZEN_TRACE=%{OIC_SUPPORT_TIZEN_TRACE} \
-    #eol
-
-
+export SCONSFLAGS=%{SCONSFLAGS}
+scons
 
 %install
 rm -rf %{buildroot}
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
-scons install --install-sandbox=%{buildroot} --prefix=%{_prefix} \
-    ES_TARGET_ENROLLEE=%{ES_TARGET_ENROLLEE} \
-    LIB_INSTALL_DIR=%{_libdir} \
-    LOGGING=%{LOGGING} \
-    RD_MODE=%{RD_MODE} \
-    RELEASE=%{RELEASE} \
-    ROUTING=%{ROUTING} \
-    SECURED=%{SECURED} \
-    TARGET_ARCH=%{TARGET_ARCH} \
-    TARGET_OS=%{TARGET_OS} \
-    TARGET_TRANSPORT=%{TARGET_TRANSPORT} \
-    VERBOSE=%{VERBOSE} \
-    WITH_CLOUD=%{WITH_CLOUD} \
-    WITH_MQ=%{WITH_MQ} \
-    WITH_PROXY=%{WITH_PROXY} \
-    WITH_TCP=%{WITH_TCP} \
-    MULTIPLE_OWNER=%{MULTIPLE_OWNER} \
-    OIC_SUPPORT_TIZEN_TRACE=%{OIC_SUPPORT_TIZEN_TRACE} \
-    #eol
+export SCONSFLAGS=%{SCONSFLAGS}
+scons install
 
 cd %{BUILD_DIR}
 install -d %{ex_install_dir}
@@ -258,7 +250,6 @@ install resource/examples/simpleserver %{ex_install_dir}
 install resource/examples/simpleserverHQ %{ex_install_dir}
 install resource/examples/threadingsample %{ex_install_dir}
 install lib*.a %{buildroot}%{_libdir}
-
 %if 0%{?WITH_PROXY} == 1
 install -d %{ex_install_dir}/proxy-sample
 install service/coap-http-proxy/samples/proxy_main %{ex_install_dir}/proxy-sample/
@@ -277,7 +268,6 @@ install resource/examples/*.dat %{ex_install_dir}
 install resource/examples/*.json %{ex_install_dir}
 
 %endif
-
 find "%{buildroot}" -type f -perm u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
@@ -287,7 +277,6 @@ ln -fs iotivity/service %{buildroot}%{_includedir}/
 ln -fs iotivity/c_common %{buildroot}%{_includedir}/
 
 rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
-
 
 %post -p /sbin/ldconfig
 
@@ -345,6 +334,8 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %files devel
 %defattr(-,root,root,-)
 %license LICENSE
+%doc *.md
+%doc *.txt
 %{_libdir}/lib*.a
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/*
