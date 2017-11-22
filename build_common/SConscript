@@ -469,31 +469,52 @@ def __src_to_obj(env, src, home=''):
     return env.Object(obj, src)
 
 
-def __install(ienv, targets, name):
-    i_n = ienv.Install(env.get('BUILD_DIR'), targets)
-    Alias(name, i_n)
-    env.AppendUnique(TS=[name])
+def __install(ienv, targets, name=''):
+    #
+    # Copy files to internal place (not for install to system)
+    # only use UserInstall() for copying files to system using "scons install"
+    #
+    for filename in ienv.GetBuildPath(targets):
+        basename = os.path.basename(filename)
+        dst = env.get('BUILD_DIR') + basename
+        i_n = Command(dst, filename, Copy("$TARGET", "$SOURCE"))
+        if '' == name:
+            name = basename
+        ienv.Alias(name, i_n)
+        env.AppendUnique(TS=[name])
 
 
 def __installlib(ienv, targets, name):
+    #
+    # Install files to system, using "scons install"
+    # If prefix or lib install dir is not specified, for developer convenience
+    # files are copied in relative "bin" folder along executables
+    # to avoid overlap with "internal place" above
+    #
     user_prefix = env.get('PREFIX')
     if user_prefix:
         user_lib = env.get('LIB_INSTALL_DIR')
         if user_lib:
-            i_n = ienv.Install(user_lib, targets)
+            dst_dir  = user_lib
         else:
-            i_n = ienv.Install(user_prefix + '/lib', targets)
-        ienv.Alias("install", i_n)
+            dst_dir  = user_prefix + '/lib'
     else:
-        i_n = ienv.Install(env.get('BUILD_DIR'), targets)
-    ienv.Alias("install", i_n)
+        dst_dir  = env.get('BUILD_DIR') + '/bin'
+    ienv.Alias("install", ienv.Install(dst_dir , targets))
 
 
 def __installbin(ienv, targets, name):
+    #
+    # Install files to system, using "scons install"
+    # If prefix is not specified, for developer convenience
+    # files are copied in relative "bin" folder along libraries
+    #
     user_prefix = env.get('PREFIX')
     if user_prefix:
-        i_n = ienv.Install(user_prefix + '/bin', targets)
-        ienv.Alias("install", i_n)
+        dst_dir  = user_prefix + '/bin'
+    else:
+        dst_dir  = env.get('BUILD_DIR') + '/bin'
+    ienv.Alias("install", ienv.Install(dst_dir , targets))
 
 
 def __installheader(ienv, targets, dir, name):
@@ -620,6 +641,9 @@ rd_mode = env.get('RD_MODE')
 with_ra_ibb = env.get('WITH_RA_IBB')
 
 env.AppendUnique(LIBPATH = [env.get('BUILD_DIR')])
+
+if not env.get('PREFIX') and not env.get('LIB_INSTALL_DIR'):
+   env.AppendUnique(LIBPATH = [env.get('BUILD_DIR') + '/bin'])
 
 if (env.get('WITH_UPSTREAM_LIBCOAP') == '1'):
     env.AppendUnique(CPPDEFINES=['WITH_UPSTREAM_LIBCOAP'])
@@ -858,14 +882,19 @@ builder = Builder(generator = generate_actions,
 env.Append(BUILDERS = {'Cbor' : builder})
 
 
-def ScanJSON(env, directory):
+def ScanJSON(env, directory='.'):
     targets = []
+    if '.' == directory:
+        directory = Dir('.').srcnode().path
     if env.GetOption('clean') or env.get('SECURED') != '1':
         return targets
     dst_dir = env.get('BUILD_DIR') + '/' + directory + '/'
     src_dir = env.get('SRC_DIR') + '/' + directory + '/'
     for json_file in Glob('*.json'):
-        targets += env.Install(dst_dir, str(json_file))
+        filename = str(json_file.name)
+        src = src_dir + filename
+        dst = dst_dir + filename
+        Command(dst, src, Copy("$TARGET", "$SOURCE"))
         if env.get('CROSS_COMPILE') != None:
             cbor_file = src_dir + re.sub('\.json$', '.dat', str(json_file))
             targets += Install(dst_dir, cbor_file)

@@ -135,7 +135,9 @@ examples = list(map(make_single_file_cpp_program, example_names))
 # Other examples
 ######################################################################
 
-examples += examples_env.ScanJSON('resource/examples')
+actions = examples_env.ScanJSON()
+examples_env.Alias("install", actions)
+examples += actions
 
 if target_os in ['msys_nt', 'windows']:
     winUIClient = examples_env.Program(
@@ -147,5 +149,5 @@ if target_os in ['msys_nt', 'windows']:
         mediaserver = examples_env.Program('mediaserver', 'mediaserver.cpp')
         examples += [mediaserver]
 
-Alias("examples", examples)
+examples_env.Alias("examples", examples)
 examples_env.AppendTarget('examples')
