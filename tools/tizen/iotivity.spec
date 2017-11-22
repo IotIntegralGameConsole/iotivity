@@ -245,13 +245,6 @@ scons --install-sandbox=%{buildroot} install
 find "%{buildroot}" -type f -perm u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
-# Support legacy path (transitional, use pkg-config)
-ln -fs iotivity/resource %{buildroot}%{_includedir}/
-ln -fs iotivity/service %{buildroot}%{_includedir}/
-ln -fs iotivity/c_common %{buildroot}%{_includedir}/
-
-rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
-
 
 %post -p /sbin/ldconfig
 
