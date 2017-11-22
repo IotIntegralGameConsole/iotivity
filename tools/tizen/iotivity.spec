@@ -68,7 +68,6 @@ BuildRequires: python-accel-aarch64-cross-aarch64
 %endif
 
 %{!?exlibdir: %define exlibdir %{_libdir}/%{name}}
-%{!?ex_install_dir: %define ex_install_dir %{buildroot}/%{exlibdir}/examples}
 
 %if ! 0%{?license:0}
 %define license %doc
@@ -230,47 +229,6 @@ CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
 export SCONSFLAGS=%{SCONSFLAGS}
 scons install
 
-cd %{BUILD_DIR}
-install -d %{ex_install_dir}
-install examples/OICMiddle/OICMiddle %{ex_install_dir}
-install resource/examples/devicediscoveryclient %{ex_install_dir}
-install resource/examples/devicediscoveryserver %{ex_install_dir}
-install resource/examples/fridgeclient %{ex_install_dir}
-install resource/examples/fridgeserver %{ex_install_dir}
-install resource/examples/garageclient %{ex_install_dir}
-install resource/examples/garageserver %{ex_install_dir}
-install resource/examples/groupclient %{ex_install_dir}
-install resource/examples/groupserver %{ex_install_dir}
-install resource/examples/lightserver %{ex_install_dir}
-install resource/examples/presenceclient %{ex_install_dir}
-install resource/examples/presenceserver %{ex_install_dir}
-install resource/examples/roomclient %{ex_install_dir}
-install resource/examples/roomserver %{ex_install_dir}
-install resource/examples/simpleclient %{ex_install_dir}
-install resource/examples/simpleclientHQ %{ex_install_dir}
-install resource/examples/simpleclientserver %{ex_install_dir}
-install resource/examples/simpleserver %{ex_install_dir}
-install resource/examples/simpleserverHQ %{ex_install_dir}
-install resource/examples/threadingsample %{ex_install_dir}
-install lib*.a %{buildroot}%{_libdir}
-%if 0%{?WITH_PROXY} == 1
-install -d %{ex_install_dir}/proxy-sample
-install service/coap-http-proxy/samples/proxy_main %{ex_install_dir}/proxy-sample/
-install service/coap-http-proxy/samples/proxy_client %{ex_install_dir}/proxy-sample/
-%endif
-%if 0%{?SECURED} == 1
-install -d %{ex_install_dir}/provisioning
-install -d %{ex_install_dir}/provision-sample
-
-install resource/csdk/security/provisioning/sample/oic_svr_db_server_justworks.dat %{ex_install_dir}/oic_svr_db_server.dat
-install resource/csdk/security/provisioning/sample/sampleserver_justworks %{ex_install_dir}/provision-sample/
-install resource/csdk/security/provisioning/sample/oic_svr_db_server_justworks.dat %{ex_install_dir}/provision-sample/
-install resource/csdk/security/provisioning/sample/sampleserver_randompin %{ex_install_dir}/provision-sample/
-install resource/csdk/security/provisioning/sample/oic_svr_db_server_randompin.dat %{ex_install_dir}/provision-sample/
-install resource/examples/*.dat %{ex_install_dir}
-install resource/examples/*.json %{ex_install_dir}
-
-%endif
 find "%{buildroot}" -type f -perm u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
@@ -278,8 +236,6 @@ find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 ln -fs iotivity/resource %{buildroot}%{_includedir}/
 ln -fs iotivity/service %{buildroot}%{_includedir}/
 ln -fs iotivity/c_common %{buildroot}%{_includedir}/
-
-rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 
 %post -p /sbin/ldconfig
 

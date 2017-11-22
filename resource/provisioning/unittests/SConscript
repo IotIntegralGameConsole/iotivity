@@ -134,11 +134,9 @@ if provisiontests_env.get('TEST') == '1':
                    'resource/provisioning/unittests/provisiontests',
                     unittests)
 
-src_dir = provisiontests_env.get('SRC_DIR')
-svr_db_src_dir = src_dir + '/resource/provisioning/examples/'
 svr_db_build_dir = os.path.join(
     provisiontests_env.get('BUILD_DIR'), 'resource', 'provisioning', 'unittests')
-provisiontests_env.Alias(
-    "install",
-    provisiontests_env.Install(
-        svr_db_build_dir, svr_db_src_dir + 'oic_svr_db_client.json'))
+
+provisiontests_env.UserInstallTargetExtra(Glob('#/resource/provisioning/examples/*.json'))
+if provisiontests_env.get('SECURED') == '1':
+    provisiontests_env.UserInstallTargetExtra(Glob('#/resource/provisioning/examples/*.dat'))
