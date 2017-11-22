@@ -232,11 +232,6 @@ scons install
 find "%{buildroot}" -type f -perm u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
-# Support legacy path (transitional, use pkg-config)
-ln -fs iotivity/resource %{buildroot}%{_includedir}/
-ln -fs iotivity/service %{buildroot}%{_includedir}/
-ln -fs iotivity/c_common %{buildroot}%{_includedir}/
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
