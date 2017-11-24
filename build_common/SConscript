@@ -545,7 +545,6 @@ def __installlegacy(ienv):
         dst= user_prefix + '/include/' + item
         i_n = ienv.Command(dst, src.name, SymLink)
     ienv.Alias("install", i_n)
-#   Depends(src, 'iotivity/c_common/iotivity_config.h', 
 
 
 def __installpcfile(ienv, targets, name):
