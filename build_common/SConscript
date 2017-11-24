@@ -543,7 +543,7 @@ def __installlegacy(ienv):
     for item in subdirs:
         src = "iotivity/" + item
         dst= user_prefix + '/include/' + item
-        i_n = ienv.Command(src, dst, SymLink)
+        i_n = ienv.Command(dst, src, SymLink)
     ienv.Alias("install", i_n)
 
 
