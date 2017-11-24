@@ -150,11 +150,11 @@ BuildRequires:  bluetooth-tools
 %if 0%{?fedora:1}
 BuildRequires:  gettext-devel
 #BuildRequires:  git
-BuildRequires:  findutils
+#BuildRequires:  findutils
 #BuildRequires:  pkgconfig
 #BuildRequires:  bzip2 
 #BuildRequires:  unzip 
-BuildRequires:  gcc-c++
+#BuildRequires:  gcc-c++
 #BuildRequires:  wget 
 %endif
 %endif
