@@ -541,10 +541,11 @@ def __installlegacy(ienv):
         print("Use: include %s source not %" % (source, target))
     subdirs = [ 'resource', 'service', 'c_common' ]
     for item in subdirs:
-        src = "iotivity/" + item
+        src = Dir("iotivity/" + item)
         dst= user_prefix + '/include/' + item
-        i_n = ienv.Command(dst, src, SymLink)
+        i_n = ienv.Command(dst, src.name, SymLink)
     ienv.Alias("install", i_n)
+#   Depends(src, 'iotivity/c_common/iotivity_config.h', 
 
 
 def __installpcfile(ienv, targets, name):
