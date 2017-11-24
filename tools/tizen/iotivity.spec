@@ -149,13 +149,13 @@ BuildRequires:  bluetooth-tools
 %else
 %if 0%{?fedora:1}
 BuildRequires:  gettext-devel
-BuildRequires:  git
+#BuildRequires:  git
 BuildRequires:  findutils
-BuildRequires:  pkgconfig
-BuildRequires:  bzip2 
-BuildRequires:  unzip 
+#BuildRequires:  pkgconfig
+#BuildRequires:  bzip2 
+#BuildRequires:  unzip 
 BuildRequires:  gcc-c++
-BuildRequires:  wget 
+#BuildRequires:  wget 
 %endif
 %endif
 Requires(postun): /sbin/ldconfig
@@ -245,6 +245,7 @@ scons --install-sandbox=%{buildroot} install
 find "%{buildroot}" -type f -perm u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
+rpm -ql gettext-devel
 
 %post -p /sbin/ldconfig
 
