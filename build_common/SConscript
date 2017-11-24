@@ -458,11 +458,11 @@ def __set_dir(env, dir):
 
 
 def __src_to_obj(env, src, home=''):
-    #
-    # make sure builds happen in BUILD_DIR (by default they
-    # would happen in the directory of the source file)
-    # Note this does not seem to be used, VariantDir is used instead
-    #
+    '''
+    Make sure builds happen in BUILD_DIR (by default they
+    would happen in the directory of the source file)
+    Note this does not seem to be used, VariantDir is used instead
+    '''
     obj = env.get('BUILD_DIR') + src.replace(home, '')
     if env.get('OBJSUFFIX'):
         obj += env.get('OBJSUFFIX')
@@ -470,10 +470,10 @@ def __src_to_obj(env, src, home=''):
 
 
 def __install(ienv, targets, name=''):
-    #
-    # Copy files to internal place (not for install to system)
-    # only use UserInstall() for copying files to system using "scons install"
-    #
+    '''
+    Copy files to internal place (not for install to system)
+    only use UserInstall() for copying files to system using "scons install"
+    '''
     for filename in ienv.GetBuildPath(targets):
         basename = os.path.basename(filename)
         dst = env.get('BUILD_DIR') + basename
@@ -483,14 +483,22 @@ def __install(ienv, targets, name=''):
         ienv.Alias(name, i_n)
         env.AppendUnique(TS=[name])
 
+def __chrpath(target, source, env):
+    '''
+    Remove RPATH (if installed elsewhere)
+    '''
+    if target_os in ['linux', 'tizen']: #TODO android
+#       print("source %s" % str(source[0]))
+        print("target %s" % dir(target[0]))
+        env.Command(None, target, 'chrpath -d $SOURCE')
 
 def __installlib(ienv, targets, name):
-    #
-    # Install files to system, using "scons install"
-    # If prefix or lib install dir is not specified, for developer convenience
-    # files are copied in relative "bin" folder along executables
-    # to avoid overlap with "internal place" above
-    #
+    '''
+    Install files to system, using "scons install" and remove rpath info if present
+    If prefix or lib install dir is not specified, for developer convenience
+    files are copied in relative "bin" folder along executables (rpath is kept)
+    to avoid overlap with "internal place" above
+    '''
     user_prefix = env.get('PREFIX')
     if user_prefix:
         user_lib = env.get('LIB_INSTALL_DIR')
@@ -500,15 +508,17 @@ def __installlib(ienv, targets, name):
             dst_dir  = user_prefix + '/lib'
     else:
         dst_dir  = env.get('BUILD_DIR') + '/bin'
-    ienv.Alias("install", ienv.Install(dst_dir , targets))
-
+    action = ienv.Install(dst_dir, targets)
+    if not user_prefix and str(targets[0]).endswith(env['SHLIBSUFFIX']):
+        ienv.AddPostAction(action, __chrpath)
+    ienv.Alias("install", action)
 
 def __installbin(ienv, targets, name):
-    #
-    # Install files to system, using "scons install"
-    # If prefix is not specified, for developer convenience
-    # files are copied in relative "bin" folder along libraries
-    #
+    '''
+    ' Install files to system, using "scons install"
+    ' If prefix is not specified, for developer convenience
+    ' files are copied in relative "bin" folder along libraries
+    '''
     user_prefix = env.get('PREFIX')
     if user_prefix:
         dst_dir  = user_prefix + '/bin'
@@ -561,8 +571,10 @@ def __installpcfile(ienv, targets, name):
 
 
 def __installextra(ienv, targets, subdir="."):
-    # Install extra files, by default use file relative location as subdir
-    # or use any other prefix of your choice, while explicit "" will put to in topdir
+    '''
+    Install extra files, by default use file relative location as subdir
+    or use any other prefix of your choice, while explicit "" will put to in topdir
+    '''
     for target in targets:
         if "." == subdir:
             subdir = Dir('.').srcnode().path
@@ -570,11 +582,11 @@ def __installextra(ienv, targets, subdir="."):
         if user_prefix:
             user_lib = env.get('LIB_INSTALL_DIR')
             if user_lib:
-                subdir = os.path.join(user_lib, 'iotivity', subdir)
+                subdir = user_lib + '/iotivity/' + subdir
             else:
-                subdir = os.path.join(user_prefix, 'lib', 'iotivity', subdir)
+                subdir = user_prefix + '/lib/' + 'iotivity/'+ subdir
         else:
-                subdir = os.path.join( env.get('BUILD_DIR'), 'lib', 'iotivity', subdir)
+                subdir = env.get('BUILD_DIR') + '/bin/' + 'iotivity/' + subdir
         i_n = ienv.Install(subdir, target)
         ienv.Alias('install', i_n)
 
