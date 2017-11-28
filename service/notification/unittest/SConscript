@@ -87,7 +87,7 @@ if env.get('SECURED') == '1':
 ######################################################################
 # Build Test
 ######################################################################
-
+unittests = []
 notification_consumer_test_env = notification_test_env.Clone()
 notification_consumer_test_env.AppendUnique(LIBS=['notification_consumer'])
 
@@ -99,6 +99,7 @@ notification_consumer_test = notification_consumer_test_env.Program(
     'notification_consumer_test', notification_consumer_test_src)
 Alias("notification_consumer_test", notification_consumer_test)
 notification_consumer_test_env.AppendTarget('notification_consumer_test')
+unittests += notification_consumer_test
 
 notification_consumer_test_src = env.Glob('./NSConsumerTest.cpp')
 notification_consumer_internaltest = notification_consumer_test_env.Program(
@@ -110,6 +111,7 @@ notification_provider_test = notification_provider_test_env.Program(
     'notification_provider_test', notification_provider_test_src)
 Alias("notification_provider_test", notification_provider_test)
 notification_provider_test_env.AppendTarget('notification_provider_test')
+unittests += notification_provider_test
 
 notification_provider_test_src = env.Glob('./NSProviderTest.cpp')
 notification_provider_internaltest = notification_provider_test_env.Program(
@@ -137,6 +139,9 @@ else:
         notification_consumer_test_env.get('BUILD_DIR'), 'service',
         'notification', 'unittest') + os.sep
     notification_consumer_test_env.Alias(
-        "install",
+        "unit_tests",
         notification_consumer_test_env.Install(
             svr_db_build_dir, os.path.join(svr_db_src_dir, 'oic_svr_db_ns.dat')))
+
+unittests += Glob('*.dat') + Glob('.json')
+notification_consumer_test_env.UserInstallTargetExtra(unittests)

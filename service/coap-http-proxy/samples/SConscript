@@ -67,6 +67,7 @@ if env.get('SECURED') == '1':
 proxy_server = proxy_sample_app_env.Program('proxy_main', 'proxy_main.c')
 proxy_client = proxy_sample_app_env.Program('proxy_client', 'proxy_client.c')
 actions = [proxy_server, proxy_client]
+actions += Glob('*.json') + Glob('*.dat')
 proxy_sample_app_env.UserInstallTargetExtra(actions)
 Alias("coap_http_proxy", actions)
 env.AppendTarget('coap_http_proxy')
@@ -77,12 +78,12 @@ if env.get('SECURED') == '1':
     proxy_sample_build_dir = proxy_sample_app_env.get(
         'BUILD_DIR') + '/service/coap-http-proxy/samples'
     proxy_sample_app_env.Alias(
-        "install",
+        "samples",
         proxy_sample_app_env.Install(
             proxy_sample_build_dir,
             proxy_sample_src_dir + 'oic_svr_db_server.dat'))
     proxy_sample_app_env.Alias(
-        "install",
+        "samples",
         proxy_sample_app_env.Install(
             proxy_sample_build_dir,
             proxy_sample_src_dir + 'oic_svr_db_client_devowner.dat'))

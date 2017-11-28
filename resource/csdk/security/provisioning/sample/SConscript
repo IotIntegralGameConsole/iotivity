@@ -120,6 +120,16 @@ if target_os not in ['msys_nt', 'windows']:
                 'cloud/cloudResource.c'
             ])
 
+sampleapps = [
+    provisioningclient,
+    autoprovisioningclient,
+    sampleserver_justworks,
+    sampleserver_randompin,
+    sampleserver_mfg,
+]
+sampleapps += provisioning_sample_env.Glob('*.json')
+provisioning_sample_env.UserInstallTargetExtra(sampleapps)
+
 src_dir = provisioning_sample_env.get('SRC_DIR')
 sec_provisioning_src_dir = src_dir + '/resource/csdk/security/provisioning/sample/'
 sec_provisioning_build_dir = env.get(
@@ -168,12 +178,7 @@ if target_os not in ['msys_nt', 'windows']:
             ])
             provisioning_sample_env.AppendTarget("cloud")
 
-sampleapps = [
-    provisioningclient,
-    autoprovisioningclient,
-    sampleserver_justworks,
-    sampleserver_randompin,
-    sampleserver_mfg,
+sampleapps += [
     clientdat,
     justworksdat,
     randompindat,
@@ -190,4 +195,3 @@ if provisioning_sample_env.get('MULTIPLE_OWNER') == '1':
     ])
 Alias('samples', sampleapps)
 provisioning_sample_env.AppendTarget('samples')
-provisioning_sample_env.UserInstallTargetExtra(sampleapps)

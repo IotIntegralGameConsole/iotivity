@@ -114,32 +114,32 @@ srmtest_env.AppendUnique(CPPDEFINES=[
 ])
 
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_unittest.json'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_unittest_acl1.json'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_unittest_default_acl.json'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_svr_db.json'))
 
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_unittest.dat'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_unittest_acl1.dat'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_unittest_default_acl.dat'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_svr_db_prov.dat'))
 srmtest_env.Alias(
-    "install",
+    "unit_tests",
     srmtest_env.Install(unittest_build_dir, unittest_src_dir + 'oic_svr_db.dat'))
 
 srmtest_env.AppendTarget('test')
@@ -154,3 +154,6 @@ if srmtest_env.get('TEST') == '1':
         run_test(srmtest_env,
                  'resource_csdk_security_unittest.memcheck',
                  'resource/csdk/security/unittest/unittest')
+
+unittest += Glob('*.json') + Glob('*.dat')
+srmtest_env.UserInstallTargetExtra(unittest)
