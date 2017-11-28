@@ -71,22 +71,48 @@ static FILE* override_fopen(const char* path, const char* mode)
     return file;
 }
 
+// This is a function called back when a device is discovered
+OCStackApplicationResult onDiscover(void *ctx,
+                                    OCDoHandle handle,
+                                    OCClientResponse *clientResponse)
+{
+    (void) ctx;
+    (void) handle;
+    (void) clientResponse;
+    OIC_LOG_V(INFO, TAG, "Discovered");
+    OIC_LOG(INFO, TAG, __PRETTY_FUNCTION__);
+
+    OCStackResult result = OC_STACK_OK;
+    return result;
+}
+
+
 int main() {
     OIC_LOG_V(INFO, TAG, "Starting occlient");
 
     /* Initialize OCStack*/
     static OCPersistentStorage ps = {override_fopen, fread, fwrite, fclose, unlink };
     OCRegisterPersistentStorageHandler(&ps);
-    if (OCInit(NULL, 0, OC_CLIENT) != OC_STACK_OK) {
+    if (OCInit(NULL, 0, OC_CLIENT_SERVER) != OC_STACK_OK) {
         OIC_LOG(ERROR, TAG, "OCStack init error");
         return 0;
     }
 
+    OCCallbackData cbData = {NULL, NULL, NULL};
+    cbData.cb = onDiscover;
     /* Start a discovery query*/
     char szQueryUri[MAX_QUERY_LENGTH] = { 0 };
-    strcpy(szQueryUri, OC_MULTICAST_DISCOVERY_URI);
-    if (OCDoResource(NULL, OC_REST_GET, szQueryUri, 0, 0, 
-            CT_DEFAULT, OC_LOW_QOS, 0, 0, 0) != OC_STACK_OK) {
+    strcpy(szQueryUri, OC_RSRVD_WELL_KNOWN_URI);
+    if (OCDoResource(NULL,
+                     OC_REST_DISCOVER, 
+                     szQueryUri, 
+                     0, 
+                     0, 
+                     CT_DEFAULT,
+                     OC_LOW_QOS, 
+                     &cbData, //
+                     0,
+                     0) != OC_STACK_OK) {
         OIC_LOG(ERROR, TAG, "OCStack resource error");
         return 0;
     }

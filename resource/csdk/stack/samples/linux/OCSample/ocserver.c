@@ -58,8 +58,7 @@ void handleSigInt(int signum) {
 }
 
  
-static FILE* override_fopen(const char* path, const char* mode)
-{
+static FILE* override_fopen(const char* path, const char* mode) {
     static const char* CRED_FILE_NAME = "./oic_svr_db_server.dat";
     char const * const filename
         = (0 == strcmp(path, OC_SECURITY_DB_DAT_FILE_NAME)) ? CRED_FILE_NAME : path;
@@ -70,6 +69,7 @@ static FILE* override_fopen(const char* path, const char* mode)
 
 int main() {
     OIC_LOG_V(INFO, TAG, "Starting ocserver");
+
     static OCPersistentStorage ps = {override_fopen, fread, fwrite, fclose, unlink };
     OCRegisterPersistentStorageHandler(&ps);
     if (OCInit(NULL, 0, OC_SERVER) != OC_STACK_OK) {
@@ -107,15 +107,35 @@ int main() {
     return 0;
 }
 
+
+OCEntityHandlerResult onOCEntity(OCEntityHandlerFlag flag,
+                                 OCEntityHandlerRequest *entityHandlerRequest,
+                                 void *callbackParam) {
+    (void) callbackParam;
+    OCEntityHandlerResult result = OC_EH_OK;
+    //OCStackResult res = OC_STACK_OK;
+    //OCRepPayload *payload = NULL;
+    OCEntityHandlerResponse response = {0};
+    memset(&response,0,sizeof response);
+
+    OIC_LOG(INFO, TAG, __PRETTY_FUNCTION__);
+    exit(5);
+    if (entityHandlerRequest && (flag & OC_REQUEST_FLAG))
+    {
+    }
+    return result;
+}
+
+
 OCStackResult createLightResource() {
     Light.power = false;
     OCStackResult res = OCCreateResource(&Light.handle,
                     "core.light",
-                    "core.rw",
+                    OC_RSRVD_INTERFACE_DEFAULT, //"core.rw",
                     "/a/light",
-                    0,
+                    onOCEntity,
                     NULL,
-                    OC_DISCOVERABLE|OC_OBSERVABLE);
+                    OC_DISCOVERABLE|OC_OBSERVABLE|OC_SECURE);
     return res;
 }
 
