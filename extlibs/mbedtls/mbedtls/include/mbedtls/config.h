@@ -25,6 +25,13 @@
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 
+
+/*
+ * This is IoTivity's version of config.h, to customize the mbedtls build. 
+ * Mainly it reduces the features of the library, to only those that are
+ * requied by IoTivity.
+ */
+
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
@@ -189,7 +196,7 @@
  *
  * Uncomment to get errors on using deprecated functions.
  */
-//#define MBEDTLS_DEPRECATED_REMOVED
+#define MBEDTLS_DEPRECATED_REMOVED
 
 /* \} name SECTION: System support */
 
@@ -345,7 +352,7 @@
  *
  * Enable Cipher Feedback mode (CFB) for symmetric ciphers.
  */
-#define MBEDTLS_CIPHER_MODE_CFB
+//#define MBEDTLS_CIPHER_MODE_CFB
 
 /**
  * \def MBEDTLS_CIPHER_MODE_CTR
@@ -399,9 +406,9 @@
  * Enable padding modes in the cipher layer.
  */
 #define MBEDTLS_CIPHER_PADDING_PKCS7
-#define MBEDTLS_CIPHER_PADDING_ONE_AND_ZEROS
-#define MBEDTLS_CIPHER_PADDING_ZEROS_AND_LEN
-#define MBEDTLS_CIPHER_PADDING_ZEROS
+//#define MBEDTLS_CIPHER_PADDING_ONE_AND_ZEROS
+//#define MBEDTLS_CIPHER_PADDING_ZEROS_AND_LEN
+//#define MBEDTLS_CIPHER_PADDING_ZEROS
 
 /**
  * \def MBEDTLS_ENABLE_WEAK_CIPHERSUITES
@@ -439,18 +446,18 @@
  *
  * Comment macros to disable the curve and functions for it
  */
-#define MBEDTLS_ECP_DP_SECP192R1_ENABLED
-#define MBEDTLS_ECP_DP_SECP224R1_ENABLED
+//#define MBEDTLS_ECP_DP_SECP192R1_ENABLED
+//#define MBEDTLS_ECP_DP_SECP224R1_ENABLED
 #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
-#define MBEDTLS_ECP_DP_SECP384R1_ENABLED
+//#define MBEDTLS_ECP_DP_SECP384R1_ENABLED
 #define MBEDTLS_ECP_DP_SECP521R1_ENABLED
-#define MBEDTLS_ECP_DP_SECP192K1_ENABLED
-#define MBEDTLS_ECP_DP_SECP224K1_ENABLED
-#define MBEDTLS_ECP_DP_SECP256K1_ENABLED
-#define MBEDTLS_ECP_DP_BP256R1_ENABLED
-#define MBEDTLS_ECP_DP_BP384R1_ENABLED
-#define MBEDTLS_ECP_DP_BP512R1_ENABLED
-#define MBEDTLS_ECP_DP_CURVE25519_ENABLED
+//#define MBEDTLS_ECP_DP_SECP192K1_ENABLED
+//#define MBEDTLS_ECP_DP_SECP224K1_ENABLED
+//#define MBEDTLS_ECP_DP_SECP256K1_ENABLED
+//#define MBEDTLS_ECP_DP_BP256R1_ENABLED
+//#define MBEDTLS_ECP_DP_BP384R1_ENABLED
+//#define MBEDTLS_ECP_DP_BP512R1_ENABLED
+//#define MBEDTLS_ECP_DP_CURVE25519_ENABLED
 
 /**
  * \def MBEDTLS_ECP_NIST_OPTIM
@@ -521,7 +528,7 @@
  *      MBEDTLS_TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_DHE_PSK_WITH_RC4_128_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
@@ -566,7 +573,7 @@
  *      MBEDTLS_TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA
  *      MBEDTLS_TLS_RSA_PSK_WITH_RC4_128_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
@@ -620,7 +627,7 @@
  *      MBEDTLS_TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA
  *      MBEDTLS_TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA
  */
-#define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
@@ -646,6 +653,21 @@
  *      MBEDTLS_TLS_ECDHE_RSA_WITH_RC4_128_SHA
  */
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+
+/**
+ * \def MBEDTLS_KEY_EXCHANGE_ECDH_ANON_ENABLED
+ *
+ * Enable the ECDHE-ANON based ciphersuite modes in SSL / TLS.
+ *
+ * Requires: MBEDTLS_ECDH_C
+ *
+ *
+ * This enables the following ciphersuites (if other requisites are
+ * enabled as well):
+ *      MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256
+ */
+#define MBEDTLS_KEY_EXCHANGE_ECDH_ANON_ENABLED
+
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
@@ -717,7 +739,7 @@
  *      MBEDTLS_TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256
  *      MBEDTLS_TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384
  */
-#define MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED
+//#define MBEDTLS_KEY_EXCHANGE_ECDH_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
@@ -774,7 +796,7 @@
  *
  * Requires: MBEDTLS_BIGNUM_C
  */
-#define MBEDTLS_GENPRIME
+//#define MBEDTLS_GENPRIME
 
 /**
  * \def MBEDTLS_FS_IO
@@ -883,7 +905,7 @@
  *
  * Comment this macro to disable support for external private RSA keys.
  */
-#define MBEDTLS_PK_RSA_ALT_SUPPORT
+//#define MBEDTLS_PK_RSA_ALT_SUPPORT
 
 /**
  * \def MBEDTLS_PKCS1_V15
@@ -922,7 +944,7 @@
  *
  * Enable the checkup functions (*_self_test).
  */
-#define MBEDTLS_SELF_TEST
+//#define MBEDTLS_SELF_TEST
 
 /**
  * \def MBEDTLS_SHA256_SMALLER
@@ -1043,7 +1065,7 @@
  *
  * Comment this macro to disable 1/n-1 record splitting.
  */
-#define MBEDTLS_SSL_CBC_RECORD_SPLITTING
+//#define MBEDTLS_SSL_CBC_RECORD_SPLITTING
 
 /**
  * \def MBEDTLS_SSL_RENEGOTIATION
@@ -1058,7 +1080,7 @@
  *
  * Comment this to disable support for renegotiation.
  */
-#define MBEDTLS_SSL_RENEGOTIATION
+//#define MBEDTLS_SSL_RENEGOTIATION
 
 /**
  * \def MBEDTLS_SSL_SRV_SUPPORT_SSLV2_CLIENT_HELLO
@@ -1078,7 +1100,7 @@
  *
  * Uncomment this macro to respect client's ciphersuite order
  */
-//#define MBEDTLS_SSL_SRV_RESPECT_CLIENT_PREFERENCE
+#define MBEDTLS_SSL_SRV_RESPECT_CLIENT_PREFERENCE
 
 /**
  * \def MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
@@ -1111,7 +1133,7 @@
  *
  * Comment this macro to disable support for TLS 1.0
  */
-#define MBEDTLS_SSL_PROTO_TLS1
+//#define MBEDTLS_SSL_PROTO_TLS1
 
 /**
  * \def MBEDTLS_SSL_PROTO_TLS1_1
@@ -1123,7 +1145,7 @@
  *
  * Comment this macro to disable support for TLS 1.1 / DTLS 1.0
  */
-#define MBEDTLS_SSL_PROTO_TLS1_1
+//#define MBEDTLS_SSL_PROTO_TLS1_1
 
 /**
  * \def MBEDTLS_SSL_PROTO_TLS1_2
@@ -1159,7 +1181,7 @@
  *
  * Comment this macro to disable support for ALPN.
  */
-#define MBEDTLS_SSL_ALPN
+//#define MBEDTLS_SSL_ALPN
 
 /**
  * \def MBEDTLS_SSL_DTLS_ANTI_REPLAY
@@ -1233,7 +1255,7 @@
  *
  * Comment this macro to disable support for SSL session tickets
  */
-#define MBEDTLS_SSL_SESSION_TICKETS
+//#define MBEDTLS_SSL_SESSION_TICKETS
 
 /**
  * \def MBEDTLS_SSL_EXPORT_KEYS
@@ -1254,7 +1276,7 @@
  *
  * Comment this macro to disable support for server name indication in SSL
  */
-#define MBEDTLS_SSL_SERVER_NAME_INDICATION
+//#define MBEDTLS_SSL_SERVER_NAME_INDICATION
 
 /**
  * \def MBEDTLS_SSL_TRUNCATED_HMAC
@@ -1263,7 +1285,7 @@
  *
  * Comment this macro to disable support for truncated HMAC in SSL
  */
-#define MBEDTLS_SSL_TRUNCATED_HMAC
+//#define MBEDTLS_SSL_TRUNCATED_HMAC
 
 /**
  * \def MBEDTLS_THREADING_ALT
@@ -1298,7 +1320,7 @@
  *
  * Comment this to disable run-time checking and save ROM space
  */
-#define MBEDTLS_VERSION_FEATURES
+//#define MBEDTLS_VERSION_FEATURES
 
 /**
  * \def MBEDTLS_X509_ALLOW_EXTENSIONS_NON_V3
@@ -1358,6 +1380,21 @@
  * Comment this macro to disallow using RSASSA-PSS in certificates.
  */
 #define MBEDTLS_X509_RSASSA_PSS_SUPPORT
+
+/**
+ * \def MBEDTLS_X509_EXPANDED_SUBJECT_ALT_NAME_SUPPORT
+ *
+ * Enable parsing of all supported subtypes of the Subject Alternative Name
+ * extension. When enabled, the subject_alt_names field of mbedtls_x509_crt
+ * is defined as an mbedtls_x509_subject_alt_name_sequence, each element of
+ * which can describe a different subtype of the GeneralName choice as defined
+ * by the standard.
+ *
+ * Comment this macro to only support dNSName subtypes, and to define the
+ * subject_alt_names field as an mbedtls_x509_sequence. Any other subtypes will
+ * be ignored. This was the behavior in earlier versions.
+ */
+#define MBEDTLS_X509_EXPANDED_SUBJECT_ALT_NAME_SUPPORT
 
 /**
  * \def MBEDTLS_ZLIB_SUPPORT
@@ -1473,6 +1510,7 @@
  *      MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256
  *      MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA256
  *      MBEDTLS_TLS_PSK_WITH_AES_128_CBC_SHA
+ *      MBEDTLS_TLS_ECDH_ANON_WITH_AES_128_CBC_SHA256
  *
  * PEM_PARSE uses AES for decrypting encrypted keys.
  */
@@ -1499,7 +1537,7 @@
  *      MBEDTLS_TLS_RSA_PSK_WITH_RC4_128_SHA
  *      MBEDTLS_TLS_PSK_WITH_RC4_128_SHA
  */
-#define MBEDTLS_ARC4_C
+//#define MBEDTLS_ARC4_C
 
 /**
  * \def MBEDTLS_ASN1_PARSE_C
@@ -1525,7 +1563,7 @@
  *          library/pkwrite.c
  *          library/x509_create.c
  *          library/x509write_crt.c
- *          library/x509write_csr.c
+ *          library/mbedtls_x509write_csr.c
  */
 #define MBEDTLS_ASN1_WRITE_C
 
@@ -1564,7 +1602,7 @@
  *
  * Module:  library/blowfish.c
  */
-#define MBEDTLS_BLOWFISH_C
+//#define MBEDTLS_BLOWFISH_C
 
 /**
  * \def MBEDTLS_CAMELLIA_C
@@ -1619,7 +1657,7 @@
  *      MBEDTLS_TLS_PSK_WITH_CAMELLIA_128_GCM_SHA256
  *      MBEDTLS_TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256
  */
-#define MBEDTLS_CAMELLIA_C
+//#define MBEDTLS_CAMELLIA_C
 
 /**
  * \def MBEDTLS_CCM_C
@@ -1645,7 +1683,7 @@
  *
  * This module is used for testing (ssl_client/server).
  */
-#define MBEDTLS_CERTS_C
+//#define MBEDTLS_CERTS_C
 
 /**
  * \def MBEDTLS_CIPHER_C
@@ -1724,7 +1762,7 @@
  *
  * PEM_PARSE uses DES/3DES for decrypting encrypted keys.
  */
-#define MBEDTLS_DES_C
+//#define MBEDTLS_DES_C
 
 /**
  * \def MBEDTLS_DHM_C
@@ -1738,7 +1776,7 @@
  * This module is used by the following key exchanges:
  *      DHE-RSA, DHE-PSK
  */
-#define MBEDTLS_DHM_C
+//#define MBEDTLS_DHM_C
 
 /**
  * \def MBEDTLS_ECDH_C
@@ -1870,7 +1908,8 @@
 /**
  * \def MBEDTLS_HMAC_DRBG_C
  *
- * Enable the HMAC_DRBG random generator.
+ * Enable the HMAC_DRBG random generator. 
+ * Required for deterministic ECDSA (MBEDTLS_ECDSA_DETERMINISTIC).
  *
  * Module:  library/hmac_drbg.c
  * Caller:
@@ -1886,7 +1925,7 @@
  *
  * Enable the generic message digest layer.
  *
- * Module:  library/md.c
+ * Module:  library/mbedtls_md.c
  * Caller:
  *
  * Uncomment to enable generic message digest wrappers.
@@ -1898,7 +1937,7 @@
  *
  * Enable the MD2 hash algorithm.
  *
- * Module:  library/md2.c
+ * Module:  library/mbedtls_md2.c
  * Caller:
  *
  * Uncomment to enable support for (rare) MD2-signed X.509 certs.
@@ -1910,7 +1949,7 @@
  *
  * Enable the MD4 hash algorithm.
  *
- * Module:  library/md4.c
+ * Module:  library/mbedtls_md4.c
  * Caller:
  *
  * Uncomment to enable support for (rare) MD4-signed X.509 certs.
@@ -1922,15 +1961,15 @@
  *
  * Enable the MD5 hash algorithm.
  *
- * Module:  library/md5.c
- * Caller:  library/md.c
+ * Module:  library/mbedtls_md5.c
+ * Caller:  library/mbedtls_md.c
  *          library/pem.c
  *          library/ssl_tls.c
  *
  * This module is required for SSL/TLS and X.509.
  * PEM_PARSE uses MD5 for decrypting encrypted keys.
  */
-#define MBEDTLS_MD5_C
+//#define MBEDTLS_MD5_C
 
 /**
  * \def MBEDTLS_MEMORY_BUFFER_ALLOC_C
@@ -1947,6 +1986,16 @@
  * Enable this module to enable the buffer memory allocator.
  */
 //#define MBEDTLS_MEMORY_BUFFER_ALLOC_C
+
+/**
+ * \def MBEDTLS_HAVE_WINSOCK2
+ *
+ * Windows builds using winsock2.h will need this macro to correctly resognize
+ * the type used for sockets.
+ *
+ * Uncomment if your system has winsock2.h.
+ */
+//#define MBEDTLS_HAVE_WINSOCK2
 
 /**
  * \def MBEDTLS_NET_C
@@ -1980,11 +2029,11 @@
  *          library/rsa.c
  *          library/x509.c
  *          library/x509_create.c
- *          library/x509_crl.c
- *          library/x509_crt.c
- *          library/x509_csr.c
+ *          library/mbedtls_x509_crl.c
+ *          library/mbedtls_x509_crt.c
+ *          library/mbedtls_x509_csr.c
  *          library/x509write_crt.c
- *          library/x509write_csr.c
+ *          library/mbedtls_x509write_csr.c
  *
  * This modules translates between OIDs and internal values.
  */
@@ -2002,7 +2051,7 @@
  *
  * This modules adds support for the VIA PadLock on x86.
  */
-#define MBEDTLS_PADLOCK_C
+//#define MBEDTLS_PADLOCK_C
 
 /**
  * \def MBEDTLS_PEM_PARSE_C
@@ -2012,9 +2061,9 @@
  * Module:  library/pem.c
  * Caller:  library/dhm.c
  *          library/pkparse.c
- *          library/x509_crl.c
- *          library/x509_crt.c
- *          library/x509_csr.c
+ *          library/mbedtls_x509_crl.c
+ *          library/mbedtls_x509_crt.c
+ *          library/mbedtls_x509_csr.c
  *
  * Requires: MBEDTLS_BASE64_C
  *
@@ -2030,7 +2079,7 @@
  * Module:  library/pem.c
  * Caller:  library/pkwrite.c
  *          library/x509write_crt.c
- *          library/x509write_csr.c
+ *          library/mbedtls_x509write_csr.c
  *
  * Requires: MBEDTLS_BASE64_C
  *
@@ -2060,8 +2109,8 @@
  * Enable the generic public (asymetric) key parser.
  *
  * Module:  library/pkparse.c
- * Caller:  library/x509_crt.c
- *          library/x509_csr.c
+ * Caller:  library/mbedtls_x509_crt.c
+ *          library/mbedtls_x509_csr.c
  *
  * Requires: MBEDTLS_PK_C
  *
@@ -2125,7 +2174,7 @@
  *
  * This module enables PKCS#12 functions.
  */
-#define MBEDTLS_PKCS12_C
+//#define MBEDTLS_PKCS12_C
 
 /**
  * \def MBEDTLS_PLATFORM_C
@@ -2152,11 +2201,11 @@
  *
  * Enable the RIPEMD-160 hash algorithm.
  *
- * Module:  library/ripemd160.c
- * Caller:  library/md.c
+ * Module:  library/mbedtls_ripemd160.c
+ * Caller:  library/mbedtls_md.c
  *
  */
-#define MBEDTLS_RIPEMD160_C
+//#define MBEDTLS_RIPEMD160_C
 
 /**
  * \def MBEDTLS_RSA_C
@@ -2181,8 +2230,8 @@
  *
  * Enable the SHA1 cryptographic hash algorithm.
  *
- * Module:  library/sha1.c
- * Caller:  library/md.c
+ * Module:  library/mbedtls_sha1.c
+ * Caller:  library/mbedtls_md.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
@@ -2197,9 +2246,9 @@
  *
  * Enable the SHA-224 and SHA-256 cryptographic hash algorithms.
  *
- * Module:  library/sha256.c
+ * Module:  library/mbedtls_sha256.c
  * Caller:  library/entropy.c
- *          library/md.c
+ *          library/mbedtls_md.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
@@ -2214,9 +2263,9 @@
  *
  * Enable the SHA-384 and SHA-512 cryptographic hash algorithms.
  *
- * Module:  library/sha512.c
+ * Module:  library/mbedtls_sha512.c
  * Caller:  library/entropy.c
- *          library/md.c
+ *          library/mbedtls_md.c
  *          library/ssl_cli.c
  *          library/ssl_srv.c
  *
@@ -2364,9 +2413,9 @@
  * Enable X.509 core for using certificates.
  *
  * Module:  library/x509.c
- * Caller:  library/x509_crl.c
- *          library/x509_crt.c
- *          library/x509_csr.c
+ * Caller:  library/mbedtls_x509_crl.c
+ *          library/mbedtls_x509_crt.c
+ *          library/mbedtls_x509_csr.c
  *
  * Requires: MBEDTLS_ASN1_PARSE_C, MBEDTLS_BIGNUM_C, MBEDTLS_OID_C,
  *           MBEDTLS_PK_PARSE_C
@@ -2380,7 +2429,7 @@
  *
  * Enable X.509 certificate parsing.
  *
- * Module:  library/x509_crt.c
+ * Module:  library/mbedtls_x509_crt.c
  * Caller:  library/ssl_cli.c
  *          library/ssl_srv.c
  *          library/ssl_tls.c
@@ -2396,8 +2445,8 @@
  *
  * Enable X.509 CRL parsing.
  *
- * Module:  library/x509_crl.c
- * Caller:  library/x509_crt.c
+ * Module:  library/mbedtls_x509_crl.c
+ * Caller:  library/mbedtls_x509_crt.c
  *
  * Requires: MBEDTLS_X509_USE_C
  *
@@ -2410,7 +2459,7 @@
  *
  * Enable X.509 Certificate Signing Request (CSR) parsing.
  *
- * Module:  library/x509_csr.c
+ * Module:  library/mbedtls_x509_csr.c
  * Caller:  library/x509_crt_write.c
  *
  * Requires: MBEDTLS_X509_USE_C
@@ -2466,7 +2515,7 @@
  * Module:  library/xtea.c
  * Caller:
  */
-#define MBEDTLS_XTEA_C
+//#define MBEDTLS_XTEA_C
 
 /* \} name SECTION: mbed TLS modules */
 
