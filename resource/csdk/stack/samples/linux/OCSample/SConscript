@@ -47,3 +47,5 @@ ocsample_env.AppendUnique(LIBPATH=[ocsample_env.get('BUILD_DIR'),])
 ######################################################################
 occlient = ocsample_env.Program('occlient', ['occlient.c'])
 ocserver = ocsample_env.Program('ocserver', ['ocserver.c'])
+targets = (ocserver, occlient, Glob('*.json'), Glob('*.dat'))
+ocsample_env.UserInstallTargetExtra(targets)

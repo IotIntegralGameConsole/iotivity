@@ -60,10 +60,23 @@ OCStackApplicationResult applicationDiscoverCB(
     return OC_STACK_KEEP_TRANSACTION;
 }
 
+ 
+static FILE* override_fopen(const char* path, const char* mode)
+{
+    static const char* CRED_FILE_NAME = "oic_svr_db_client_devowner.dat";
+    char const * const filename
+        = (0 == strcmp(path, OC_SECURITY_DB_DAT_FILE_NAME))
+        ? CRED_FILE_NAME : path;
+    FILE* file = fopen(filename, mode);
+    return file;
+}
+
 int main() {
     OIC_LOG_V(INFO, TAG, "Starting occlient");
 
     /* Initialize OCStack*/
+    static OCPersistentStorage ps = {override_fopen, fread, fwrite, fclose, unlink };
+    OCRegisterPersistentStorageHandler(&ps);
     if (OCInit(NULL, 0, OC_CLIENT) != OC_STACK_OK) {
         OIC_LOG(ERROR, TAG, "OCStack init error");
         return 0;
