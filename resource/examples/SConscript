@@ -108,6 +108,8 @@ if target_os not in ['windows', 'msys_nt']:
         example_names += ['rdclient']
 
 examples = list(map(make_single_file_cpp_program, example_names))
+examples += Glob('*.dat') + Glob('*.json') 
+examples_env.UserInstallTargetExtra(examples)
 
 ######################################################################
 # Other examples
@@ -120,7 +122,6 @@ light_introspection_json = examples_env.Install(examples_env.get('BUILD_DIR') + 
                 examples_env.get('SRC_DIR') + '/resource/examples/' + 'light_introspection.json')
 
 examples += [clientjson, serverjson]
-examples_env.UserInstallTargetExtra(examples)
 
 if target_os in ['msys_nt', 'windows']:
     winUIClient = examples_env.Program('winUIClient', ['winuiclientgui.cpp', 'winuiclient.cpp'])
@@ -131,6 +132,5 @@ if target_os in ['msys_nt', 'windows']:
         mediaserver = examples_env.Program('mediaserver', 'mediaserver.cpp')
         examples += [mediaserver]
 
-examples_env.Alias("examples", examples)
+examples_env.Alias('examples', examples)
 examples_env.AppendTarget('examples')
-examples_env.Alias("install", examples)

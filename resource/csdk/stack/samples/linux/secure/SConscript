@@ -85,35 +85,38 @@ sec_samples_build_dir = samples_env.get(
     'BUILD_DIR') + '/resource/csdk/stack/samples/linux/secure'
 
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_svr_db_server.json'))
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_svr_db_client_devowner.json'))
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_svr_db_client_nondevowner.json'))
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_amss_db.json'))
 
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_svr_db_server.dat'))
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_svr_db_client_devowner.dat'))
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_svr_db_client_nondevowner.dat'))
 samples_env.Alias(
-    "install",
+    "samples",
     samples_env.Install(sec_samples_build_dir,
                         sec_samples_src_dir + 'oic_amss_db.dat'))
+
+ocsamples += Glob('*.dat') + Glob('*.json')
+samples_env.UserInstallTargetExtra(ocsamples)
