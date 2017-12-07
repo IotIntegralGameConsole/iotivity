@@ -907,9 +907,9 @@ builder = Builder(generator = generate_actions,
 env.Append(BUILDERS = {'Cbor' : builder})
 
 
-def ScanJSON(env, directory='.'):
+def ScanJSON(env, directory=None):
     targets = []
-    if '.' == directory:
+    if not directory:
         directory = Dir('.').srcnode().path
     if env.GetOption('clean') or env.get('SECURED') != '1':
         return targets
@@ -921,8 +921,10 @@ def ScanJSON(env, directory='.'):
         dst = dst_dir + filename
         targets += Command(dst, src, Copy("$TARGET", "$SOURCE"))
         if env.get('CROSS_COMPILE') != None:
-            cbor_file = src_dir + re.sub('\.json$', '.dat', str(json_file))
-            targets += Install(dst_dir, cbor_file)
+            cbor_file = re.sub('\.json$', '.dat', filename)
+            src = src_dir + cbor_file
+            dst = dst_dir + cbor_file
+            targets += Command(dst, src, Copy("$TARGET", "$SOURCE"))
         else:
             cbor_file = env.Cbor(json_file)
             targets.append(cbor_file)
