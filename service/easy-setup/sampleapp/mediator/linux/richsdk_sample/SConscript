@@ -99,3 +99,5 @@ subclientdat = mediator_env.Install(
 
 Alias('mediator_rich', [i_mediator, clientdat, subclientdat])
 env.AppendTarget('mediator_rich')
+examples = [mediator, submediator]
+mediator_env.UserInstallTargetExtra(examples)

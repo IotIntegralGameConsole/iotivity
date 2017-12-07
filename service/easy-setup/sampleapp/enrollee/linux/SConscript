@@ -86,3 +86,4 @@ MOTdat = enrollee_env.Install(
 
 Alias('enrollee', [i_enrollee, justworksdat, MOTdat])
 env.AppendTarget('enrollee')
+enrollee_env.UserInstallTargetExtra(enrollee)
