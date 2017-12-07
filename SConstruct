@@ -95,3 +95,5 @@ env.PrintTargets()
 
 # to install the generated pc file into custom prefix location
 env.UserInstallTargetPCFile('iotivity.pc', 'iotivity.pc')
+
+env.UserInstallLegal()
