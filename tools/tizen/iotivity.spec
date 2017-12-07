@@ -183,24 +183,7 @@ developing applications that use %{name}.
 %setup -q
 chmod g-w %_sourcedir/*
 
-find . \
-     -iname "LICEN*E*"  \
-     -o -name "*BSD*" \
-     -o -name "*COPYING*" \
-     -o -name "*GPL*" \
-     -o -name "*MIT*" \
-     | sort | uniq \
-     | grep -v 'libcoap-4.1.1/LICENSE.GPL'  \
-     | while read file ; do \
-          dir=$(dirname -- "$file")
-          echo "Files: ${dir}/*"
-          echo "License: ${file}"
-          sed 's/^/ /' "${file}"
-          echo ""
-          echo ""
-     done > tmp.tmp && mv tmp.tmp LICENSE
-
-cat LICENSE
+cat LEGAL.md
 
 [ -r 'config.md' ] || cat<<EOF | sed -e 's|%{buildroot}|(...BUILDROOT...)|g' | tee config.md
 # Build configuration info #
@@ -248,7 +231,7 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %manifest %{name}.manifest
 %endif
 %defattr(-,root,root,-)
-%license LICENSE
+%license LEGAL.md
 %{_libdir}/liboc.so
 %{_libdir}/liboc_logger.so
 %{_libdir}/liboc_logger_core.so
@@ -265,7 +248,7 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %manifest %{name}.manifest
 %endif
 %defattr(-,root,root,-)
-%license LICENSE
+%license LEGAL.md
 %{_libdir}/libBMISensorBundle.so
 %{_libdir}/libDISensorBundle.so
 %{_libdir}/libHueBundle.so
@@ -289,12 +272,12 @@ rm -rfv out %{buildroot}/out %{buildroot}/${HOME} ||:
 %manifest %{name}-test.manifest
 %endif
 %defattr(-,root,root,-)
-%license LICENSE
+%license LEGAL.md
 %{_libdir}/%{name}/*
 
 %files devel
 %defattr(-,root,root,-)
-%license LICENSE
+%license LEGAL.md
 %doc *.md
 %{_libdir}/lib*.a
 %{_libdir}/pkgconfig/%{name}.pc
