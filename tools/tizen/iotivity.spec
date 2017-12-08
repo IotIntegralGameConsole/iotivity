@@ -13,12 +13,10 @@ Source1002: %{name}-test.manifest
 %endif
 
 %if 0%{?tizen:1}
-%define TARGET_OS tizen
+%{!?TARGET_OS: %define TARGET_OS tizen}
 #TODO: align to default
 %define WITH_CLOUD 1
 %define LOGGING 1
-%else
-%define TARGET_OS linux
 %endif
 
 %if "%{tizen}" == "2.3"
