@@ -54,7 +54,7 @@ if target_os in ['linux']:
     else:
         conf = Configure(lib_env.Clone(LIBS=[]))
 
-    if target_os not in ['tizen']:
+    if target_os not in ['tizen', 'linux']:
         if not conf.CheckLib('boost_thread', language='C++'):
             msg = 'Did not find boost_thread, exiting!'
             Exit(msg)
