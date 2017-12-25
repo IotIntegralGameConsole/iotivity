@@ -151,3 +151,5 @@ debian/*.debhelper.log
 debian/*.substvars
 debian/iotivity*/*
 debian/tmp/*
+debian/.debhelper/
+debian/*-stamp
