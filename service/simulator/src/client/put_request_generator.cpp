@@ -21,7 +21,7 @@
 #include "put_request_generator.h"
 #include "request_model.h"
 #include "simulator_exceptions.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "PUT_REQUEST_GEN"
 

@@ -35,9 +35,9 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "utlist.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include "ocprovisioningmanager.h"
@@ -50,7 +50,7 @@
 #include "ocsecurity.h"
 #include "ocstackinternal.h"
 #include "pmutility.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -1030,6 +1030,7 @@ exit:
 /* Function to work around IOT-1927.  The ocrandom.h include is only required for the workaround.
  * @todo: when IOT-1927 is resolved remove this function
  */
+
 #include "experimental/ocrandom.h"
 int workAroundBug()
 {

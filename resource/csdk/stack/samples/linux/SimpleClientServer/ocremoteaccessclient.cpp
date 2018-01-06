@@ -27,9 +27,9 @@
 #include <iostream>
 #include <sstream>
 #include "ocstack.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ocpayload.h"
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "ocremoteaccessclient.h"
 #include "common.h"
 

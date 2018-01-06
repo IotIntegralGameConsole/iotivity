@@ -37,7 +37,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <time.h>
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ConcurrentIotivityUtils.h"
 #include "messageHandler.h"
 #include "ocpayload.h"

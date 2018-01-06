@@ -38,10 +38,10 @@
 #endif
 
 #include "caprotocolmessage.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oic_malloc.h"
 #include "oic_string.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "cacommonutil.h"
 #include "cablockwisetransfer.h"
 

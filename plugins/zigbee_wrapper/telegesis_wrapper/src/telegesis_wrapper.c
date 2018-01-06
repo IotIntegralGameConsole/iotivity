@@ -33,7 +33,7 @@
 
 #include "oic_string.h"
 #include "oic_malloc.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #include "twtypes.h"
 #include "telegesis_socket.h"

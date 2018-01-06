@@ -29,7 +29,7 @@
 #include "CAManager.h"
 #include "cautilinterface.h"
 #include "casecurityinterface.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "OIC_CAMANAGER"
 

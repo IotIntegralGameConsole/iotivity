@@ -31,7 +31,7 @@
 #include "RCSResourceAttributes.h"
 #include "ExpiryTimer.h"
 
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 
 namespace OIC
 {

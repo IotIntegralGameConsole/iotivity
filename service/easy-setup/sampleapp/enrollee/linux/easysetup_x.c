@@ -22,7 +22,7 @@
 #include "easysetup_x.h"
 #include "string.h"
 #include "oic_malloc.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ocpayload.h"
 #include <inttypes.h>
 

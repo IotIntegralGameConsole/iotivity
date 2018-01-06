@@ -28,7 +28,7 @@
 
 #include <bluetooth.h>
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include "uarraylist.h"
 
 /**

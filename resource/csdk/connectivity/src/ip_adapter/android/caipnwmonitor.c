@@ -36,7 +36,7 @@
 
 #include "caadapterutils.h"
 #include "caipnwmonitor.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include "org_iotivity_ca_CaIpInterface.h"

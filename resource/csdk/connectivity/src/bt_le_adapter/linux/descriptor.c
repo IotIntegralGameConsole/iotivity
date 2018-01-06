@@ -22,7 +22,7 @@
 #include "utils.h"
 #include "bluez.h"
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include "cagattservice.h"
 
 #include <assert.h>

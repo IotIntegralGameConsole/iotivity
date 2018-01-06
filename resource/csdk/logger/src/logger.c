@@ -51,9 +51,9 @@
 #include <windows.h>
 #endif
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include "string.h"
-#include "experimental/logger_types.h"
+#include "logger_types.h"
 
 // log level
 static int g_level = DEBUG;

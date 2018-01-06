@@ -26,7 +26,7 @@
 
 #include "NSProviderInterface.h"
 #include "NSCommon.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "octypes.h"
 #include "pthread.h"
 #include "oic_string.h"

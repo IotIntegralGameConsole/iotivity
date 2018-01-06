@@ -42,7 +42,7 @@
 #include "caipnwmonitor.h"
 #include "octhread.h"
 #include "caadapterutils.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include <coap/utlist.h>

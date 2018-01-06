@@ -20,7 +20,7 @@
 #include "gatt_dbus.h"
 
 #include "cagattservice.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #include <assert.h>
 

@@ -18,7 +18,7 @@
  *
  * *****************************************************************/
 #include "cloudCommon.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "cloudClient"
 

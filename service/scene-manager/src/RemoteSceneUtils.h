@@ -23,7 +23,7 @@
 
 #include <cassert>
 
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define SCENE_CLIENT_PRINT_LOG(strError) \
         OIC_LOG_V(ERROR, "[SCENE_CLIENT]", "%s:%d %s", __PRETTY_FUNCTION__, __LINE__, strError);

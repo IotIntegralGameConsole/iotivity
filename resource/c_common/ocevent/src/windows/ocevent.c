@@ -24,7 +24,7 @@
 
 #include "ocevent.h"
 #include "oic_malloc.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "iotivity_debug.h"
 
 #include <assert.h>

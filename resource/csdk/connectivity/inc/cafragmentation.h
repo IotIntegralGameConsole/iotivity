@@ -30,7 +30,7 @@
 #define CA_FRAGMENTATION_H_
 
 #include "cacommon.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 /**
  * The maximum port value for BLE packet format

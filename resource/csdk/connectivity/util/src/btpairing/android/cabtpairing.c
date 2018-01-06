@@ -21,7 +21,7 @@
 #include "cabtpairinginterface.h"
 #include "cabtpairing.h"
 #include "cacommon.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include <jni.h>
 
 #define  TAG   "OIC_CA_BT_PAIRING"

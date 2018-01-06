@@ -21,7 +21,7 @@
 
 
 extern "C" {
-    #include "experimental/ocrandom.h"
+    #include "ocrandom.h"
 }
 
 #include <gtest/gtest.h>

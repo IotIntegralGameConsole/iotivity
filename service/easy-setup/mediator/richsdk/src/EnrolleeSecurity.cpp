@@ -22,7 +22,7 @@
 #include "oxmjustworks.h"
 #include "oxmrandompin.h"
 #include "EnrolleeResource.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ESException.h"
 #include "oic_malloc.h"
 #include "provisioningdatabasemanager.h"
@@ -31,7 +31,7 @@
 #include "srmutility.h"
 #include "aclresource.h"
 #include "experimental/doxmresource.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 
 namespace OIC
 {

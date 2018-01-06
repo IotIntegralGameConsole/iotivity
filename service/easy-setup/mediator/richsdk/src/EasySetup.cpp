@@ -21,7 +21,7 @@
 #include "EasySetup.hpp"
 
 #include "OCPlatform.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ESException.h"
 #include "RemoteEnrollee.h"
 

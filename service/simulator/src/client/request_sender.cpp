@@ -21,7 +21,7 @@
 #include "request_sender.h"
 #include "simulator_logger.h"
 #include "simulator_utils.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "GET_REQUEST_SNDR"
 

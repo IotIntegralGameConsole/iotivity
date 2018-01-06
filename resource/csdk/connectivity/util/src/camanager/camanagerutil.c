@@ -26,8 +26,8 @@
 #include <assert.h>
 
 #include "caadapterutils.h"
-#include "experimental/logger.h"
-#include "experimental/ocrandom.h"
+#include "logger.h"
+#include "ocrandom.h"
 #include "oic_string.h"
 #include "oic_malloc.h"
 

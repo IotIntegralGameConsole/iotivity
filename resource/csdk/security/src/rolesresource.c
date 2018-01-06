@@ -32,9 +32,9 @@
 #include <inttypes.h>
 #include "oic_string.h"
 #include "cainterface.h"
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "ocstack.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "cacommon.h"
 #include "srmresourcestrings.h"
 #include "ocpayload.h"

@@ -58,7 +58,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <oic_malloc.h>
-#include "experimental/logger.h"
+#include "logger.h"
 
 /**
  * TAG

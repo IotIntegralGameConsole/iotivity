@@ -22,7 +22,7 @@
 
 #include "iotivity_config.h"
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
@@ -30,11 +30,11 @@
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include "cacommon.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "cacommonutil.h"
 
 #include "ocpayload.h"
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "pmutility.h"
 #include "srmutility.h"
 #include "srmresourcestrings.h"

@@ -34,8 +34,8 @@
 #include <sstream>
 #include <getopt.h>
 #include "ocpayload.h"
-#include "experimental/payload_logging.h"
-#include "experimental/logger.h"
+#include "payload_logging.h"
+#include "logger.h"
 #include "common.h"
 #include "oic_string.h"
 

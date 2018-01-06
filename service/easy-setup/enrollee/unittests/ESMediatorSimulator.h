@@ -30,7 +30,7 @@
 #include "EasySetup.hpp"
 #include "ESRichCommon.h"
 
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "cainterface.h"
 #include "OCPlatform.h"
 

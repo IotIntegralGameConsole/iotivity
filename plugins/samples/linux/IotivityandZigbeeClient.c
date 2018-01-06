@@ -34,9 +34,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include "ocstack.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ocpayload.h"
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "oic_string.h"
 
 #define DEFAULT_CONTEXT_VALUE       (0x99)

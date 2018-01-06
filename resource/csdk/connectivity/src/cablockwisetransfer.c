@@ -43,7 +43,7 @@
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include "octhread.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "OIC_CA_BWT"
 

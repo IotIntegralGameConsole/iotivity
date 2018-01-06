@@ -25,7 +25,7 @@
 #include <functional>
 #include <list>
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include "PrimitiveResource.h"
 
 namespace OIC

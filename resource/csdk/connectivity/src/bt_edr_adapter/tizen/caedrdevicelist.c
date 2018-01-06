@@ -27,7 +27,7 @@
 #include "caedrdevicelist.h"
 #include "caadapterutils.h"
 #include "caedrutils.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 
 /**

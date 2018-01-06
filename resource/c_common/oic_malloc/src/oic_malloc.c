@@ -32,7 +32,7 @@
 
 // Enable extra debug logging for malloc.  Comment out to disable
 #ifdef ENABLE_MALLOC_DEBUG
-#include "experimental/logger.h"
+#include "logger.h"
 #define TAG "OIC_MALLOC"
 #endif
 

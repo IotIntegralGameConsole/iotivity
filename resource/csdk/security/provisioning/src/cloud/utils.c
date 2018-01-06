@@ -19,8 +19,8 @@
  * *****************************************************************/
 #include "utils.h"
 
-#include "experimental/logger.h"
-#include "experimental/payload_logging.h"
+#include "logger.h"
+#include "payload_logging.h"
 #include "oic_malloc.h"
 #include "experimental/doxmresource.h"
 #include "srmutility.h"

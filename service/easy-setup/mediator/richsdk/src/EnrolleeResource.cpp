@@ -25,7 +25,7 @@
 #include "OCPlatform.h"
 #include "ESException.h"
 #include "OCResource.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 namespace OIC
 {

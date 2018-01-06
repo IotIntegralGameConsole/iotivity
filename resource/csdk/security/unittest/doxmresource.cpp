@@ -27,7 +27,7 @@
 #include "srmresourcestrings.h"
 #include "experimental/doxmresource.h"
 #include "security_internals.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 
 #define TAG  "SRM-DOXM"
 

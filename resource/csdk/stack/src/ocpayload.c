@@ -31,7 +31,7 @@
 #include "oic_string.h"
 #include "ocstackinternal.h"
 #include "ocresource.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "ocendpoint.h"
 #include "cacommon.h"
 #include "ocstack.h"

@@ -19,7 +19,7 @@
  * *****************************************************************/
 
 #include "ocstack.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "srmutility.h"
 #include "OCProvisioningManager.hpp"
 

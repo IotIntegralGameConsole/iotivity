@@ -58,10 +58,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <mbedtls/md.h>
-#include "experimental/logger.h"
+#include "logger.h"
 #include "iotivity_debug.h"
 #include "oic_platform.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "oic_string.h"
 
 #define TAG "OIC_PLATFORM"

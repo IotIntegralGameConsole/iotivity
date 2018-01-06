@@ -27,7 +27,7 @@
 #include "OCResource.h"
 #include "ocpayload.h"
 #include <OCSerialization.h>
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "OIC_CLIENT_WRAPPER"
 

@@ -38,7 +38,7 @@
 #include "ocstack.h"
 #include "ocstackconfig.h"
 #include "occlientcb.h"
-#include "experimental/ocrandom.h"
+#include <ocrandom.h>
 
 #include "cacommon.h"
 #include "cainterface.h"

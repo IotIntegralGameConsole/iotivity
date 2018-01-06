@@ -45,7 +45,7 @@
 #include "ocpayload.h"
 #include "iotivity_debug.h"
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oc_logger.hpp"
 
 #define TAG "OIC_PLATFORM"

@@ -30,7 +30,7 @@
 #include "twsocketlist.h"
 #include "oic_string.h"
 #include "oic_malloc.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "Telegesis_Socket"
 

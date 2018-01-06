@@ -18,7 +18,7 @@
  *
  * *****************************************************************/
 #include "cloudCommon.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "cloudResource.h"
 
 #define TAG "cloudServer"

@@ -37,10 +37,10 @@
 #include <sstream>
 #include <getopt.h>
 #include "ocstack.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "occlientbasicops.h"
 #include "ocpayload.h"
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "oic_string.h"
 #include "common.h"
 

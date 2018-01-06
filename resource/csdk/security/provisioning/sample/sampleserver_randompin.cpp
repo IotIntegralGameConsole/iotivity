@@ -43,7 +43,7 @@
 #endif //ERROR
 #endif //HAVE_WINDOWS_H
 #include "platform_features.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "SAMPLE_RANDOMPIN"
 

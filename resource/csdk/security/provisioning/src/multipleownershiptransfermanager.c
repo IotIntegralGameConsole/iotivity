@@ -31,7 +31,7 @@
 #include <string.h>
 
 #include "utlist.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oic_malloc.h"
 #include "oic_string.h"
 #include "cacommon.h"
@@ -50,7 +50,7 @@
 #include "provisioningdatabasemanager.h"
 #include "oxmrandompin.h"
 #include "ocpayload.h"
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #include "oxmjustworks.h"
 #include "oxmpreconfpin.h"
 #include "oxmrandompin.h"
@@ -58,7 +58,7 @@
 #include "ocstackinternal.h"
 #include "mbedtls/ssl_ciphersuites.h"
 #include "mbedtls/base64.h"
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 #include "secureresourceprovider.h"
 
 #define TAG "OIC_MULTIPLE_OTM"

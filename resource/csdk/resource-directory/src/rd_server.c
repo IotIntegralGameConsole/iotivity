@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "experimental/payload_logging.h"
+#include "payload_logging.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif

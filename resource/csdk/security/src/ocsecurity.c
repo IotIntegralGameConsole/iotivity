@@ -22,7 +22,7 @@
 
 #include "iotivity_config.h"
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include <stddef.h>
 #include <string.h>
 #include "oic_malloc.h"

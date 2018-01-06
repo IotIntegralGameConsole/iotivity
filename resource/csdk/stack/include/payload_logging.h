@@ -32,7 +32,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "experimental/logger.h"
+#include "logger.h"
 #include "oic_malloc.h"
 #include "ocpayload.h"
 #include "ocstack.h"

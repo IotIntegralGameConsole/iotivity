@@ -24,7 +24,7 @@
 #define __PRINTLOG 0
 #define __NS_FILE__ ( strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__ )
 
-#include "experimental/logger.h"
+#include "logger.h"
 
 #ifdef TB_LOG
 #ifdef __TIZEN__

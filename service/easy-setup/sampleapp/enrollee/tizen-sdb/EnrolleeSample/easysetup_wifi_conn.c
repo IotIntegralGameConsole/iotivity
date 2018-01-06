@@ -21,7 +21,7 @@
 
 #include "easysetup_wifi_conn.h"
 #include "string.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "escommon.h"
 
 #include <wifi.h>

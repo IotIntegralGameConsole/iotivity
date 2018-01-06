@@ -22,7 +22,7 @@
 #include "service.h"
 
 #include "oic_malloc.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #include <string.h>
 #include <assert.h>

@@ -24,7 +24,7 @@
 #include "cainterfacecontroller.h"
 #include "cainterface.h"
 #include "uarraylist.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 #define TAG "OIC_CA_NW_CONFIG"
 

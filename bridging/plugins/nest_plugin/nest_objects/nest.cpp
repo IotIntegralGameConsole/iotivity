@@ -29,7 +29,7 @@
 #include "stringbuffer.h"
 #include "writer.h"
 #include "JsonHelper.h"
-#include "experimental/logger.h"
+#include "logger.h"
 
 using namespace rapidjson;
 using namespace OC::Bridging;

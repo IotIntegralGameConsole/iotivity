@@ -40,7 +40,7 @@
 #include "caadapterutils.h"
 #include "caleutil.h"
 #include "caadapterinterface.h"
-#include "experimental/logger.h"
+#include "logger.h"
 #include "cathreadpool.h"
 #include "caleinterface.h"
 #include "oic_malloc.h"
