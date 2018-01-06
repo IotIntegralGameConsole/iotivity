@@ -1031,7 +1031,7 @@ exit:
  * @todo: when IOT-1927 is resolved remove this function
  */
 
-#include "experimental/ocrandom.h"
+#include "ocrandom.h"
 int workAroundBug(void)
 {
     /* Remove credential for 31313131-3131-3131-3131-313131313131 */
