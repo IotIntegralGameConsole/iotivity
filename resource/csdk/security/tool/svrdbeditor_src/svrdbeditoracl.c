@@ -388,8 +388,8 @@ static int InputResources(OicSecRsrc_t *resources)
     size_t i = 0;
     char *href = NULL;
     char **types = NULL;
-    char **interfaces = NULL;
     size_t typeLen = 0;
+    char **interfaces = NULL;
     size_t interfaceLen = 0;
 
     if (NULL == resources)
@@ -408,42 +408,45 @@ static int InputResources(OicSecRsrc_t *resources)
     // input types
     PRINT_PROG("\tInput the number of resource type for %s (MAX : %d): ", href,
                SVR_MAX_ENTITY);
-    typeLen = InputSize("");
-    if (SVR_MAX_ENTITY < typeLen || 0 == typeLen)
+    typeLen = InputNumber("");
+    if (SVR_MAX_ENTITY < typeLen)
     {
-        PRINT_ERR("Invalid number: %zu", typeLen);
+        PRINT_ERR("Invalid number");
         OICFree(href);
         return -1;
     }
 
-    types = (char **)OICCalloc(typeLen, sizeof(char *));
-    if (NULL == types)
+    if (0 < typeLen)
     {
-        PRINT_ERR("Failed to allocate memory");
-        OICFree(href);
-        return -1;
-    }
-
-    for (i = 0; i < typeLen; i++)
-    {
-        PRINT_PROG("\tInput the resource type name #%zu : ", i + 1);
-        types[i] = InputString("");
-        if (NULL == types[i] )
+        types = (char **)OICCalloc(typeLen, sizeof(char *));
+        if (NULL == types)
         {
-            PRINT_ERR("Failed InputString");
+            PRINT_ERR("Failed to allocate memory");
             OICFree(href);
-            for (size_t j = 0; j < i; j++)
-            {
-                OICFree(types[j]);
-            }
-            OICFree(types);
             return -1;
+        }
+
+        for (i = 0; i < typeLen; i++)
+        {
+            PRINT_PROG("\tInput the resource type name #%zu : ", i + 1);
+            types[i] = InputString("");
+            if (NULL == types[i] )
+            {
+                PRINT_ERR("Failed InputString");
+                OICFree(href);
+                for (size_t j = 0; j < i; j++)
+                {
+                    OICFree(types[j]);
+                }
+                OICFree(types);
+                return -1;
+            }
         }
     }
 
     // input interfaces
     PRINT_PROG("\tInput the number of interface for %s (MAX : %d): ", href, SVR_MAX_ENTITY);
-    interfaceLen = InputSize("");
+    interfaceLen = InputNumber("");
     if (SVR_MAX_ENTITY < interfaceLen)
     {
         PRINT_ERR("Invalid number");
@@ -605,7 +608,7 @@ int InputAceData(OicSecAce_t *ace)
         return ret;
     }
     PRINT_PROG("\tInput the number of resource for this access : ");
-    numOfRsrc = InputSize("");
+    numOfRsrc = InputNumber("");
     if (SVR_MAX_ENTITY < numOfRsrc)
     {
         PRINT_ERR("Invalid number");
@@ -693,7 +696,7 @@ static int ModifyAce(OicSecAce_t *ace)
             break;
         case ACE_REMOVE_RESOURCE:
             sizeOfRsrc = PrintResourceList(ace->resources);
-            rsrcIdx = InputSize("\tInput the number of resource to remove : ");
+            rsrcIdx = InputNumber("\tInput the number of resource to remove : ");
             if (0 == rsrcIdx || sizeOfRsrc < rsrcIdx)
             {
                 PRINT_ERR("Invalid number");
@@ -712,7 +715,7 @@ static int ModifyAce(OicSecAce_t *ace)
         case ACE_EDIT_RESOURCE:
             sizeOfRsrc = PrintResourceList(ace->resources);
             PRINT_PROG("\tInput the number of resource to edit : ");
-            rsrcIdx = InputSize("");
+            rsrcIdx = InputNumber("");
             if (0 == rsrcIdx || sizeOfRsrc < rsrcIdx)
             {
                 PRINT_ERR("Invalid number");
@@ -772,7 +775,7 @@ static int ModifyAcl(void)
                 PRINT_ERR("empty ace");
                 return -1;
             }
-            aclIdx = InputSize("\tPlease input the number of ACE : ");
+            aclIdx = InputNumber("\tPlease input the number of ACE : ");
             if (0 == aclIdx || numOfAce < aclIdx)
             {
                 PRINT_ERR("Wrong number of ACE.");
@@ -885,7 +888,7 @@ void HandleAclOperation(const SubOperationType_t cmd)
                     return;
                 }
 
-                aclIdx = InputSize("\tPlease input the number of ACE : ");
+                aclIdx = InputNumber("\tPlease input the number of ACE : ");
 
                 if (0 == aclIdx || aclIdx > numOfAce)
                 {
