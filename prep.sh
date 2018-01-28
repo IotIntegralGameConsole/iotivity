@@ -3,7 +3,7 @@
 set -f
 set -e
 
-[ ! -z ${EXEC_MODE} ] || EXEC_MODE=true
+[ ! -z ${EXEC_MODE} ] || EXEC_MODE=false
 
 topdir="${PWD}"
 
