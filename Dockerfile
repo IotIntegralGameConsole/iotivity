@@ -34,13 +34,12 @@ RUN echo "#log: Configuring locales" \
 
 ENV project iotivity
 
-# Enable for recent docker
-#ARG SCONSFLAGS
+ARG SCONSFLAGS
 ENV SCONSFLAGS ${SCONSFLAGS:-"VERBOSE=1 ERROR_ON_WARN=False"}
 
-#ARG prefix
+ARG prefix
 ENV prefix ${prefix:-/usr/}
-#ARG destdir
+ARG destdir
 ENV destdir ${destdir:-/usr/local/opt/${project}}
 
 RUN echo "#log: ${project}: Setup system" \
