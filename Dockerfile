@@ -19,6 +19,7 @@
 FROM debian:stable
 MAINTAINER Philippe Coval (philippe.coval@osg.samsung.com)
 
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL en_US.UTF-8
 ENV LANG ${LC_ALL}
@@ -33,9 +34,8 @@ RUN echo "#log: Configuring locales" \
   && sync
 
 ENV project iotivity
-
 ARG SCONSFLAGS
-ENV SCONSFLAGS ${SCONSFLAGS:-"VERBOSE=1 ERROR_ON_WARN=False"}
+ENV SCONSFLAGS ${SCONSFLAGS:-"VERBOSE=1"}
 
 ARG prefix
 ENV prefix ${prefix:-/usr/}
@@ -46,67 +46,25 @@ RUN echo "#log: ${project}: Setup system" \
   && set -x \
   && apt-get update -y \
   && apt-get install -y \
-    devscripts \
-    debhelper \
-    base-files \
-\
-    autoconf \
-    automake \
-    autotools-dev \
-    bash \
-    git \
-    libtool \
-    make \
-    python-dev \
-    scons \
-    sudo \
-    unzip \
-    valgrind \
-    wget \
-\
-    libboost-date-time-dev \
-    libboost-iostreams-dev \
-    libboost-log-dev \
-    libboost-program-options-dev \
-    libboost-regex-dev \
-    libboost-system-dev \
-    libboost-thread-dev \
-    libbz2-dev \
-    libcurl4-openssl-dev \
-    libglib2.0-dev \
-    libicu-dev \
-    libsqlite3-dev \
-    uuid-dev \
+  fakeroot \
+  make \
+  sudo \
+  dpkg-dev \
+  debhelper \
   && apt-get clean \
   && sync
 
-ADD . /usr/local/src/${project}
-WORKDIR /usr/local/src/${project}
+ADD . /usr/local/src/${project}/${project}/
+WORKDIR /usr/local/src/${project}/${project}/
 RUN echo "#log: ${project}: Preparing sources" \
   && set -x \
-  && uname -a \
-  && cat /etc/os-release \
-  && scons --version \
-  && gcc --version \
-  && g++ --version \
-  && [ ! -x prep.sh ] || EXEC_MODE=true ./prep.sh \
+  && ./debian/rules rule/dist \
   && sync
 
-RUN echo "#log: ${project}: Building" \
+RUN echo "#log: ${project}: Building sources" \
   && set -x \
-  && scons -h \
-  && scons --prefix="${prefix}" \
-  || scons --prefix="${prefix}" --debug=stacktrace \
-  && sync
-
-RUN echo "#log: ${project}: Installing" \
-  && set -x \
-  && scons install --prefix="${prefix}" --install-sandbox="${destdir}" \
-  || scons install --prefix="${prefix}" --install-sandbox="${destdir}" --debug=stacktrace \
-  && find ${destdir} \
-  && sync
-
-RUN echo "#log: ${project}: Cleaning objects" \
-  && set -x \
-  && scons -c \
+  && ./debian/rules \
+  && sudo debi \
+  && ls -la /usr/local/src/${project}/*.* \
+  && dpkg -L ${project} \
   && sync
