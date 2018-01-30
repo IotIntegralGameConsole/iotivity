@@ -31,7 +31,7 @@
 #include "pmutility.h"
 #include "oic_string.h"
 #include "utlist.h"
-
+#include "logger.h"
 
 #define DB_FILE "PDM.db"
 
