@@ -214,7 +214,7 @@ SCONSFLAGS="%{SCONSFLAGS}" ; export SCONSFLAGS;
 scons --install-sandbox=%{buildroot} install
 
 
-find "%{buildroot}" -type f -perm u+x -exec chrpath -d "{}" \;
+find "%{buildroot}" -type f -perm /u+x -exec chrpath -d "{}" \;
 find "%{buildroot}" -type f -iname "lib*.so" -exec chrpath -d "{}" \;
 
 # Support legacy path (transitional, use pkg-config)
