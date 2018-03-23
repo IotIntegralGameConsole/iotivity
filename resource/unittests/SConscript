@@ -119,9 +119,9 @@ if (('SUB' in with_mq) or ('PUB' in with_mq) or ('BROKER' in with_mq)):
 if unittests_env.get('WITH_CLOUD'):
     unittests_src = unittests_src + ['OCAccountManagerTest.cpp']
 
-unittests = unittests_env.Program('unittests', unittests_src)
+unittests = [unittests_env.Program('unittests', unittests_src)]
 
-Alias("unittests", [unittests])
+Alias("unittests", unittests)
 
 unittests_env.AppendTarget('unittests')
 if unittests_env.get('TEST') == '1':
@@ -132,3 +132,5 @@ if unittests_env.get('TEST') == '1':
                  'resource_unittests_unittests.memcheck',
                  'resource/unittests/unittests', 
                  unittests)
+unittests_env.UserInstallTargetExtra(unittests, 'tests/resource/')
+
